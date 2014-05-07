@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="fileAppender" class="ch.qos.logback.core.FileAppender">
+        <file>vfs.log</file>
+        <append>false</append><!-- delete and create new log file after restart of application -->
+        <encoder>
+            <pattern>%d [%thread] %-5level  %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+     
+    <root level="INFO">
+        <appender-ref ref="fileAppender" />
+    </root>
+</configuration>
