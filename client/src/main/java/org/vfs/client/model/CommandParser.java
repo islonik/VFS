@@ -177,17 +177,15 @@ public class CommandParser
         ResponseFactory factory = new ResponseFactory();
         Response response = factory.parse(strResponse);
 
-        int code       = response.getCode();
+        int code       = Integer.parseInt(response.getCode());
         String message = response.getMessage();
 
         if(Response.STATUS_SUCCESS_CONNECT == code && !this.authorization.isAuthorized())   // success authorization
         {
-            this.authorization.getUser().setId(Long.toString(response.getSpecificCode()));
+            this.authorization.getUser().setId(response.getSpecificCode());
         }
         else if(Response.STATUS_FAIL_CONNECT == code && !this.authorization.isAuthorized()) // fail authorization
         {
-            this.authorization.setServerHost(null);
-            this.authorization.setServerPort(null);
             this.authorization.setUser(null);
             if(authorization.getConnection() != null)
             {
@@ -196,8 +194,6 @@ public class CommandParser
         }
         else if(Response.STATUS_SUCCESS_QUIT == code && this.authorization.isAuthorized())  // quit response
         {
-            this.authorization.setServerHost(null);
-            this.authorization.setServerPort(null);
             this.authorization.setUser(null);
             if(authorization.getConnection() != null)
             {
@@ -211,7 +207,7 @@ public class CommandParser
         return true;
     }
 
-    public boolean parserClientCommand(String inputCommand)
+    public boolean parseClientCommand(String inputCommand)
     {
 
         // connect command
@@ -224,10 +220,9 @@ public class CommandParser
             }
 
             User user = new User("0", this.getLogin(inputCommand));
-            this.authorization.setServerHost(this.getHost(inputCommand));
-            this.authorization.setServerPort(this.getPort(inputCommand));
             this.authorization.setUser(user);
-            if(!this.authorization.sendConnectCommand())
+
+            if(!this.authorization.sendConnectCommand(this.getHost(inputCommand), this.getPort(inputCommand)))
             {
                 System.out.println(this.authorization.getErrorMessage());
             }

@@ -8,16 +8,22 @@ import org.vfs.core.network.protocol.RequestFactory;
  * Class of user authorization.
  * @author Lipatov Nikita
  */
-public class Authorization
+public class Authorization implements AutoCloseable
 {
+    private ClientThread client = null;  // Object of client connection.
 
-    private static String serverHost = null;        // Name of server;
-    private static String serverPort = null;        // Port of server;
-
-    private static ClientThread client = null;  // Object of client connection.
-
-    private static User user = null;
+    private User user = null;
     private String errorMessage = "";
+
+    public ClientThread getConnection()
+    {
+        return client;
+    }
+
+    public String getErrorMessage()
+    {
+        return this.errorMessage;
+    }
 
     public User getUser()
     {
@@ -27,11 +33,6 @@ public class Authorization
     public void setUser(User user)
     {
         this.user = user;
-    }
-
-    public ClientThread getConnection()
-    {
-        return client;
     }
 
     public boolean isAuthorized()
@@ -45,17 +46,15 @@ public class Authorization
         return false;
     }
 
-    public void setServerPort(String port)
+    public void close() throws Exception
     {
-        serverPort = port;
+        if(this.client != null)
+        {
+            this.client.kill();
+        }
     }
 
-    public void setServerHost(String host)
-    {
-        serverHost = host;
-    }
-
-    public boolean sendConnectCommand()
+    public boolean sendConnectCommand(String serverHost, String serverPort)
     {
         if(serverHost == null || serverPort == null || user == null)
         {
@@ -79,9 +78,6 @@ public class Authorization
         return true;
     }
 
-    public String getErrorMessage()
-    {
-        return this.errorMessage;
-    }
+
 
 }

@@ -7,9 +7,9 @@ public interface Request
 {
     public String getUserId();
     public String getUserLogin();
-    public String getCommand();
 
-    public void parse(String data);
+    public void setCommand(String command);
+    public String getCommand();
 
     public String toXml();
 }

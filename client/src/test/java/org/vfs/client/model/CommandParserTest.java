@@ -141,15 +141,9 @@ public class CommandParserTest
 
         String xml = parser.getXML(connectCommand);
 
-        Assert.assertEquals
-        (
-            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<request>\n" +
-            "  <user id=\"344\" login=\"user\" />\n" +
-            "  <command>connect user</command>\n" +
-            "</request>",
-            xml
-        );
+        Assert.assertTrue(xml.contains("<command>connect user</command>"));
+        Assert.assertTrue(xml.contains("id=\"344\""));
+        Assert.assertTrue(xml.contains("login=\"user\""));
     }
 
     private static final String responseExample01 =
@@ -157,7 +151,7 @@ public class CommandParserTest
         "<response>\n" +
         "  <code>2</code>\n" +
         "  <message>/home/demon</message>\n" +
-        "  <specific_code>139877254875232</specific_code>\n" +
+        "  <specificCode>139877254875232</specificCode>\n" +
         "</response>\n";
 
     @Test
@@ -225,7 +219,7 @@ public class CommandParserTest
 
         String inputString = "quit";
 
-        Assert.assertTrue(parser.parserClientCommand(inputString));
+        Assert.assertTrue(parser.parseClientCommand(inputString));
         Assert.assertEquals(CommandParser.YOU_NOT_AUTHORIZED, parser.getOutMessage());
     }
 
@@ -240,7 +234,7 @@ public class CommandParserTest
 
         String inputString = "exit";
 
-        Assert.assertTrue(parser.parserClientCommand(inputString));
+        Assert.assertTrue(parser.parseClientCommand(inputString));
         Assert.assertEquals(CommandParser.TYPE_QUIT_COMMAND, parser.getOutMessage());
     }
 
@@ -255,7 +249,7 @@ public class CommandParserTest
 
         String inputString = "exit";
 
-        Assert.assertFalse(parser.parserClientCommand(inputString));
+        Assert.assertFalse(parser.parseClientCommand(inputString));
     }
 
     @Test
@@ -270,7 +264,7 @@ public class CommandParserTest
 
         String inputString = "connect localhost:4499 nikita";
 
-        Assert.assertTrue(parser.parserClientCommand(inputString));
+        Assert.assertTrue(parser.parseClientCommand(inputString));
         Assert.assertEquals(CommandParser.YOU_ALREADY_AUTHORIZED, parser.getOutMessage());
     }
 

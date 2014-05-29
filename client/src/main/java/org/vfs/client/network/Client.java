@@ -6,6 +6,7 @@ import org.vfs.client.model.Authorization;
 import org.vfs.client.model.CommandParser;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -13,19 +14,18 @@ import java.io.InputStreamReader;
  */
 public class Client 
 {
-
     private static final Logger log = LoggerFactory.getLogger(Client.class);
     private static Client instance = null;
-
-    private Authorization authorization;
 
     public Client()
     {
         try
-        {
-            this.authorization = new Authorization();
-            CommandParser parser = new CommandParser(this.authorization);
+        (
             BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+            Authorization authorization = new Authorization();
+        )
+        {
+            CommandParser parser = new CommandParser(authorization);
 
             String clientHello =
                     "The VFS client is run.\n"  +
@@ -40,7 +40,7 @@ public class Client
                 try
                 {
                     String inputCommand = keyboard.readLine().trim();
-                    if(!parser.parserClientCommand(inputCommand))
+                    if(!parser.parseClientCommand(inputCommand))
                     {
                         break;
                     }
@@ -49,27 +49,15 @@ public class Client
                         System.out.println(parser.getOutMessage());
                     }
                 }
-                catch (Exception e)
+                catch (IOException e)
                 {
-                    if(keyboard != null)
-                    {
-                        keyboard.close();
-                    }
                     System.err.println(e.getLocalizedMessage());
-                    if(authorization.getConnection()!= null)
-                    {
-                        authorization.getConnection().kill();
-                    }
                 }
             }
         }
-        catch(Throwable error)
+        catch(Exception error)
         {
             System.err.println(error.getMessage());
-            if(authorization.getConnection()!= null)
-            {
-                authorization.getConnection().kill();
-            }
         }
     }
 

@@ -1,102 +1,48 @@
 package org.vfs.core.network.protocol.impl;
 
-import org.jdom.Attribute;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vfs.core.network.protocol.Request;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * @author Lipatov Nikita
  */
-public class XmlRequest extends AbstractXml implements Request
+@XmlRootElement(name = "request")
+public class XmlRequest implements Request
 {
     private static final Logger log = LoggerFactory.getLogger(XmlRequest.class);
 
-    protected String id;
-    protected String login;
-    protected String command;
+    private UserElement userElement;
+    private String command;
 
-    public XmlRequest(){}
-
-    /**
-     * @param id xml-data content.
-     * @param login xml-data content.
-     * @param command xml-data content.
-     **/
-    public XmlRequest(String id, String login, String command)
+    @XmlElement(name = "user", required = true)
+    public void setUserElement(UserElement userElement)
     {
-        this.id = id;
-        this.login = login;
-        this.command = command;
-
-        document = new Document(new Element("request"));
-        Element elementRequest = document.getRootElement();
-        Element elementUser    = new Element("user");
-        Element elementCommand = new Element("command");
-        elementRequest.addContent(elementUser);
-        elementRequest.addContent(elementCommand);
-
-        Attribute attributeId = new Attribute("id", this.id);
-        elementUser.setAttribute(attributeId);
-
-        Attribute attributeLogin = new Attribute("login", this.login);
-        elementUser.setAttribute(attributeLogin);
-
-        elementCommand.setText(this.command);
+        this.userElement = userElement;
     }
 
-    /**
-     * @param data xml-data content.
-     **/
-    public void parse(String data)
+    public UserElement getUserElement()
     {
-        try
-        {
-            SAXBuilder builder = new SAXBuilder();
-            document = builder.build(new ByteArrayInputStream(data.getBytes()));
-
-            Element rootElement    = document.getRootElement();
-            Element userElement    = rootElement.getChild("user");
-            Element commandElement = rootElement.getChild("command");
-            id      = userElement.getAttributeValue("id");
-            login   = userElement.getAttributeValue("login");
-            command = commandElement.getText();
-        }
-        catch(IOException ioe)
-        {
-            log.error(ioe.getLocalizedMessage(), ioe);
-        }
-        catch(JDOMException jdome)
-        {
-            log.error(jdome.getLocalizedMessage(), jdome);
-        }
+        return this.userElement;
     }
 
     public String getUserId()
     {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
+        return userElement.getId();
     }
 
     public String getUserLogin()
     {
-        return login;
+        return userElement.getLogin();
     }
 
-    public void setLogin(String login)
+    @XmlElement(required = true)
+    public void setCommand(String command)
     {
-        this.login = login;
+        this.command = command;
     }
 
     public String getCommand()
@@ -104,9 +50,10 @@ public class XmlRequest extends AbstractXml implements Request
         return command;
     }
 
-    public void setCommand(String command)
+    public String toXml()
     {
-        this.command = command;
+        XmlHelper xmlHelper = new XmlHelper();
+        return xmlHelper.marshal(XmlRequest.class, this);
     }
 
 }

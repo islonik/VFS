@@ -2,6 +2,8 @@ package org.vfs.core.network.protocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vfs.core.network.protocol.impl.UserElement;
+import org.vfs.core.network.protocol.impl.XmlHelper;
 import org.vfs.core.network.protocol.impl.XmlRequest;
 
 /**
@@ -11,21 +13,26 @@ public class RequestFactory
 {
     private static final Logger log = LoggerFactory.getLogger(RequestFactory.class);
 
-    public Request create(String id, String login, String command)
+    public Request create(String userId, String userLogin, String command)
     {
         // TODO: should be dynamic in case of several protocols (xml, json ant e.t.c.)
-        Request request = new XmlRequest(id, login, command);
+
+        UserElement userElement = new UserElement();
+        userElement.setId(userId);
+        userElement.setLogin(userLogin);
+
+        XmlRequest request = new XmlRequest();
+        request.setUserElement(userElement);
+        request.setCommand(command);
+
         return request;
     }
 
-    public Request parse(String response)
+    public Request parse(String xmlRequest)
     {
-        Request request;
         // TODO: should be dynamic in case of several protocols (xml, json ant e.t.c.)
-        request = new XmlRequest();
+        XmlHelper xmlHelper = new XmlHelper();
 
-        request.parse(response);
-
-        return request;
+        return (Request) xmlHelper.unmarshal(XmlRequest.class, xmlRequest);
     }
 }

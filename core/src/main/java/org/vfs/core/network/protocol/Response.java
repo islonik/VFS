@@ -12,11 +12,14 @@ public interface Response
     public static final int STATUS_SUCCESS_QUIT = 4;
     public static final int STATUS_FAIL_QUIT = 5;
 
-    public int getCode();
-    public long getSpecificCode();
+    public void setMessage(String message);
     public String getMessage();
 
-    public void parse(String data);
+    public void setCode(String code);
+    public String getCode();
+
+    public void setSpecificCode(String specificCode);
+    public String getSpecificCode();
 
     public String toXml();
 }

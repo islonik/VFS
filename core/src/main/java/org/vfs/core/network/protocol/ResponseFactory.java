@@ -2,6 +2,7 @@ package org.vfs.core.network.protocol;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vfs.core.network.protocol.impl.XmlHelper;
 import org.vfs.core.network.protocol.impl.XmlResponse;
 
 /**
@@ -15,18 +16,20 @@ public class ResponseFactory
     public Response create(int code, long specificCode, String message)
     {
         // TODO: should be dynamic in case of several protocols (xml, json ant e.t.c.)
-        Response response = new XmlResponse(code, specificCode, message);
+
+        Response response = new XmlResponse();
+        response.setMessage(message);
+        response.setCode(Integer.toString(code));
+        response.setSpecificCode(Long.toString(specificCode));
+
         return response;
     }
 
-    public Response parse(String request)
+    public Response parse(String xmlResponse)
     {
-        Response response;
         // TODO: should be dynamic in case of several protocols (xml, json ant e.t.c.)
-        response = new XmlResponse();
+        XmlHelper xmlHelper = new XmlHelper();
 
-        response.parse(request);
-
-        return response;
+        return (Response) xmlHelper.unmarshal(XmlResponse.class, xmlResponse);
     }
 }
