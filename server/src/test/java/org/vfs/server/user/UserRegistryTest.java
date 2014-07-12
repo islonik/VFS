@@ -17,7 +17,7 @@ public class UserRegistryTest
 
         Assert.assertNotNull(UserRegistry.getInstance().getUser(login));
         
-        Assert.assertTrue(UserRegistry.getInstance().removeUser(Long.toString(UserRegistry.getInstance().getUser(login).getId()), login));
+        Assert.assertTrue(UserRegistry.getInstance().removeUser(UserRegistry.getInstance().getUser(login).getId(), login));
 
         Assert.assertNull(UserRegistry.getInstance().getUser(login));
     }

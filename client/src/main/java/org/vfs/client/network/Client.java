@@ -2,8 +2,10 @@ package org.vfs.client.network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vfs.client.command.CommandLine;
 import org.vfs.client.model.Authorization;
-import org.vfs.client.model.CommandParser;
+import org.vfs.core.model.Context;
+import org.vfs.core.network.protocol.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -22,10 +24,10 @@ public class Client
         try
         (
             BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
-            Authorization authorization = new Authorization();
+            Authorization authorization = Authorization.getInstance();
         )
         {
-            CommandParser parser = new CommandParser(authorization);
+            CommandLine commandLine = new CommandLine();
 
             String clientHello =
                     "The VFS client is run.\n"  +
@@ -40,13 +42,18 @@ public class Client
                 try
                 {
                     String inputCommand = keyboard.readLine().trim();
-                    if(!parser.parseClientCommand(inputCommand))
+
+                    User user = authorization.getUser();
+                    Context context = commandLine.execute(user, inputCommand);
+
+                    if(context.isThreadClose())
                     {
                         break;
                     }
-                    if(!parser.isEmptyMessage())
+
+                    if(context.getMessage() != null)
                     {
-                        System.out.println(parser.getOutMessage());
+                        System.out.println(context.getMessage());
                     }
                 }
                 catch (IOException e)
@@ -57,7 +64,7 @@ public class Client
         }
         catch(Exception error)
         {
-            System.err.println(error.getMessage());
+            System.err.println(error.getLocalizedMessage());
         }
     }
 

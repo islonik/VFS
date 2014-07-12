@@ -1,0 +1,37 @@
+<!--
+    Document   : Request.xsd
+    Author     : Lipatov Nikita
+    Description:
+        Typical request from client to server.
+
+    Example:
+
+    <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+    <request>
+		<user>
+			<id>1234345</id>
+			<login>admin</login>
+		</user>
+		<command>cd applications</command>
+    </request>
+-->
+
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+	<xs:element name="request">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="user"    type="User"/>
+				<xs:element name="command" type="xs:string"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+
+	<xs:complexType name="User">
+		<xs:sequence>
+			<xs:element name="id"        type="xs:string"/>
+			<xs:element name="login"     type="xs:string"/>
+			<xs:element name="directory" type="xs:anyType" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

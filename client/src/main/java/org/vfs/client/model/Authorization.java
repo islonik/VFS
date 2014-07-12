@@ -1,28 +1,30 @@
 package org.vfs.client.model;
 
 import org.vfs.client.network.ClientThread;
-import org.vfs.core.network.protocol.Request;
-import org.vfs.core.network.protocol.RequestFactory;
+import org.vfs.core.network.protocol.User;
+
+import java.io.IOException;
 
 /**
- * Class of user authorization.
+ * Class of user authorization and ClientThread which linked to user.
  * @author Lipatov Nikita
  */
 public class Authorization implements AutoCloseable
 {
-    private ClientThread client = null;  // Object of client connection.
+    private static Authorization authorization = new Authorization();
 
-    private User user = null;
-    private String errorMessage = "";
+    private User user;
+    private ClientThread client;
 
-    public ClientThread getConnection()
+    public static Authorization newInstance()
     {
-        return client;
+        authorization = new Authorization();
+        return authorization;
     }
 
-    public String getErrorMessage()
+    public static Authorization getInstance()
     {
-        return this.errorMessage;
+        return authorization;
     }
 
     public User getUser()
@@ -46,38 +48,22 @@ public class Authorization implements AutoCloseable
         return false;
     }
 
-    public void close() throws Exception
+    public ClientThread getConnection()
+    {
+        return client;
+    }
+
+    public void setConnection(ClientThread clientThread)
+    {
+        this.client = clientThread;
+    }
+
+    public void close() throws IOException
     {
         if(this.client != null)
         {
             this.client.kill();
         }
     }
-
-    public boolean sendConnectCommand(String serverHost, String serverPort)
-    {
-        if(serverHost == null || serverPort == null || user == null)
-        {
-            this.errorMessage = "ServerHost or ServerPort or User doesn't found!";
-            return false;
-        }
-
-        client = new ClientThread(this, serverHost, serverPort);
-
-        if(!client.isConnected())
-        {
-            this.errorMessage = "Connection wasn't established! Please check host name and port!";
-            return false;
-        }
-
-        RequestFactory factory = new RequestFactory();
-        Request request = factory.create(user.getId(), user.getLogin(), "connect " + user.getLogin());
-
-        String xml = request.toXml();
-        client.flush(xml); // first command
-        return true;
-    }
-
-
 
 }

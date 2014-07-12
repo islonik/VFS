@@ -1,15 +1,17 @@
 package org.vfs.server.command.impl;
 
 import org.vfs.core.network.protocol.Response;
-import org.vfs.server.command.Command;
-import org.vfs.server.model.Context;
-import org.vfs.server.user.User;
+import org.vfs.core.network.protocol.User;
+import org.vfs.core.command.Command;
+import org.vfs.core.command.CommandValues;
+import org.vfs.core.model.Context;
+import org.vfs.server.model.impl.Directory;
 import org.vfs.server.user.UserRegistry;
 
 /**
  * @author Lipatov Nikita
  */
-public class ConnectCommand extends AbstractCommand implements Command
+public class ConnectCommand extends AbstractServerCommand implements Command
 {
     public static final String USER_ALREADY_EXIST = "User with such login already was registered before. Please, change the login!";
     public static final String ADD_USER_FAIL = "User wasn't added and registered! Try to change user login and type connect command again!";
@@ -23,7 +25,8 @@ public class ConnectCommand extends AbstractCommand implements Command
 
     public void action(Context context)
     {
-        String userName = context.getArg1();
+        CommandValues values = context.getCommandValues();
+        String userName = values.getNextParam();
 
         if(UserRegistry.getInstance().getUser(userName) != null)
         {
@@ -39,8 +42,8 @@ public class ConnectCommand extends AbstractCommand implements Command
             context.setUser(user);
             context.setCommandWasExecuted(true);
             context.setCode(Response.STATUS_SUCCESS_CONNECT);
-            context.setSpecificCode(user.getId());
-            context.setMessage(user.getDirectory().getFullPath());
+            context.setSpecificCode(Long.parseLong(user.getId()));
+            context.setMessage(((Directory)user.getDirectory()).getFullPath());
         }
         else
         {

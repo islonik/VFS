@@ -2,9 +2,9 @@ package org.vfs.server.model;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.impl.Directory;
 import org.vfs.server.model.impl.File;
-import org.vfs.server.user.User;
 
 /**
  * User: Lipatov Nikita
@@ -41,8 +41,10 @@ public class NodeTest
     @Test
     public void testNode_lock_01()
     {
-        User user1 = new User("testUser");
-        User user2 = new User("testUser");
+        User user1 = new User();
+        user1.setLogin("testUser");
+        User user2 = new User();
+        user2.setLogin("testUser");
 
         Node node01 = NodeFactory.getFactory().createDirectory("org");
 
@@ -61,8 +63,10 @@ public class NodeTest
     @Test
     public void testNode_lock_02()
     {
-        User user1 = new User("testUser");
-        User user2 = new User("testUser");
+        User user1 = new User();
+        user1.setLogin("testUser");
+        User user2 = new User();
+        user2.setLogin("testUser");
 
         Node node01 = NodeFactory.getFactory().createFile("test.jpg");
 

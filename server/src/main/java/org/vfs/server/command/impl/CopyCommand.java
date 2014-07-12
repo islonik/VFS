@@ -1,15 +1,16 @@
 package org.vfs.server.command.impl;
 
-import org.vfs.server.command.Command;
-import org.vfs.server.model.Context;
+import org.vfs.core.network.protocol.User;
+import org.vfs.core.command.Command;
+import org.vfs.core.command.CommandValues;
+import org.vfs.core.model.Context;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.impl.Directory;
-import org.vfs.server.user.User;
 
 /**
  * @author Lipatov Nikita
  */
-public class CopyCommand extends AbstractCommand implements Command
+public class CopyCommand extends AbstractServerCommand implements Command
 {
     public static final String SOURCE_NOT_FOUND = "Source path/node not found!";
     public static final String DESTINATION_NOT_FOUND = "Destination path/node not found!";
@@ -21,19 +22,15 @@ public class CopyCommand extends AbstractCommand implements Command
         this.isBroadcastCommand = true;
     }
 
-    public Context parse(String command, String args)
-    {
-        return this.twoArgs(command, args);
-    }
-
     public void action(Context context)
     {
         User user = context.getUser();
-        Directory directory = user.getDirectory();
-        String source = context.getArg1();
-        String destination = context.getArg2();
+        Directory directory  = (Directory)user.getDirectory();
+        CommandValues values = context.getCommandValues();
+        String source        = values.getNextParam();
+        String destination   = values.getNextParam();
 
-        Node sourceNode = search(directory, source);
+        Node sourceNode      = search(directory, source);
         Node destinationNode = search(directory, destination);
 
         if(sourceNode == null)

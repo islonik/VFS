@@ -1,15 +1,16 @@
 package org.vfs.server.command.impl;
 
-import org.vfs.server.command.Command;
-import org.vfs.server.model.Context;
+import org.vfs.core.network.protocol.User;
+import org.vfs.core.command.Command;
+import org.vfs.core.command.CommandValues;
+import org.vfs.core.model.Context;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.impl.Directory;
-import org.vfs.server.user.User;
 
 /**
  * @author Lipatov Nikita
  */
-public class RemoveCommand extends AbstractCommand implements Command
+public class RemoveCommand extends AbstractServerCommand implements Command
 {
     public static final String NODE_NOT_FOUND = "Node could not be found!";
     public static final String NODES_IS_LOCKED = "Node/nodes is/are locked! Please, unlock node/nodes and try again!";
@@ -24,8 +25,9 @@ public class RemoveCommand extends AbstractCommand implements Command
     public void action(Context context)
     {
         User user = context.getUser();
-        Directory directory = user.getDirectory();
-        String removeNode = context.getArg1();
+        Directory directory = (Directory)user.getDirectory();
+        CommandValues values = context.getCommandValues();
+        String removeNode = values.getNextParam();
 
         Node node = search(directory, removeNode);
 

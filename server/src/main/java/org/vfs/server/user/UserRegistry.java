@@ -1,5 +1,7 @@
 package org.vfs.server.user;
 
+import org.vfs.core.network.protocol.User;
+
 import java.util.*;
 
 /**
@@ -8,6 +10,7 @@ import java.util.*;
 public class UserRegistry
 {
     private static UserRegistry instance = new UserRegistry();
+    private UserService userService = new UserService();
     private HashMap<String, User> users = new HashMap<String, User>();
 
     public static UserRegistry getInstance()
@@ -37,7 +40,8 @@ public class UserRegistry
         login = login.toLowerCase().trim();
         if(!this.users.containsKey(login))
         {
-            this.users.put(login, new User(login));
+            User user = userService.create(login);
+            this.users.put(login, user);
             return true;
         }
         return false;
@@ -49,7 +53,7 @@ public class UserRegistry
         if(this.users.containsKey(login))
         {
             User user = this.users.get(login);
-            if(user.getId() == Long.parseLong(id))
+            if(user.getId().equals(id))
             {
                 this.users.remove(login);
                 return true;

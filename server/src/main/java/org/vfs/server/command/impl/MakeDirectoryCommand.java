@@ -1,16 +1,17 @@
 package org.vfs.server.command.impl;
 
-import org.vfs.server.command.Command;
-import org.vfs.server.model.Context;
+import org.vfs.core.network.protocol.User;
+import org.vfs.core.command.Command;
+import org.vfs.core.command.CommandValues;
+import org.vfs.core.model.Context;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeFactory;
 import org.vfs.server.model.impl.Directory;
-import org.vfs.server.user.User;
 
 /**
  * @author Lipatov Nikita
  */
-public class MakeDirectoryCommand extends AbstractCommand implements Command
+public class MakeDirectoryCommand extends AbstractServerCommand implements Command
 {
     public static final String DIRECTORY_NOT_CREATED = "Directory could not be created!";
 
@@ -23,8 +24,9 @@ public class MakeDirectoryCommand extends AbstractCommand implements Command
     public void action(Context context)
     {
         User user = context.getUser();
-        Directory directory = user.getDirectory();
-        String createDirectory = context.getArg1();
+        Directory directory = (Directory)user.getDirectory();
+        CommandValues values = context.getCommandValues();
+        String createDirectory = values.getNextParam();
 
         Node node = search(directory, createDirectory);
         if(node == null)

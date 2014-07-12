@@ -1,8 +1,8 @@
 package org.vfs.server.model.impl;
 
+import org.vfs.core.network.protocol.User;
 import org.vfs.server.command.CommandLine;
 import org.vfs.server.model.Node;
-import org.vfs.server.user.User;
 import org.vfs.server.model.Tree;
 
 /**
@@ -115,7 +115,17 @@ public abstract class AbstractNode implements Comparable<Node>
         {
             result = path + "/" + result;
         }
-        return CommandLine.removeDoubleSlashes(Tree.getInstance().getRoot().getName() + result);
+        return removeDoubleSlashes(Tree.getInstance().getRoot().getName() + result);
+    }
+
+    private String removeDoubleSlashes(String path)
+    {
+        if(path.contains("//"))
+        {
+            path = path.replaceAll("//", "/");
+            return removeDoubleSlashes(path);
+        }
+        return path;
     }
 
 }

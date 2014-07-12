@@ -5,10 +5,11 @@ import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.vfs.core.network.protocol.User;
 import org.vfs.server.command.impl.*;
-import org.vfs.server.model.Context;
+import org.vfs.core.model.Context;
 import org.vfs.server.model.Tree;
-import org.vfs.server.user.User;
+import org.vfs.server.model.impl.Directory;
 import org.vfs.server.user.UserRegistry;
 
 /**
@@ -34,36 +35,30 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context = cmd.toContext(null, "connect user1");
-        cmd.execute(context);
+        context = cmd.execute(null, "connect user1");
         Assert.assertTrue(context.isCommandWasExecuted());
         userOne = context.getUser();
         Assert.assertNotNull(userOne);
-        Assert.assertEquals("/home/user1", userOne.getDirectory().getFullPath());
+        Assert.assertEquals("/home/user1", ((Directory)userOne.getDirectory()).getFullPath());
 
-        context = cmd.toContext(null, "connect user1");
-        cmd.execute(context);
+        context = cmd.execute(null, "connect user1");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertNull(context.getUser());
         Assert.assertEquals(ConnectCommand.USER_ALREADY_EXIST, context.getMessage());
 
-        context = cmd.toContext(null, "connect user2");
-        cmd.execute(context);
+        context = cmd.execute(null, "connect user2");
         Assert.assertTrue(context.isCommandWasExecuted());
         userTwo = context.getUser();
         Assert.assertNotNull(userTwo);
-        Assert.assertEquals("/home/user2", userTwo.getDirectory().getFullPath());
+        Assert.assertEquals("/home/user2", ((Directory)userTwo.getDirectory()).getFullPath());
 
-        context = cmd.toContext(userTwo, "quit");
-        cmd.execute(context);
+        context = cmd.execute(userTwo, "quit");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userTwo, "quit");
-        cmd.execute(context);
+        context = cmd.execute(userTwo, "quit");
         Assert.assertFalse(context.isCommandWasExecuted());
 
-        context = cmd.toContext(null, "connect user2");
-        cmd.execute(context);
+        context = cmd.execute(null, "connect user2");
         Assert.assertTrue(context.isCommandWasExecuted());
     }
 
@@ -73,49 +68,39 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context = cmd.toContext(userOne, "cd u034");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "cd u034");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(ChangeDirectoryCommand.NODE_NOT_FOUND, context.getMessage());
 
-        context = cmd.toContext(userOne, "cd ../..");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "cd ../..");
         Assert.assertTrue(context.isCommandWasExecuted());
-        Assert.assertEquals("/", context.getUser().getDirectory().getFullPath());
+        Assert.assertEquals("/", ((Directory)context.getUser().getDirectory()).getFullPath());
 
-        context = cmd.toContext(userTwo, "cd ../..");
-        cmd.execute(context);
+        context = cmd.execute(userTwo, "cd ../..");
         Assert.assertTrue(context.isCommandWasExecuted());
-        Assert.assertEquals("/", context.getUser().getDirectory().getFullPath());
+        Assert.assertEquals("/", ((Directory)context.getUser().getDirectory()).getFullPath());
 
-        context = cmd.toContext(userOne, "mkdir applications");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkdir applications");
         Assert.assertTrue(context.isCommandWasExecuted());
-        Assert.assertEquals("/", context.getUser().getDirectory().getFullPath());
+        Assert.assertEquals("/", ((Directory)context.getUser().getDirectory()).getFullPath());
 
-        context = cmd.toContext(userOne, "mkdir applications");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkdir applications");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(MakeDirectoryCommand.DIRECTORY_NOT_CREATED, context.getMessage());
 
-        context = cmd.toContext(userOne, "mkdir logs");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkdir logs");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "mkdir u01");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkdir u01");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "mkdir u02");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkdir u02");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "mkdir u02/toms");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkdir u02/toms");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "print");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "print");
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals
         (
@@ -138,33 +123,26 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context = cmd.toContext(userOne, "mkfile applications/result.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkfile applications/result.log");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "mkfile applications/result.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkfile applications/result.log");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(MakeFileCommand.FILE_NOT_CREATED, context.getMessage());
 
-        context = cmd.toContext(userOne, "mkfile u01/config.u01.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkfile u01/config.u01.log");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "cd u02");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "cd u02");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "mkfile config.u02.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkfile config.u02.log");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "cd ..");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "cd ..");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "print");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "print");
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals
         (
@@ -190,21 +168,16 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context= cmd.toContext(userOne, "cd applications");
-        cmd.execute(context);
-
-        context= cmd.toContext(userOne, "cd result.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "cd applications");
+        context = cmd.execute(userOne, "cd result.log");
         Assert.assertFalse(context.isCommandWasExecuted());
-        Assert.assertEquals("/applications", context.getUser().getDirectory().getFullPath());
+        Assert.assertEquals("/applications", ((Directory)context.getUser().getDirectory()).getFullPath());
         Assert.assertEquals(ChangeDirectoryCommand.NODE_IS_FILE, context.getMessage());
 
-        context = cmd.toContext(userOne, "cd ..");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "cd ..");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "print");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "print");
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals
         (
@@ -230,27 +203,22 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context = cmd.toContext(userOne, "copy u03 u01");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "copy u03 u01");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(CopyCommand.SOURCE_NOT_FOUND, context.getMessage());
 
-        context = cmd.toContext(userOne, "copy u01 u04");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "copy u01 u04");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(CopyCommand.DESTINATION_NOT_FOUND, context.getMessage());
 
-        context = cmd.toContext(userOne, "copy applications u02/config.u02.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "copy applications u02/config.u02.log");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(CopyCommand.DESTINATION_NOT_DIRECTORY, context.getMessage());
 
-        context = cmd.toContext(userOne, "copy u01 u02/toms");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "copy u01 u02/toms");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "print");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "print");
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals
         (
@@ -278,31 +246,25 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context = cmd.toContext(userOne, "lock u01");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "lock u01");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "lock u03");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "lock u03");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(LockCommand.NODE_NOT_FOUND, context.getMessage());
 
-        context = cmd.toContext(userOne, "lock u01/config.u01.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "lock u01/config.u01.log");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "rm u01/config.u01.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "rm u01/config.u01.log");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(RemoveCommand.NODES_IS_LOCKED, context.getMessage());
 
-        context = cmd.toContext(userTwo, "lock u01/config.u01.log");
-        cmd.execute(context);
+        context = cmd.execute(userTwo, "lock u01/config.u01.log");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(LockCommand.NODE_NOT_LOCKED, context.getMessage());
 
-        context = cmd.toContext(userOne, "print");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "print");
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals
         (
@@ -323,29 +285,23 @@ public class CommandLineTest
             context.getMessage()
         );
 
-        context = cmd.toContext(userOne, "unlock u02");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "unlock u02");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(UnlockCommand.NODE_ALREADY_UNLOCKED, context.getMessage());
 
-        context = cmd.toContext(userOne, "unlock u03");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "unlock u03");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(UnlockCommand.NODE_NOT_FOUND, context.getMessage());
 
-        context = cmd.toContext(userTwo, "unlock u01");
-        cmd.execute(context);
+        context = cmd.execute(userTwo, "unlock u01");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(UnlockCommand.NODE_LOCK_DIFF_USER, context.getMessage());
 
-        context = cmd.toContext(userOne, "unlock u01");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "unlock u01");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "unlock u01/config.u01.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "unlock u01/config.u01.log");
         Assert.assertTrue(context.isCommandWasExecuted());
-
     }
 
     @Test
@@ -354,25 +310,20 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context = cmd.toContext(userOne, "mkdir u01/u034");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "mkdir u01/u034");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "rm u01/u034");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "rm u01/u034");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "rm u01");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "rm u01");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "rm u01");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "rm u01");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(RemoveCommand.NODE_NOT_FOUND, context.getMessage());
 
-        context = cmd.toContext(userOne, "print");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "print");
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals
         (
@@ -398,32 +349,26 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context = cmd.toContext(userOne, "move u01 u23");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "move u01 u23");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(MoveDirectoryCommand.SOURCE_NOT_FOUND, context.getMessage());
 
-        context = cmd.toContext(userOne, "move applications u23");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "move applications u23");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(MoveDirectoryCommand.DESTINATION_NOT_FOUND, context.getMessage());
 
-        context = cmd.toContext(userOne, "move applications u02/config.u02.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "move applications u02/config.u02.log");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(MoveDirectoryCommand.DESTINATION_NOT_DIRECTORY, context.getMessage());
 
-        context = cmd.toContext(userOne, "move applications u02/config.u02.log");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "move applications u02/config.u02.log");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(MoveDirectoryCommand.DESTINATION_NOT_DIRECTORY, context.getMessage());
 
-        context = cmd.toContext(userOne, "move u02/toms/u01 .");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "move u02/toms/u01 .");
         Assert.assertTrue(context.isCommandWasExecuted());
 
-        context = cmd.toContext(userOne, "print");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "print");
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals
         (
@@ -449,13 +394,11 @@ public class CommandLineTest
         CommandLine cmd = new CommandLine();
         Context context;
 
-        context = cmd.toContext(userOne, "rmdir applications");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "rmdir applications");
         Assert.assertFalse(context.isCommandWasExecuted());
         Assert.assertEquals(CommandLine.NO_SUCH_COMMAND, context.getMessage());
 
-        context = cmd.toContext(userOne, "help");
-        cmd.execute(context);
+        context = cmd.execute(userOne, "help");
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals(HelpCommand.HELP_MESSAGE, context.getMessage());
 

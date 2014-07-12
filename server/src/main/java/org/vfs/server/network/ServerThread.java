@@ -2,15 +2,11 @@ package org.vfs.server.network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vfs.core.network.protocol.Request;
-import org.vfs.core.network.protocol.RequestFactory;
-import org.vfs.core.network.protocol.Response;
-import org.vfs.core.network.protocol.ResponseFactory;
+import org.vfs.core.network.protocol.*;
 import org.vfs.server.command.CommandLine;
-import org.vfs.server.model.Context;
-import org.vfs.server.user.User;
+import org.vfs.core.model.Context;
 import org.vfs.server.user.UserRegistry;
-import org.vfs.server.user.UserSecurity;
+import org.vfs.server.user.UserService;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -39,7 +35,7 @@ class ServerThread extends Thread
     private ThreadCollector threadKiller = null;  // Object for timeout.
     private User user;
     private String userId;
-    private UserSecurity security;
+    private UserService service;
 
     public ServerThread(Socket socket)
     {
@@ -50,7 +46,7 @@ class ServerThread extends Thread
             this.outStream    = new DataOutputStream(socket.getOutputStream());
             this.id           = socket.getInetAddress().toString() + ":" + Integer.toString(socket.getPort());
             this.threadKiller = new ThreadCollector(this);
-            this.security = new UserSecurity();
+            this.service      = new UserService();
         }
         catch (IOException ioe)
         {
@@ -112,22 +108,21 @@ class ServerThread extends Thread
     private boolean parse(String requestMessage)
     {
         // get request and validate security
-        RequestFactory requestFactory = new RequestFactory();
-        Request request = requestFactory.parse(requestMessage);
+        RequestService requestService = new RequestService();
+        Request request = requestService.parse(requestMessage);
 
         // execute command
-        userId = request.getUserId();
-        user = UserRegistry.getInstance().getUser(request.getUserLogin());
+        userId = request.getUser().getId();
+        user = UserRegistry.getInstance().getUser(request.getUser().getLogin());
 
         String command = request.getCommand();
         CommandLine cmd = new CommandLine();
-        Context context = cmd.toContext(user, command);
-        cmd.execute(context);
+        Context context = cmd.execute(user, command);
 
         // send feedback to user
-        ResponseFactory responseFactory = new ResponseFactory();
-        Response response = responseFactory.create(context.getCode(), context.getSpecificCode(), context.getMessage());
-        pointToPoint(response.toXml());
+        ResponseService responseService = new ResponseService();
+        Response response = responseService.create(context.getCode(), context.getSpecificCode(), context.getMessage());
+        pointToPoint(responseService.toXml(response));
 
         // send feedback to all
         if(context.isBroadcastCommand() && context.isCommandWasExecuted())
@@ -170,8 +165,8 @@ class ServerThread extends Thread
     public void broadcast(User user, Request request)
     {
         String message = user.getLogin() + " performs command: " + request.getCommand() + "\n";
-        ResponseFactory factory = new ResponseFactory();
-        Response response = factory.create(Response.STATUS_OK, -1, message);
+        ResponseService responseService = new ResponseService();
+        Response response = responseService.create(Response.STATUS_OK, -1, message);
 
         synchronized (threads)
         {
@@ -185,7 +180,7 @@ class ServerThread extends Thread
                     {
                         synchronized (threadMap.getValue().outStream)
                         {
-                            threadMap.getValue().outStream.writeUTF(response.toXml());
+                            threadMap.getValue().outStream.writeUTF(responseService.toXml(response));
                             threadMap.getValue().outStream.flush();
                         }
                     }

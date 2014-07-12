@@ -1,7 +1,7 @@
 package org.vfs.server.model;
 
+import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.impl.Directory;
-import org.vfs.server.user.User;
 
 /**
  * @author Lipatov

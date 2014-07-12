@@ -1,11 +1,12 @@
 package org.vfs.client.network;
 
+import org.vfs.client.model.Authorization;
+import org.vfs.core.network.protocol.Response;
+import org.vfs.core.network.protocol.ResponseService;
+
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-
-import org.vfs.client.model.Authorization;
-import org.vfs.client.model.CommandParser;
 
 /**
  * Class of client connection.
@@ -20,13 +21,11 @@ public class ClientThread extends Thread
     private String serverHost = null;           // name of server;
     private String serverPort = null;           // port of server;
     private Thread listener = null;             // thread;
-    private Authorization authorization;
 
-    public ClientThread(Authorization authorization, String host, String port)
+    public ClientThread(String host, String port)
     {
         if (socket == null)
         {
-            this.authorization = authorization;
             serverHost = host;
             serverPort = port;
             listener = new Thread(this);
@@ -86,11 +85,43 @@ public class ClientThread extends Thread
                 // server response
                 String serverResponse = inStream.readUTF();
 
-                CommandParser parser = new CommandParser(this.authorization);
-                if(!parser.parseServerResponse(serverResponse))
+                if(serverResponse == null)
                 {
                     break;
                 }
+
+                ResponseService factory = new ResponseService();
+                Response response = factory.parse(serverResponse);
+
+                int code       = Integer.parseInt(response.getCode());
+                String message = response.getMessage();
+
+                Authorization authorization = Authorization.getInstance();
+
+                if(Response.STATUS_SUCCESS_CONNECT == code && !authorization.isAuthorized())   // success authorization
+                {
+                    authorization.getUser().setId(response.getSpecificCode());
+                }
+                else if(Response.STATUS_FAIL_CONNECT == code && !authorization.isAuthorized()) // fail authorization
+                {
+                    authorization.setUser(null);
+                    if(authorization.getConnection() != null)
+                    {
+                        authorization.getConnection().kill();
+                    }
+                }
+                else if(Response.STATUS_SUCCESS_QUIT == code && authorization.isAuthorized())  // quit response
+                {
+                    authorization.setUser(null);
+                    if(authorization.getConnection() != null)
+                    {
+                        authorization.getConnection().kill();
+                    }
+                    System.out.println(message);
+                    break; // close current connection
+                }
+
+                System.out.println(message);
             }
         }
         catch (IOException error)
@@ -112,14 +143,10 @@ public class ClientThread extends Thread
         {
             if(socket != null)
             {
-                if(!socket.isClosed())
-                {
-                    socket.close();
-                }
+                socket.close();
             }
-            this.interrupt();
         }
-        catch (Exception error)
+        catch (IOException error)
         {
             System.err.println("Close method:" + error);
         }

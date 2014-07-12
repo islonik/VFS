@@ -1,14 +1,12 @@
 package org.vfs.server.command.impl;
 
-import org.vfs.server.command.Command;
-import org.vfs.server.model.Context;
-
-import java.util.HashMap;
+import org.vfs.core.command.Command;
+import org.vfs.core.model.Context;
 
 /**
  * @author Lipatov Nikita
  */
-public class HelpCommand extends AbstractCommand implements Command
+public class HelpCommand extends AbstractServerCommand implements Command
 {
 
     public static final String HELP_MESSAGE =
@@ -29,17 +27,6 @@ public class HelpCommand extends AbstractCommand implements Command
     public HelpCommand()
     {
         this.commandName = "help";
-    }
-
-    public Context parse(String command, String args)
-    {
-        Context context = new Context();
-
-        HashMap<String, String> keys = new HashMap<String, String>();
-        keys.put("command", command);
-
-        context.setKeys(keys);
-        return context;
     }
 
     public void action(Context context)
