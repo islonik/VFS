@@ -63,24 +63,4 @@ public abstract class AbstractCommandMapping
         return mapping;
     }
 
-    /**
-     *  Double checked locking (since java 1.5+)
-     **/
-    /*public static HashMap<String, Command> getCommandMapping()
-    {
-        AbstractCommandMapping localInstance = instance;
-        if(localInstance == null)
-        {
-            synchronized (AbstractCommandMapping.class)
-            {
-                localInstance = instance;
-                if(localInstance == null)
-                {
-                    instance = localInstance = new AbstractCommandMapping();
-                }
-            }
-        }
-        return localInstance.getMapping();
-    }*/
-
 }

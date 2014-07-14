@@ -18,7 +18,6 @@ public class MakeDirectoryCommand extends AbstractServerCommand implements Comma
     public MakeDirectoryCommand()
     {
         this.commandName = "mkdir";
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -35,6 +34,7 @@ public class MakeDirectoryCommand extends AbstractServerCommand implements Comma
             if(makeDirectory != null)
             {
                 context.setCommandWasExecuted(true);
+                context.setBroadcastCommand(true);
                 context.setMessage("Directory " + makeDirectory.getFullPath() + " was created!");
                 return;
             }

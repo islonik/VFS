@@ -90,4 +90,5 @@ public class ResponseServiceTest
         String xml = service.toXml(response);
         Assert.assertEquals(request03, xml);
     }
+
 }

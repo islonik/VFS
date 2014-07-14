@@ -14,6 +14,7 @@ public class ClientMain
      */
     public static void main(String[] args)
     {
-        Client.run();
+        Client client = new Client();
+        client.run();
     }
 }

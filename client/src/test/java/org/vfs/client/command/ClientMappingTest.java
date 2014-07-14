@@ -21,8 +21,8 @@ public class ClientMappingTest
         ClientMapping clientMapping = new ClientMapping();
         HashMap<String, Command> commands = clientMapping.getMapping();
 
-        Assert.assertEquals(ConnectCommand.class.getCanonicalName(),      commands.get("connect").getClass().getCanonicalName());
-        Assert.assertEquals(QuitCommand.class.getCanonicalName(),         commands.get("quit").getClass().getCanonicalName());
-        Assert.assertEquals(ExitCommand.class.getCanonicalName(),         commands.get("exit").getClass().getCanonicalName());
+        Assert.assertEquals(ConnectCommand.class.getCanonicalName(),  commands.get("connect").getClass().getCanonicalName());
+        Assert.assertEquals(QuitCommand.class.getCanonicalName(),     commands.get("quit").getClass().getCanonicalName());
+        Assert.assertEquals(ExitCommand.class.getCanonicalName(),     commands.get("exit").getClass().getCanonicalName());
     }
 }

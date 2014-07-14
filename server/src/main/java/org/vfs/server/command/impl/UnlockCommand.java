@@ -19,7 +19,6 @@ public class UnlockCommand extends AbstractServerCommand implements Command
     public UnlockCommand()
     {
         this.commandName = "unlock";
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -41,6 +40,7 @@ public class UnlockCommand extends AbstractServerCommand implements Command
             if(!node.isLock())
             {
                 context.setCommandWasExecuted(true);
+                context.setBroadcastCommand(true);
                 context.setMessage("Node " + node.getFullPath() + " was unlocked!");
             }
             else

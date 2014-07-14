@@ -19,7 +19,6 @@ public class MoveDirectoryCommand extends AbstractServerCommand implements Comma
     public MoveDirectoryCommand()
     {
         this.commandName = "move";
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -51,6 +50,7 @@ public class MoveDirectoryCommand extends AbstractServerCommand implements Comma
             ((Directory) destinationNode).addNode(sourceNode);
             parent.removeNode(sourceNode);
             context.setCommandWasExecuted(true);
+            context.setBroadcastCommand(true);
             context.setMessage("Source node " + sourceNode.getFullPath() + " was moved to destination node " + destinationNode.getFullPath());
         }
         else

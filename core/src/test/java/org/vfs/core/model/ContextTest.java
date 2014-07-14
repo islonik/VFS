@@ -16,13 +16,10 @@ public class ContextTest
         User user = new User();
         user.setLogin("nikita");
 
-        CommandValues values = new CommandValues();
-        values.setCommand("mkdir");
-        values.getParams().add("testDir2");
         Context context = new Context(user);
-        context.setCommandValues(values);
+        context.setCommand("mkdir testDir2");
 
-        values = context.getCommandValues();
+        CommandValues values = context.getCommandValues();
 
         Assert.assertEquals("mkdir",    values.getCommand());
         Assert.assertEquals("testDir2", values.getNextParam());

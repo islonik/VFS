@@ -17,7 +17,6 @@ public class QuitCommand extends AbstractServerCommand implements Command
     public QuitCommand()
     {
         this.commandName = "quit";
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -29,7 +28,8 @@ public class QuitCommand extends AbstractServerCommand implements Command
             //context.setUser(null);
             context.setCode(Response.STATUS_SUCCESS_QUIT); // quit
             context.setCommandWasExecuted(true);
-            context.setThreadClose(true);
+            context.setBroadcastCommand(true);
+            context.setExit(true);
             context.setMessage(SERVER_DISCONNECT);
         }
         else

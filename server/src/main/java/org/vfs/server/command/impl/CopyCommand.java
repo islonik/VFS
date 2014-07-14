@@ -19,7 +19,6 @@ public class CopyCommand extends AbstractServerCommand implements Command
     public CopyCommand()
     {
         this.commandName = "copy";
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -50,6 +49,7 @@ public class CopyCommand extends AbstractServerCommand implements Command
             Node copyNode = sourceNode.copy();
             ((Directory) destinationNode).addNode(copyNode);
             context.setCommandWasExecuted(true);
+            context.setBroadcastCommand(true);
             context.setMessage("Source node " + sourceNode.getFullPath() + " was copied to destination node " + destinationNode.getFullPath() );
         }
         else

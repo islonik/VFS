@@ -1,5 +1,6 @@
 package org.vfs.core.model;
 
+import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.network.protocol.Response;
 import org.vfs.core.network.protocol.User;
@@ -11,10 +12,11 @@ public class Context
 {
     private User user;
 
+    private String command;
     private CommandValues commandValues;
     private boolean isCommandWasExecuted = false;
     private boolean isBroadcastCommand = false;
-    private boolean isThreadClose = false;
+    private boolean isExit = false;
 
     private String message;
     private String errorMessage;
@@ -46,14 +48,26 @@ public class Context
         this.user = user;
     }
 
-    public CommandValues getCommandValues()
+    public String getCommand()
     {
-        return commandValues;
+        return command;
     }
 
-    public void setCommandValues(CommandValues commandValues)
+    public void setCommand(String command)
     {
-        this.commandValues = commandValues;
+        this.command = command;
+    }
+
+    public CommandValues getCommandValues()
+    {
+        if(commandValues == null)
+        {
+            CommandParser parser = new CommandParser();
+            parser.parse(command);
+
+            commandValues = parser.getCommandValues();
+        }
+        return commandValues;
     }
 
     public boolean isCommandWasExecuted()
@@ -76,19 +90,19 @@ public class Context
         this.isBroadcastCommand = isBroadcastCommand;
     }
 
-    public boolean isThreadClose()
+    public boolean isExit()
     {
-        return isThreadClose;
+        return isExit;
     }
 
-    public void setThreadClose(boolean isThreadClose)
+    public void setExit(boolean isExit)
     {
-        this.isThreadClose = isThreadClose;
+        this.isExit = isExit;
     }
 
     public String getMessage()
     {
-        return (this.errorMessage.isEmpty()) ? message : errorMessage;
+        return (errorMessage.trim().isEmpty()) ? (message.trim().isEmpty() ? null : message) : errorMessage;
     }
 
     public void setMessage(String message)

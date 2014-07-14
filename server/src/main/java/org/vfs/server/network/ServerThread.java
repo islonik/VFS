@@ -131,7 +131,7 @@ class ServerThread extends Thread
         }
 
         // stop thread
-        if(context.isThreadClose())
+        if(context.isExit())
         {
             return false;
         }

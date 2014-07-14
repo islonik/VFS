@@ -18,7 +18,6 @@ public class LockCommand extends AbstractServerCommand implements Command
     public LockCommand()
     {
         this.commandName = "lock";
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -35,6 +34,7 @@ public class LockCommand extends AbstractServerCommand implements Command
             if(node.isLock(user))
             {
                 context.setCommandWasExecuted(true);
+                context.setBroadcastCommand(true);
                 context.setMessage("Node " + node.getFullPath() + " was locked!");
                 return;
             }

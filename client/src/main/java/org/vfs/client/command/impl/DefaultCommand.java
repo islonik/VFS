@@ -4,44 +4,43 @@ import org.vfs.client.network.ClientConnection;
 import org.vfs.client.network.ClientConnectionManager;
 import org.vfs.core.command.AbstractCommand;
 import org.vfs.core.command.Command;
-import org.vfs.core.command.CommandValues;
 import org.vfs.core.model.Context;
 import org.vfs.core.network.protocol.*;
 
 /**
  * @author Lipatov Nikita
  */
-public class QuitCommand extends AbstractCommand implements Command
+public class DefaultCommand extends AbstractCommand implements Command
 {
-    public static final String YOU_NOT_AUTHORIZED = "You are not authorized or connection was lost!";
+    public static final String CONNECT_SERVER = "Please connect to the server.";
 
-    public QuitCommand()
+    public DefaultCommand()
     {
-        this.commandName = "quit";
+        this.commandName = "default";
     }
 
     public void action(Context context)
     {
         User user = context.getUser();
+        String command = context.getCommand();
 
         ClientConnectionManager clientConnectionManager = ClientConnectionManager.getInstance();
         ClientConnection clientConnection = clientConnectionManager.getClientConnection();
 
-        if (user != null && clientConnection.isConnected())
+        if(user != null && clientConnection.isConnected())
         {
-            CommandValues commandValues = context.getCommandValues();
-
             // create request and send it to server
             RequestService requestService = new RequestService();
-            Request request = requestService.create(user.getId(), user.getLogin(), commandValues.getCommand());
+            Request request = requestService.create(user.getId(), user.getLogin(), command);
             String requestXml = requestService.toXml(request);
             clientConnection.sendMessageToServer(requestXml);
+
+            context.setCommandWasExecuted(true);
         }
         else
         {
-            context.setMessage(YOU_NOT_AUTHORIZED);
+            context.setErrorMessage(CONNECT_SERVER);
         }
-        context.setCommandWasExecuted(true);
 
     }
 }

@@ -19,7 +19,6 @@ public class RemoveCommand extends AbstractServerCommand implements Command
     public RemoveCommand()
     {
         this.commandName = "rm";
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -46,6 +45,7 @@ public class RemoveCommand extends AbstractServerCommand implements Command
             }
             boolean result = directory.removeNode(directory, removeNode);
             context.setCommandWasExecuted(result);
+            context.setBroadcastCommand(true);
             context.setMessage("Node " + removeNode + " was removed!");
             if(!result)   // TODO: rewrite it!
             {
