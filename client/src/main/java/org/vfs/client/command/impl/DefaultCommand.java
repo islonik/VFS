@@ -3,37 +3,36 @@ package org.vfs.client.command.impl;
 import org.vfs.client.network.NetworkManager;
 import org.vfs.core.command.AbstractCommand;
 import org.vfs.core.command.Command;
-import org.vfs.core.command.CommandValues;
 import org.vfs.core.model.Context;
 import org.vfs.core.network.protocol.*;
 
 /**
  * @author Lipatov Nikita
  */
-public class QuitCommand extends AbstractCommand implements Command
+public class DefaultCommand extends AbstractCommand implements Command
 {
-    public static final String YOU_NOT_AUTHORIZED = "You are not authorized or connection was lost!";
+    public static final String CONNECT_SERVER = "Please connect to the server.";
 
-    public QuitCommand()
+    public DefaultCommand()
     {
-        this.commandName = "quit";
+        this.commandName = "default";
     }
 
     public void action(Context context)
     {
         User user = context.getUser();
+        String command = context.getCommand();
+
         NetworkManager networkManager = NetworkManager.getInstance();
 
-        if (user != null)
+        if(user != null )
         {
-            CommandValues commandValues = context.getCommandValues();
-
-            boolean isSent = networkManager.getMessageSender().add(commandValues.getCommand());
+            boolean isSent = networkManager.getMessageSender().add(command);
             context.setCommandWasExecuted(isSent);
         }
         else
         {
-            context.setMessage(YOU_NOT_AUTHORIZED);
+            context.setErrorMessage(CONNECT_SERVER);
         }
     }
 }

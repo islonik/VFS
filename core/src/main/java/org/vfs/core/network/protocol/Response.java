@@ -8,13 +8,13 @@ import javax.xml.bind.annotation.*;
 /**
  * @author Lipatov Nikita
  */
+@XmlRootElement(name = "response")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
         "code",
         "message",
         "specificCode"
 })
-@XmlRootElement(name = "response")
 public class Response
 {
     public static final int STATUS_OK = 0;

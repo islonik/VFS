@@ -20,7 +20,6 @@ public class ConnectCommand extends AbstractServerCommand implements Command
     public ConnectCommand()
     {
         this.commandName = CONNECT;
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -32,7 +31,7 @@ public class ConnectCommand extends AbstractServerCommand implements Command
         {
             context.setCode(Response.STATUS_FAIL_CONNECT);
             context.setErrorMessage(USER_ALREADY_EXIST);
-            context.setThreadClose(true);
+            context.setExit(true);
             return;
         }
 
@@ -41,6 +40,7 @@ public class ConnectCommand extends AbstractServerCommand implements Command
             User user = UserRegistry.getInstance().getUser(userName);
             context.setUser(user);
             context.setCommandWasExecuted(true);
+            context.setBroadcastCommand(true);
             context.setCode(Response.STATUS_SUCCESS_CONNECT);
             context.setSpecificCode(Long.parseLong(user.getId()));
             context.setMessage(((Directory)user.getDirectory()).getFullPath());
@@ -49,7 +49,7 @@ public class ConnectCommand extends AbstractServerCommand implements Command
         {
             context.setCode(Response.STATUS_FAIL_CONNECT);
             context.setErrorMessage(ADD_USER_FAIL);
-            context.setThreadClose(true);
+            context.setExit(true);
         }
     }
 }

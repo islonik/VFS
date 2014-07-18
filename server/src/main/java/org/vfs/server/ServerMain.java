@@ -14,6 +14,7 @@ public class ServerMain
      */
     public static void main(String[] args)
     {
-        Server.run();
+        Server server = new Server();
+        server.run();
     }
 }

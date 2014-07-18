@@ -1,9 +1,9 @@
 package org.vfs.client.command.impl;
 
-import org.vfs.client.model.Authorization;
 import org.vfs.core.command.AbstractCommand;
 import org.vfs.core.command.Command;
 import org.vfs.core.model.Context;
+import org.vfs.core.network.protocol.User;
 
 /**
  * @author Lipatov Nikita
@@ -19,13 +19,14 @@ public class ExitCommand extends AbstractCommand implements Command
 
     public void action(Context context)
     {
-        if(Authorization.getInstance().isAuthorized())
+        User user = context.getUser();
+        if(user != null)
         {
             context.setMessage(TYPE_QUIT_COMMAND);
         }
         else
         {
-            context.setThreadClose(true);
+            context.setExit(true);
         }
         context.setCommandWasExecuted(true);
     }

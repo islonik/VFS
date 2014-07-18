@@ -19,7 +19,6 @@ public class MakeFileCommand extends AbstractServerCommand implements Command
     public MakeFileCommand()
     {
         this.commandName = "mkfile";
-        this.isBroadcastCommand = true;
     }
 
     public void action(Context context)
@@ -36,6 +35,7 @@ public class MakeFileCommand extends AbstractServerCommand implements Command
             if(makeFile != null)
             {
                 context.setCommandWasExecuted(true);
+                context.setBroadcastCommand(true);
                 context.setMessage("File " + makeFile.getFullPath() + " was created!");
                 return;
             }

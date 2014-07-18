@@ -27,21 +27,18 @@ public class CommandLine extends AbstractCommandLine
         synchronized (CommandLine.class)
         {
             args = trimSlashes(removeDoubleSlashes(args.toLowerCase().trim()));
-            CommandParser parser = new CommandParser();
-            parser.parse(args);
-
-            CommandValues commandValues = parser.getCommandValues();
 
             Context context = new Context();
             context.setUser(user);
-            context.setCommandValues(commandValues);
+            context.setCommand(args);
+
+            CommandValues commandValues = context.getCommandValues();
 
             HashMap<String, Command> mapping = serverMapping.getMapping();
             if(mapping.containsKey(commandValues.getCommand()))
             {
                 Command command = mapping.get(commandValues.getCommand());
                 command.action(context);
-                context.setBroadcastCommand(command.isBroadcastCommand());
             }
             else
             {
