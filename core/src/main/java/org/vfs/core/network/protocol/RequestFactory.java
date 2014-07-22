@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Lipatov Nikita
  */
-public class RequestService
+public class RequestFactory
 {
-    private static final Logger log = LoggerFactory.getLogger(RequestService.class);
+    private static final Logger log = LoggerFactory.getLogger(RequestFactory.class);
 
     public Request create(String userId, String userLogin, String command)
     {
@@ -30,9 +30,5 @@ public class RequestService
         return (Request) xmlHelper.unmarshal(Request.class, xmlRequest);
     }
 
-    public String toXml(Request request)
-    {
-        XmlHelper xmlHelper = new XmlHelper();
-        return xmlHelper.marshal(Request.class, request);
-    }
+
 }

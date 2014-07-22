@@ -16,6 +16,7 @@ public class CommandParser
             throw new RuntimeException("Command error : " + inputString);
         }
         paramsObject = new CommandValues();
+        paramsObject.setSource(inputString);
 
         StringTokenizer tokenizer = new StringTokenizer(inputString.trim(), " :");
         while(tokenizer.hasMoreTokens())

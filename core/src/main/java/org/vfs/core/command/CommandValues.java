@@ -8,12 +8,22 @@ import java.util.List;
  */
 public class CommandValues
 {
-
+    private String source;
     private String command;
     private List<String> keys   = new ArrayList<String>();
     private List<String> params = new ArrayList<String>();
     private int keyPointer = 0;
     private int paramPointer = 0;
+
+    public String getSource()
+    {
+        return source;
+    }
+
+    public void setSource(String source)
+    {
+        this.source = source;
+    }
 
     public List<String> getParams()
     {

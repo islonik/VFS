@@ -6,7 +6,7 @@ import org.junit.Test;
 /**
  * @author Lipatov Nikita
  */
-public class RequestServiceTest
+public class RequestFactoryTest
 {
     private String request01 =
         "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\n" +
@@ -35,14 +35,15 @@ public class RequestServiceTest
     @Test
     public void testRequest_create_testCase01()
     {
-        RequestService requestService = new RequestService();
-        Request request = requestService.create("1234345", "admin", command01);
+        RequestFactory requestFactory = new RequestFactory();
+        Request request = requestFactory.create("1234345", "admin", command01);
 
         Assert.assertEquals("1234345", request.getUser().getId());
         Assert.assertEquals("admin",   request.getUser().getLogin());
         Assert.assertEquals(command01, request.getCommand());
 
-        String xml = requestService.toXml(request);
+        XmlHelper helper = new XmlHelper();
+        String xml = helper.marshal(Request.class, request);
         Assert.assertTrue(xml.contains("<command>cd applications</command>"));
         Assert.assertTrue(xml.contains("<id>1234345</id>"));
         Assert.assertTrue(xml.contains("<login>admin</login>"));
@@ -51,14 +52,15 @@ public class RequestServiceTest
     @Test
     public void testRequest_create_testCase02()
     {
-        RequestService requestService = new RequestService();
-        Request request = requestService.create("1234345", "admin", command02);
+        RequestFactory requestFactory = new RequestFactory();
+        Request request = requestFactory.create("1234345", "admin", command02);
 
         Assert.assertEquals("1234345", request.getUser().getId());
         Assert.assertEquals("admin",   request.getUser().getLogin());
         Assert.assertEquals(command02, request.getCommand());
 
-        String xml = requestService.toXml(request);
+        XmlHelper helper = new XmlHelper();
+        String xml = helper.marshal(Request.class, request);
         Assert.assertTrue(xml.contains("<command>cd ..</command>"));
         Assert.assertTrue(xml.contains("<id>1234345</id>"));
         Assert.assertTrue(xml.contains("<login>admin</login>"));
@@ -67,14 +69,15 @@ public class RequestServiceTest
     @Test
     public void testRequest_parse_testCase01()
     {
-        RequestService requestService = new RequestService();
-        Request request = requestService.parse(request01);
+        RequestFactory requestFactory = new RequestFactory();
+        Request request = requestFactory.parse(request01);
 
         Assert.assertEquals("1234345", request.getUser().getId());
         Assert.assertEquals("admin",   request.getUser().getLogin());
         Assert.assertEquals(command01, request.getCommand());
 
-        String xml = requestService.toXml(request);
+        XmlHelper helper = new XmlHelper();
+        String xml = helper.marshal(Request.class, request);
         Assert.assertTrue(xml.contains("<command>cd applications</command>"));
         Assert.assertTrue(xml.contains("<id>1234345</id>"));
         Assert.assertTrue(xml.contains("<login>admin</login>"));
@@ -83,14 +86,15 @@ public class RequestServiceTest
     @Test
     public void testRequest_parse_testCase02()
     {
-        RequestService requestService = new RequestService();
-        Request request = requestService.parse(request02);
+        RequestFactory requestFactory = new RequestFactory();
+        Request request = requestFactory.parse(request02);
 
         Assert.assertEquals("0",       request.getUser().getId());
         Assert.assertEquals("nikita",  request.getUser().getLogin());
         Assert.assertEquals(command03, request.getCommand());
 
-        String xml = requestService.toXml(request);
+        XmlHelper helper = new XmlHelper();
+        String xml = helper.marshal(Request.class, request);
         Assert.assertTrue(xml.contains("<command>connect nikita</command>"));
         Assert.assertTrue(xml.contains("<id>0</id>"));
         Assert.assertTrue(xml.contains("<login>nikita</login>"));

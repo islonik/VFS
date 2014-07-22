@@ -8,9 +8,7 @@ import org.vfs.core.model.Context;
 import org.vfs.server.user.UserRegistry;
 import org.vfs.server.user.UserService;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.Hashtable;
@@ -28,11 +26,11 @@ class ServerThread extends Thread
     // id - ip:port
     private static Hashtable<String, ServerThread> threads = new Hashtable();
     private Socket clientSocket = null;
-    private DataInputStream inStream = null;
-    private DataOutputStream outStream = null;
+    private BufferedWriter outStream = null;
+    private BufferedReader inStream = null;
 
     private String id = "";                       // ID of ServerThread.
-    private ThreadCollector threadKiller = null;  // Object for timeout.
+    //private ThreadCollector threadKiller = null;  // Object for timeout.
     private User user;
     private String userId;
     private UserService service;
@@ -42,10 +40,10 @@ class ServerThread extends Thread
         try
         {
             this.clientSocket = socket;
-            this.inStream     = new DataInputStream(socket.getInputStream());
-            this.outStream    = new DataOutputStream(socket.getOutputStream());
+            this.inStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.outStream = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
             this.id           = socket.getInetAddress().toString() + ":" + Integer.toString(socket.getPort());
-            this.threadKiller = new ThreadCollector(this);
+            //this.threadKiller = new ThreadCollector(this);
             this.service      = new UserService();
         }
         catch (IOException ioe)
@@ -73,11 +71,21 @@ class ServerThread extends Thread
             // all incoming requests
             while (true)
             {
-                DataInputStream in = inStream;
+                BufferedReader in = inStream;
 
-                String strRequest = in.readUTF();
+                StringBuilder stringBuilder = new StringBuilder();
+                while(in.ready())
+                {
+                    stringBuilder.append(in.readLine());
+                }
+                if(stringBuilder.length() == 0)
+                {
+                    continue;
+                }
 
-                threadKiller.resetTimer();
+                String strRequest = stringBuilder.toString();
+
+                //threadKiller.resetTimer();
                 if (!parse(strRequest))
                 {
                     break;
@@ -108,8 +116,8 @@ class ServerThread extends Thread
     private boolean parse(String requestMessage)
     {
         // get request and validate security
-        RequestService requestService = new RequestService();
-        Request request = requestService.parse(requestMessage);
+        RequestFactory requestFactory = new RequestFactory();
+        Request request = requestFactory.parse(requestMessage);
 
         // execute command
         userId = request.getUser().getId();
@@ -149,7 +157,8 @@ class ServerThread extends Thread
         {
             synchronized (thread.outStream)
             {
-                thread.outStream.writeUTF(message + "\n");
+                thread.outStream.write(message, 0, message.length());
+                thread.outStream.newLine();
                 thread.outStream.flush();
             }
         }
@@ -180,8 +189,11 @@ class ServerThread extends Thread
                     {
                         synchronized (threadMap.getValue().outStream)
                         {
-                            threadMap.getValue().outStream.writeUTF(responseService.toXml(response));
+                            String xmlResponse = responseService.toXml(response);
+                            threadMap.getValue().outStream.write(xmlResponse, 0, xmlResponse.length());
+                            threadMap.getValue().outStream.newLine();
                             threadMap.getValue().outStream.flush();
+
                         }
                     }
                     catch (Exception error)
@@ -214,12 +226,12 @@ class ServerThread extends Thread
                 log.info("The client with id = " + id + " was disconnected");
                 id = null;
             }
-            if(threadKiller != null)
+            /*if(threadKiller != null)
             {
                 threadKiller.stop();
                 threadKiller = null;
             }
-            this.interrupt();
+            this.interrupt();*/
         }
         catch (IOException ioe)
         {

@@ -1,36 +1,28 @@
 package org.vfs.client.network;
 
-import org.vfs.client.model.IncomingMessageHandler;
-
 import java.util.concurrent.BlockingQueue;
 
 /**
  * BlockingQueue should use blocking API.
+ *
  * @author Lipatov Nikita
  */
-public class IncomingMessageListener
-{
+public class IncomingMessageListener {
     private BlockingQueue<String> toUserQueue;
     private IncomingMessageHandler handler;
 
-    public IncomingMessageListener(BlockingQueue<String> queue)
-    {
+    public IncomingMessageListener(BlockingQueue<String> queue, IncomingMessageHandler handler) {
         this.toUserQueue = queue;
-        this.handler = new IncomingMessageHandler();
+        this.handler = handler;
     }
 
-    public void run()
-    {
-        while(true)
-        {
-            try
-            {
+    public void run() {
+        while (true) {
+            try {
                 String serverResponse = toUserQueue.take();
 
                 handler.handle(serverResponse);
-            }
-            catch(InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 System.out.println("QueueReader " + e.getMessage());
             }
         }

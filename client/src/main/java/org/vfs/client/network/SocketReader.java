@@ -1,63 +1,46 @@
 package org.vfs.client.network;
 
-import java.io.DataInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.Socket;
+import java.io.InputStreamReader;
 import java.util.concurrent.BlockingQueue;
 
 /**
  * SocketReader should listen socket(inputStream) and write message in queue
  * BlockingQueue should use non-blocking API.
+ *
  * @author Lipatov Nikita
  */
-public class SocketReader
-{
-    private Socket socket;
-    private BlockingQueue<String> toUserQueue;
-    private DataInputStream dataInputStream;
+public class SocketReader {
+    private final BlockingQueue<String> toUserQueue;
+    private final NetworkManager networkManager;
 
-    public SocketReader(Socket socket, BlockingQueue<String> queue) throws IOException
-    {
+    public SocketReader(BlockingQueue<String> queue, NetworkManager networkManager) throws IOException {
         this.toUserQueue = queue;
-        this.setSocket(socket);
+        this.networkManager = networkManager;
     }
 
-    public void setSocket(Socket socket) throws IOException
-    {
-        this.socket = socket;
-        this.dataInputStream = new DataInputStream(socket.getInputStream());
-    }
-
-    public void run()
-    {
-        try
-        {
-            while (socket.isConnected())
-            {
-                try
-                {
-                    String serverMessage = dataInputStream.readUTF();
-                    toUserQueue.put(serverMessage);
-                }
-                catch (IOException ioe)
-                {
-                    try
-                    {
-                        this.socket = NetworkManager.getInstance().getSocket();
-                        this.dataInputStream = new DataInputStream(socket.getInputStream());
+    public void run() {
+        try {
+            while (true) {
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(networkManager.getSocket().getInputStream()));
+                    StringBuilder stringBuilder = new StringBuilder();
+                    while (bufferedReader.ready()) {
+                        stringBuilder.append(bufferedReader.readLine());
                     }
-                    catch(IOException iioe)
-                    {
-                        System.err.println(iioe.getMessage());
+                    if (stringBuilder.length() == 0) {
+                        continue;
                     }
+                    this.toUserQueue.put(stringBuilder.toString());
+                } catch (IOException ioe) {
+                    System.err.println("SocketReader.IOException.Message=" + ioe.getMessage());
+                    throw new RuntimeException(ioe);
                 }
             }
-        }
-        catch(InterruptedException ie)
-        {
+        } catch (InterruptedException ie) {
             System.err.println("SocketReader.InterruptedException.Message=" + ie.getMessage());
         }
-
     }
 
 }

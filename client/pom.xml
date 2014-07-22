@@ -35,7 +35,12 @@
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 		</dependency>
-		<dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>17.0</version>
+        </dependency>
+        <dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
@@ -59,7 +64,7 @@
 							<classpathPrefix>lib/</classpathPrefix>
 						</manifest>
 						<manifestEntries>
-							<Main-Class>org.vfs.client.ClientMain</Main-Class>
+							<Main-Class>org.vfs.client.Application</Main-Class>
 						</manifestEntries>
 					</archive>
 				</configuration>

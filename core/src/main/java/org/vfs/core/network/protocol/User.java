@@ -20,6 +20,17 @@ public class User
     @XmlElement(required = false)
     protected Object directory;
 
+    public User()
+    {
+
+    }
+
+    public User(String id, String login)
+    {
+        this.id = id;
+        this.login = login;
+    }
+
     public void setId(String id)
     {
         this.id = id;
@@ -48,5 +59,25 @@ public class User
     public void setDirectory(Object directory)
     {
         this.directory = directory;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        if (id != null ? !id.equals(user.id) : user.id != null) return false;
+        if (login != null ? !login.equals(user.login) : user.login != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (login != null ? login.hashCode() : 0);
+        return result;
     }
 }
