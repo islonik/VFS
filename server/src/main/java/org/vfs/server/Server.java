@@ -1,10 +1,12 @@
-package org.vfs.server.network;
+package org.vfs.server;
 
 import java.net.*;
 import java.io.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vfs.server.network.ServerSettings;
+import org.vfs.server.network.ServerThread;
 
 /**
  * Server class.

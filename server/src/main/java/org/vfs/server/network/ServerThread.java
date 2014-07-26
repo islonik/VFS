@@ -3,9 +3,9 @@ package org.vfs.server.network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vfs.core.network.protocol.*;
-import org.vfs.server.command.CommandLine;
+import org.vfs.server.CommandLine;
 import org.vfs.core.model.Context;
-import org.vfs.server.user.UserRegistry;
+import org.vfs.server.user.UserSession;
 import org.vfs.server.user.UserService;
 
 import java.io.*;
@@ -19,7 +19,7 @@ import java.util.Set;
  * Class of threads.
  * @author Lipatov Nikita
  */
-class ServerThread extends Thread
+public class ServerThread extends Thread
 {
     private static final Logger log = LoggerFactory.getLogger(ServerThread.class);
 
@@ -121,7 +121,7 @@ class ServerThread extends Thread
 
         // execute command
         userId = request.getUser().getId();
-        user = UserRegistry.getInstance().getUser(request.getUser().getLogin());
+        user = UserSession.getInstance().getUser(request.getUser().getLogin());
 
         String command = request.getCommand();
         CommandLine cmd = new CommandLine();
@@ -221,7 +221,7 @@ class ServerThread extends Thread
                 threads.remove(id);
                 if(user != null)
                 {
-                    UserRegistry.getInstance().removeUser(userId, user.getLogin());
+                    UserSession.getInstance().removeUser(userId, user.getLogin());
                 }
                 log.info("The client with id = " + id + " was disconnected");
                 id = null;

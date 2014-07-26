@@ -1,31 +1,37 @@
 package org.vfs.server.model;
 
-import org.vfs.core.network.protocol.User;
-import org.vfs.server.model.impl.Directory;
-
 /**
  * @author Lipatov
  * @date 11.02.14
  */
-public interface Node {
+public class Node {
 
-    public enum NodeType
-    {
-        DIR,
-        FILE
+    protected NodeTypes type;
+    protected Node parent;
+    protected String name;
+
+    public NodeTypes getType() {
+        return type;
     }
 
-	public void setParent(Directory parent);
-	public Directory getParent();
-	public void setName(String name);
-	public String getName();
-	public NodeType getType();
-    public String getFullPath();
+    public void setType(NodeTypes type) {
+        this.type = type;
+    }
 
-    public boolean isLock();
-    public boolean isLock(User user);
-    public void setLock(User user, boolean isLock);
-    public User getLockByUser();
-    public Node copy();
+    public Node getParent() {
+        return parent;
+    }
+
+    public void setParent(Node parent) {
+        this.parent = parent;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

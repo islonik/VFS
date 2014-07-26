@@ -15,9 +15,9 @@ public class NodeTest
     @Test
     public void testNode_add_01()
     {
-        Directory node01 = NodeFactory.getFactory().createDirectory("org");
-        Directory node02 = NodeFactory.getFactory().createDirectory("vfs");
-        Directory node03 = NodeFactory.getFactory().createDirectory("server");
+        Directory node01 = NodeService.getFactory().createDirectory("org");
+        Directory node02 = NodeService.getFactory().createDirectory("vfs");
+        Directory node03 = NodeService.getFactory().createDirectory("server");
 
         node01.addNode(node02);
         node02.addNode(node03);
@@ -28,9 +28,9 @@ public class NodeTest
     @Test
     public void testNode_add_02()
     {
-        Directory node01 = NodeFactory.getFactory().createDirectory("org");
-        Directory node02 = NodeFactory.getFactory().createDirectory("vfs");
-        File node03 = NodeFactory.getFactory().createFile("test.jsp");
+        Directory node01 = NodeService.getFactory().createDirectory("org");
+        Directory node02 = NodeService.getFactory().createDirectory("vfs");
+        File node03 = NodeService.getFactory().createFile("test.jsp");
 
         node01.addNode(node02);
         node02.addNode(node03);
@@ -46,7 +46,7 @@ public class NodeTest
         User user2 = new User();
         user2.setLogin("testUser");
 
-        Node node01 = NodeFactory.getFactory().createDirectory("org");
+        Node node01 = NodeService.getFactory().createDirectory("org");
 
         Assert.assertFalse(node01.isLock());
         node01.setLock(user1, true);
@@ -68,7 +68,7 @@ public class NodeTest
         User user2 = new User();
         user2.setLogin("testUser");
 
-        Node node01 = NodeFactory.getFactory().createFile("test.jpg");
+        Node node01 = NodeService.getFactory().createFile("test.jpg");
 
         Assert.assertFalse(node01.isLock());
         Assert.assertNull(node01.getLockByUser());

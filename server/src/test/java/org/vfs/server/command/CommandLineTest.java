@@ -6,11 +6,12 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.vfs.core.network.protocol.User;
+import org.vfs.server.CommandLine;
 import org.vfs.server.command.impl.*;
 import org.vfs.core.model.Context;
-import org.vfs.server.model.Tree;
+import org.vfs.server.model.Partition;
 import org.vfs.server.model.impl.Directory;
-import org.vfs.server.user.UserRegistry;
+import org.vfs.server.user.UserSession;
 
 /**
  * @author: Lipatov Nikita
@@ -25,8 +26,8 @@ public class CommandLineTest
     @BeforeClass
     public static void before()
     {
-        Tree.cleanup();
-        UserRegistry.cleanup();
+        Partition.cleanup();
+        UserSession.cleanup();
     }
 
     @Test

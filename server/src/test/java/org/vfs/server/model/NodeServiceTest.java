@@ -8,19 +8,19 @@ import org.vfs.server.model.impl.Directory;
 /**
  * User: Lipatov Nikita
  */
-public class NodeFactoryTest
+public class NodeServiceTest
 {
 
     @BeforeClass
     public static void beforeClass()
     {
-        Tree.cleanup();
+        Partition.cleanup();
     }
 
     @Test
     public void testNodeFactory_testCase01()
     {
-        Directory homeDirectory = NodeFactory.getFactory().createDirectory("home/user1");
+        Directory homeDirectory = NodeService.getFactory().createDirectory("home/user1");
 
         Assert.assertEquals("user1", homeDirectory.getName());
         Assert.assertEquals("/home/user1", homeDirectory.getFullPath());
@@ -29,7 +29,7 @@ public class NodeFactoryTest
     @Test
     public void testNodeFactory_testCase02()
     {
-        Directory homeDirectory = NodeFactory.getFactory().createDirectory("//home/user2");
+        Directory homeDirectory = NodeService.getFactory().createDirectory("//home/user2");
 
         Assert.assertEquals("user2", homeDirectory.getName());
         Assert.assertEquals("/home/user2", homeDirectory.getFullPath());

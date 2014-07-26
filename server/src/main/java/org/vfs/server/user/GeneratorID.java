@@ -19,7 +19,7 @@ public class GeneratorID
         return instance;
     }
 
-    public String getId()
+    public String getNextId()
     {
         long time = System.currentTimeMillis();
         return time + "" + Integer.toString(Thread.activeCount()) + "" + Long.toString(count++);

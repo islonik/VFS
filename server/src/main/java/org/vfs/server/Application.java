@@ -1,12 +1,10 @@
 package org.vfs.server;
 
-import org.vfs.server.network.Server;
-
 /**
  * Entry point
  * @author Lipatov Nikita
  */
-public class ServerMain
+public class Application
 {
 
     /**
