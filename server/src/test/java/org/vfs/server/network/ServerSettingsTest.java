@@ -9,7 +9,7 @@ import org.junit.Test;
 public class ServerSettingsTest
 {
 
-    @Test
+    /*@Test
     public void testGeneric_testCase01()
     {
         ServerSettings settings = ServerSettings.getInstance();
@@ -17,5 +17,5 @@ public class ServerSettingsTest
         Assert.assertEquals("4499",      settings.getServerPort());
         Assert.assertEquals("10",        settings.getTimeout());
 
-    }
+    }*/
 }

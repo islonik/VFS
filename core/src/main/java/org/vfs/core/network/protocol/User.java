@@ -8,57 +8,36 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "User", propOrder = {
         "id",
-        "login",
-        "directory"
+        "login"
 })
-public class User
-{
+public class User {
     @XmlElement(required = true)
     protected String id;
     @XmlElement(required = true)
     protected String login;
-    @XmlElement(required = false)
-    protected Object directory;
 
-    public User()
-    {
-
+    public User() {
     }
 
-    public User(String id, String login)
-    {
+    public User(String id, String login) {
         this.id = id;
         this.login = login;
     }
 
-    public void setId(String id)
-    {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getId()
-    {
+    public String getId() {
         return this.id;
     }
 
-    public void setLogin(String login)
-    {
+    public void setLogin(String login) {
         this.login = login;
     }
 
-    public String getLogin()
-    {
+    public String getLogin() {
         return this.login;
-    }
-
-    public Object getDirectory()
-    {
-        return directory;
-    }
-
-    public void setDirectory(Object directory)
-    {
-        this.directory = directory;
     }
 
     @Override
@@ -69,7 +48,8 @@ public class User
         User user = (User) o;
 
         if (id != null ? !id.equals(user.id) : user.id != null) return false;
-        if (login != null ? !login.equals(user.login) : user.login != null) return false;
+        if (login != null ? !login.equals(user.login) : user.login != null)
+            return false;
 
         return true;
     }

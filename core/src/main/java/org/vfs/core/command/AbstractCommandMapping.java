@@ -8,7 +8,7 @@ import java.util.*;
 
 /**
  *
- *   Load all classes where interface is Command and create mapping
+ *   Load all classes where interface is Command and newRequest mapping
  *   required dependency:
  *
  *   <dependency>

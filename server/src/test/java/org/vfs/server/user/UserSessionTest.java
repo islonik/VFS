@@ -2,13 +2,14 @@ package org.vfs.server.user;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.vfs.server.model.UserSession;
 
 /**
  * User: Lipatov Nikita
  */
 public class UserSessionTest
 {
-
+/*
     @Test
     public void testUserRegistry_case01()
     {
@@ -20,5 +21,5 @@ public class UserSessionTest
         Assert.assertTrue(UserSession.getInstance().removeUser(UserSession.getInstance().getUser(login).getId(), login));
 
         Assert.assertNull(UserSession.getInstance().getUser(login));
-    }
+    }*/
 }

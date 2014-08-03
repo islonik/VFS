@@ -27,7 +27,7 @@ public class Response
     private static final Logger log = LoggerFactory.getLogger(Response.class);
 
     @XmlElement(required = true)
-    protected String code;
+    protected int code;
     @XmlElement(required = true)
     protected String message;
     @XmlElement(defaultValue = "0", required = false)
@@ -43,12 +43,12 @@ public class Response
         return message;
     }
 
-    public void setCode(String code)
+    public void setCode(int code)
     {
         this.code = code;
     }
 
-    public String getCode()
+    public int getCode()
     {
         return code;
     }

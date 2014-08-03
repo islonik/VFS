@@ -1,13 +1,11 @@
 package org.vfs.client;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.vfs.client.network.MessageSender;
 import org.vfs.client.network.NetworkManager;
 import org.vfs.client.network.UserManager;
+import org.vfs.core.command.CommandParser;
 import org.vfs.core.network.protocol.User;
-
-import java.io.*;
 
 import static org.mockito.Mockito.*;
 
@@ -33,7 +31,7 @@ public class CommandLineTest {
         verify(messageSender, atLeastOnce()).send(user, "connect nikita");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testConnectCommandAlreadyAuthorized() throws Exception {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
@@ -41,22 +39,14 @@ public class CommandLineTest {
         when(networkManager.getMessageSender()).thenReturn(messageSender);
         when(userManager.isAuthorized()).thenReturn(true);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-        System.setErr(ps);
-
         CommandLine cmd = new CommandLine(userManager, networkManager);
-        cmd.execute("connect localhost:4499 nikita");
-
-        User user = new User("0", "nikita");
-        verify(networkManager, never()).openSocket("localhost", "4499");
-        verify(userManager, never()).setUser(user);
-        verify(messageSender, never()).send(user, "connect nikita");
-        String result = baos.toString();
-        Assert.assertEquals("Validation error : You are already authorized!\r\n", result);
+        CommandParser parser = new CommandParser();
+        parser.parse("connect localhost:4499 nikita");
+        cmd.commandValues = parser.getCommandValues();
+        cmd.commands.get("connect").run();
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testQuitCommandNotAuthorized() throws Exception {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
@@ -64,18 +54,11 @@ public class CommandLineTest {
         when(networkManager.getMessageSender()).thenReturn(messageSender);
         when(userManager.isAuthorized()).thenReturn(false);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-        System.setErr(ps);
-
         CommandLine cmd = new CommandLine(userManager, networkManager);
-        cmd.execute("quit");
-
-        verify(networkManager, never()).getMessageSender();
-        verify(userManager, never()).getUser();
-
-        String result = baos.toString();
-        Assert.assertEquals("Validation error : You are not authorized or connection was lost!\r\n", result);
+        CommandParser parser = new CommandParser();
+        parser.parse("quit");
+        cmd.commandValues = parser.getCommandValues();
+        cmd.commands.get("quit").run();
     }
 
     @Test
@@ -96,7 +79,7 @@ public class CommandLineTest {
         verify(messageSender, atLeastOnce()).send(user, "quit");
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testDefaultCommandNotAuthorized() throws Exception {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
@@ -104,18 +87,11 @@ public class CommandLineTest {
         when(networkManager.getMessageSender()).thenReturn(messageSender);
         when(userManager.isAuthorized()).thenReturn(false);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-        System.setErr(ps);
-
         CommandLine cmd = new CommandLine(userManager, networkManager);
-        cmd.execute("default");
-
-        verify(networkManager, never()).getMessageSender();
-        verify(userManager, never()).getUser();
-
-        String result = baos.toString();
-        Assert.assertEquals("Validation error : Please connect to the server!\r\n", result);
+        CommandParser parser = new CommandParser();
+        parser.parse("default");
+        cmd.commandValues = parser.getCommandValues();
+        cmd.commands.get("default").run();
     }
 
     @Test

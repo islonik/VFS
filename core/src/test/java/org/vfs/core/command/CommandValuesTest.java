@@ -2,17 +2,14 @@ package org.vfs.core.command;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.vfs.core.command.CommandValues;
 
 /**
  * @author Lipatov Nikita
  */
-public class CommandValuesTest
-{
+public class CommandValuesTest {
 
     @Test
-    public void test()
-    {
+    public void test() {
         CommandValues values = new CommandValues();
         values.setCommand("copy");
         values.getParams().add("test");

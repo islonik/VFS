@@ -73,4 +73,19 @@ public class CommandParserTest
 
         Assert.assertEquals(null, values.getCommand());
     }
+
+    @Test
+    public void testKeys() throws Exception {
+        CommandParser parser = new CommandParser();
+
+        String command = "lock --r applications";
+
+        parser.parse(command);
+        CommandValues values = parser.getCommandValues();
+
+        Assert.assertEquals("lock", values.getCommand());
+        Assert.assertEquals("r", values.getNextKey());
+        Assert.assertEquals("applications", values.getNextParam());
+
+    }
 }

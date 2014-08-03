@@ -11,7 +11,7 @@ import java.util.HashMap;
  * @author Lipatov Nikita
  */
 public class ServerMappingTest
-{
+{/*
     @Test
     public void testGettingCommands()
     {
@@ -30,5 +30,5 @@ public class ServerMappingTest
         Assert.assertEquals(RemoveCommand.class.getCanonicalName(),          commands.get("rm").getClass().getCanonicalName());
         Assert.assertEquals(UnlockCommand.class.getCanonicalName(),          commands.get("unlock").getClass().getCanonicalName());
 
-    }
+    }*/
 }

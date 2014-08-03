@@ -18,6 +18,7 @@ import java.net.URL;
 
 /**
  * @author  Lipatov Nikita
+ * Help link - http://dev64.wordpress.com/2012/03/19/xml-schema-jaxb-example/
  */
 public class XmlHelper
 {
@@ -51,7 +52,6 @@ public class XmlHelper
             log.error(jaxbe.getLocalizedMessage(), jaxbe);
             return null;
         }
-        //http://dev64.wordpress.com/2012/03/19/xml-schema-jaxb-example/
         catch(SAXException saxe)
         {
             log.error(saxe.getLocalizedMessage(), saxe);
@@ -59,7 +59,7 @@ public class XmlHelper
         }
     }
 
-    public Object unmarshal(Class className, String xml)
+    public <T> T unmarshal(Class<T> className, String xml)
     {
         try
         {
@@ -67,7 +67,7 @@ public class XmlHelper
 
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             jaxbUnmarshaller.setSchema(getSchema(className.getSimpleName()));
-            return jaxbUnmarshaller.unmarshal(new StringReader(xml));
+            return (T)jaxbUnmarshaller.unmarshal(new StringReader(xml));
         }
         catch(JAXBException jaxbe)
         {

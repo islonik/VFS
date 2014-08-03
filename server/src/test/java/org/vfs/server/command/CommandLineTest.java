@@ -7,18 +7,15 @@ import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.vfs.core.network.protocol.User;
 import org.vfs.server.CommandLine;
-import org.vfs.server.command.impl.*;
 import org.vfs.core.model.Context;
-import org.vfs.server.model.Partition;
-import org.vfs.server.model.impl.Directory;
-import org.vfs.server.user.UserSession;
+import org.vfs.server.model.UserSession;
 
 /**
  * @author: Lipatov Nikita
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CommandLineTest
-{
+{/*
 
     private static User userOne;
     private static User userTwo;
@@ -403,5 +400,5 @@ public class CommandLineTest
         Assert.assertTrue(context.isCommandWasExecuted());
         Assert.assertEquals(HelpCommand.HELP_MESSAGE, context.getMessage());
 
-    }
+    }*/
 }

@@ -2,67 +2,58 @@ package org.vfs.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vfs.core.command.AbstractCommandLine;
-import org.vfs.core.command.Command;
+import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
-import org.vfs.core.network.protocol.Response;
-import org.vfs.core.network.protocol.User;
-import org.vfs.core.model.Context;
-import org.vfs.server.command.ServerMapping;
+import org.vfs.core.network.protocol.*;
 import org.vfs.server.model.Node;
-import org.vfs.server.model.NodeService;
-import org.vfs.server.user.UserCell;
-import org.vfs.server.user.UserSession;
+import org.vfs.server.model.NodeTypes;
+import org.vfs.server.network.ClientWriter;
+import org.vfs.server.services.LockService;
+import org.vfs.server.services.NodeService;
+import org.vfs.server.model.UserSession;
+import org.vfs.server.services.UserService;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.vfs.core.network.protocol.Response.*;
+import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
  */
-public class CommandLine extends AbstractCommandLine
-{
+public class CommandLine {
     private static final Logger log = LoggerFactory.getLogger(CommandLine.class);
 
-    public static final String NO_SUCH_COMMAND = "Such command doesn't exist! Please use help command for getting full list of available commands!";
+    Map<String, Runnable> commands = new HashMap<String, Runnable>() {{
 
-    final Map<String, Runnable> commands = new HashMap<String, Runnable>() {{
         put("cd", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
-                Directory directory = (Directory)user.getDirectory();
-
-                CommandValues values = context.getCommandValues();
+                CommandValues values = parser.getCommandValues();
+                Node directory = userSession.getNode();
                 String source = values.getNextParam();
 
-                if(source == null)
-                {
+                if (source == null) {
                     source = ".";
                 }
 
-                Node node = search(directory, source);
-                if(node instanceof File)
-                {
-                    context.setErrorMessage("Source node is file!");
-                }
-                else
-                {
-                    if(node != null)
-                    {
-                        user.setDirectory((Directory)node);
-                        context.setCommandWasExecuted(true);
-                        context.setMessage(node.getFullPath());
+                Node node = nodeService.search(directory, source);
+                if(node != null) {
+                    if (node.getType() == NodeTypes.FILE) {
+                        clientWriter.send(newResponse(STATUS_OK, "Source node is file!"));
+                    } else {
+                        if (node != null) {
+                            userSession.setNode(node);
+                            clientWriter.send(newResponse(STATUS_OK, nodeService.getFullPath(node)));
+                        } else {
+                            clientWriter.send(newResponse(STATUS_OK, "Directory wasn't found!"));
+                        }
                     }
-                    else
-                    {
-                        context.setErrorMessage("Directory wasn't found!");
-                    }
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "Destination node is not found!"));
                 }
             }
         });
@@ -70,32 +61,11 @@ public class CommandLine extends AbstractCommandLine
         put("connect", new Runnable() {
             @Override
             public void run() {
-                CommandValues values = context.getCommandValues();
-                String userName = values.getNextParam();
-
-                if(UserSession.getInstance().getUser(userName) != null)
-                {
-                    context.setCode(Response.STATUS_FAIL_CONNECT);
-                    context.setErrorMessage("User with such login already was registered before. Please, change the login!");
-                    context.setExit(true);
-                    return;
-                }
-
-                if(UserSession.getInstance().addUser(userName))
-                {
-                    User user = UserSession.getInstance().getUser(userName);
-                    context.setUser(user);
-                    context.setCommandWasExecuted(true);
-                    context.setBroadcastCommand(true);
-                    context.setCode(Response.STATUS_SUCCESS_CONNECT);
-                    context.setSpecificCode(Long.parseLong(user.getId()));
-                    context.setMessage(((Directory)user.getDirectory()).getFullPath());
-                }
-                else
-                {
-                    context.setCode(Response.STATUS_FAIL_CONNECT);
-                    context.setErrorMessage("User wasn't added and registered! Try to change user login and type connect command again!");
-                    context.setExit(true);
+                if (userService.isLogged(user.getLogin())) {
+                    clientWriter.send(newResponse(STATUS_FAIL_CONNECT, "User was registered before with such login already. Please, change the login!"));
+                } else {
+                    userService.attachUser(userSession.getUser().getId(), user.getLogin());
+                    clientWriter.send(newResponse(STATUS_SUCCESS_CONNECT, nodeService.getFullPath(userSession.getNode()), userSession.getUser().getId()));
                 }
             }
         });
@@ -103,38 +73,39 @@ public class CommandLine extends AbstractCommandLine
         put("copy", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
-                Directory directory  = (Directory)user.getDirectory();
-                CommandValues values = context.getCommandValues();
-                String source        = values.getNextParam();
-                String destination   = values.getNextParam();
+                Node directory = userSession.getNode();
+                CommandValues values = parser.getCommandValues();
+                String source = values.getNextParam();
+                String destination = values.getNextParam();
 
-                Node sourceNode      = search(directory, source);
-                Node destinationNode = search(directory, destination);
+                Node sourceNode = nodeService.search(directory, source);
+                Node destinationNode = nodeService.search(directory, destination);
 
-                if(sourceNode == null)
-                {
-                    context.setErrorMessage("Source path/node not found!");
+                if (sourceNode == null) {
+                    clientWriter.send(newResponse(STATUS_OK, "Source path/node is not found!"));
+                    return;
+                }
+                if (destinationNode == null) {
+                    clientWriter.send(newResponse(STATUS_OK, "Destination path/node is not found!"));
                     return;
                 }
 
-                if(destinationNode == null)
-                {
-                    context.setErrorMessage("Destination path/node not found!");
-                    return;
-                }
+                if (destinationNode.getType() == NodeTypes.DIR) {
 
-                if(destinationNode instanceof Directory)
-                {
-                    Node copyNode = sourceNode.copy();
-                    ((Directory) destinationNode).addNode(copyNode);
-                    context.setCommandWasExecuted(true);
-                    context.setBroadcastCommand(true);
-                    context.setMessage("Source node " + sourceNode.getFullPath() + " was copied to destination node " + destinationNode.getFullPath() );
-                }
-                else
-                {
-                    context.setErrorMessage("Destination path is not directory");
+                    if (lockService.isLocked(destinationNode, true)) {
+                        clientWriter.send(newResponse(STATUS_OK, "Node or children nodes is/are locked!"));
+                        return;
+                    }
+
+                    Node copyNode = nodeService.clone(sourceNode);
+                    nodeService.setParent(copyNode, destinationNode);
+                    clientWriter.send(
+                            newResponse(STATUS_OK,
+                                    "Source node " + nodeService.getFullPath(sourceNode) + " was copied to destination node " + nodeService.getFullPath(destinationNode)
+                            )
+                    );
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "Destination path is not directory"));
                 }
             }
         });
@@ -142,137 +113,131 @@ public class CommandLine extends AbstractCommandLine
         put("help", new Runnable() {
             @Override
             public void run() {
-                context.setCommandWasExecuted(true);
-                context.setMessage(
+                clientWriter.send(newResponse(STATUS_OK,
                         "You can use next commands:\n" +
-                        "    * - connect server_name:port login \n" +
-                        "    * - quit \n" +
-                        "    * - cd directory \n" +
-                        "    * - copy node directory \n" +
-                        "    * - help \n" +
-                        "    * - lock node \n" +
-                        "    * - mkdir directory \n" +
-                        "    * - mkfile file\n" +
-                        "    * - move node directory \n" +
-                        "    * - print \n" +
-                        "    * - rm node \n" +
-                        "    * - unlock node ");
+                                "    * - cd directory \n" +
+                                "    * - connect server_name:port login \n" +
+                                "    * - copy node directory \n" +
+                                "    * - help \n" +
+                                "    * - lock [-r] node \n" +
+                                "        -r - enable recursive mode \n" +
+                                "    * - mkdir directory \n" +
+                                "    * - mkfile file\n" +
+                                "    * - move node directory \n" +
+                                "    * - print \n" +
+                                "    * - quit \n" +
+                                "    * - rename node name \n" +
+                                "    * - rm node \n" +
+                                "    * - unlock [-r] node \n" +
+                                "        -r - enable recursive mode \n"
+                ));
             }
         });
 
         put("lock", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
-                Directory directory = (Directory)user.getDirectory();
-                CommandValues values = context.getCommandValues();
+                User user = userSession.getUser();
+                Node directory = userSession.getNode();
+                CommandValues values = parser.getCommandValues();
+                String key = values.getNextKey();
                 String lockDirectory = values.getNextParam();
 
-                Node node = search(directory, lockDirectory);
-                if(node != null)
-                {
-                    node.setLock(user, true);
-                    if(node.isLock(user))
-                    {
-                        context.setCommandWasExecuted(true);
-                        context.setBroadcastCommand(true);
-                        context.setMessage("Node " + node.getFullPath() + " was locked!");
+                Node node = nodeService.search(directory, lockDirectory);
+                if (node != null) {
+                    boolean recursive = false;
+                    if(key != null && key.equals("r")) {
+                        recursive = true;
+                    }
+                    if (lockService.isLocked(node, recursive)) {
+                        clientWriter.send(newResponse(STATUS_OK, "Node or children nodes is/are locked!"));
                         return;
                     }
-                    else
-                    {
-                        context.setErrorMessage("Node not locked!");
-                        return;
-                    }
+                    lockService.lock(user, node, recursive);
+                    clientWriter.send(newResponse(STATUS_OK, "Node " + nodeService.getFullPath(node) + " was locked!"));
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "Destination node is not found!"));
                 }
-                context.setErrorMessage("Node not found!");
             }
         });
 
         put("mkdir", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
-                Directory directory = (Directory)user.getDirectory();
-                CommandValues values = context.getCommandValues();
-                String createDirectory = values.getNextParam();
+                Node directory = userSession.getNode();
+                CommandValues values = parser.getCommandValues();
+                String createNode = values.getNextParam();
 
-                Node node = search(directory, createDirectory);
-                if(node == null)
-                {
-                    Directory makeDirectory = NodeService.getFactory().createDirectory(directory, createDirectory);
-                    if(makeDirectory != null)
-                    {
-                        context.setCommandWasExecuted(true);
-                        context.setBroadcastCommand(true);
-                        context.setMessage("Directory " + makeDirectory.getFullPath() + " was created!");
-                        return;
+                Node node = nodeService.search(directory, createNode);
+                if (node == null) {
+                    node = nodeService.createNode(directory, createNode, NodeTypes.DIR);
+                    if(node != null) {
+                        clientWriter.send(newResponse(STATUS_OK, "Directory " + nodeService.getFullPath(node) + " was created!"));
+                    } else {
+                        clientWriter.send(newResponse(STATUS_OK, "Directory was not created!"));
                     }
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "Directory could not be created!"));
                 }
-                context.setErrorMessage("Directory could not be created!");
             }
         });
 
         put("mkfile", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
-                Directory directory = (Directory)user.getDirectory();
-                CommandValues values = context.getCommandValues();
-                String createFile = values.getNextParam();
+                Node directory = userSession.getNode();
+                CommandValues values = parser.getCommandValues();
+                String createNode = values.getNextParam();
 
-                Node node = search(directory, createFile);
-                if(node == null)
-                {
-                    File makeFile = NodeService.getFactory().createFile(directory, createFile);
-                    if(makeFile != null)
-                    {
-                        context.setCommandWasExecuted(true);
-                        context.setBroadcastCommand(true);
-                        context.setMessage("File " + makeFile.getFullPath() + " was created!");
-                        return;
+                Node node = nodeService.search(directory, createNode);
+                if (node == null) {
+                    node = nodeService.createNode(directory, createNode, NodeTypes.FILE);
+                    if(node != null) {
+                        clientWriter.send(newResponse(STATUS_OK, "File " + nodeService.getFullPath(node) + " was created!"));
+                    } else {
+                        clientWriter.send(newResponse(STATUS_OK, "File was not created!"));
                     }
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "File could not be created!"));
                 }
-                context.setErrorMessage("File could not be created!");
             }
         });
 
         put("move", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
-                Directory directory = (Directory)user.getDirectory();
-                CommandValues values = context.getCommandValues();
-                String source      = values.getNextParam();
+                Node directory = userSession.getNode();
+                CommandValues values = parser.getCommandValues();
+                String source = values.getNextParam();
                 String destination = values.getNextParam();
 
-                Node sourceNode      = search(directory, source);
-                Node destinationNode = search(directory, destination);
+                Node sourceNode = nodeService.search(directory, source);
+                Node destinationNode = nodeService.search(directory, destination);
 
-                if(sourceNode == null)
-                {
-                    context.setErrorMessage("Source path/node not found!");
+                if (sourceNode == null) {
+                    clientWriter.send(newResponse(STATUS_OK, "Source path/node not found!"));
                     return;
                 }
 
-                if(destinationNode == null)
-                {
-                    context.setErrorMessage("Destination path/node not found!");
+                if (destinationNode == null) {
+                    clientWriter.send(newResponse(STATUS_OK, "Destination path/node not found!"));
                     return;
                 }
 
-                if(destinationNode instanceof Directory)
-                {
-                    Directory parent = sourceNode.getParent();
-                    ((Directory) destinationNode).addNode(sourceNode);
-                    parent.removeNode(sourceNode);
-                    context.setCommandWasExecuted(true);
-                    context.setBroadcastCommand(true);
-                    context.setMessage("Source node " + sourceNode.getFullPath() + " was moved to destination node " + destinationNode.getFullPath());
-                }
-                else
-                {
-                    context.setErrorMessage("Destination path is not directory");
+                if (destinationNode.getType() == NodeTypes.DIR) {
+                    if (lockService.isLocked(destinationNode, true)) {
+                        clientWriter.send(newResponse(STATUS_OK, "Node or children nodes is/are locked!"));
+                        return;
+                    }
+
+                    Node parent = sourceNode.getParent();
+                    nodeService.setParent(sourceNode, destinationNode);
+                    nodeService.removeNode(parent, sourceNode);
+
+                    clientWriter.send(newResponse(STATUS_OK,
+                            "Source node " + nodeService.getFullPath(sourceNode) + " was moved to destination node " + nodeService.getFullPath(destinationNode)));
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "Destination path is not directory"));
                 }
             }
         });
@@ -280,44 +245,43 @@ public class CommandLine extends AbstractCommandLine
         put("print", new Runnable() {
             @Override
             public void run() {
-                simplePrintTreeNode(parentDir, textTree, deep);
-
-                deep++;
-
-                List<Directory> directories = parentDir.getDirectories();
-                for (Directory directory : directories)
-                {
-                    simplePrintTreeDir(directory, textTree, deep);
-                }
-
-                List<File> files = parentDir.getFiles();
-                for (File file : files)
-                {
-                    simplePrintTreeNode(file, textTree, deep);
-                }
-
-                return textTree;
+                Node directory = userSession.getNode();
+                clientWriter.send(newResponse(STATUS_OK, nodeService.printTree(directory)));
             }
         });
 
         put("quit", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
+                // TODO: WTF with thread??
+                lockService.unlockAllNodes(userSession.getUser());
+                userService.stopSession(userSession.getUser().getId());
+                clientWriter.send(newResponse(STATUS_SUCCESS_QUIT, "You are disconnected from server!"));
+            }
+        });
 
-                if(UserSession.getInstance().removeUser(user.getId(), user.getLogin()))
-                {
-                    //context.setUser(null);
-                    context.setCode(Response.STATUS_SUCCESS_QUIT); // quit
-                    context.setCommandWasExecuted(true);
-                    context.setBroadcastCommand(true);
-                    context.setExit(true);
-                    context.setMessage("You are disconnected from server!");
-                }
-                else
-                {
-                    context.setCode(Response.STATUS_FAIL_QUIT);
-                    context.setErrorMessage("User wasn't removed! Please try again!");
+        put("rename", new Runnable() {
+            @Override
+            public void run() {
+                Node directory = userSession.getNode();
+                CommandValues values = parser.getCommandValues();
+                String renameNode = values.getNextParam();
+                String newName = values.getNextParam();
+
+                Node node = nodeService.search(directory, renameNode);
+                String oldName = node.getName();
+
+                if (node != null) {
+                    if (lockService.isLocked(node, false)) {
+                        clientWriter.send(newResponse(STATUS_OK, "Node is locked!"));
+                        return;
+                    }
+
+                    node.setName(newName);
+
+                    clientWriter.send(newResponse(STATUS_OK, "Node " + oldName + " was renamed to " + newName));
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "Node is not found!"));
                 }
             }
         });
@@ -325,34 +289,26 @@ public class CommandLine extends AbstractCommandLine
         put("rm", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
-                Directory directory = (Directory)user.getDirectory();
-                CommandValues values = context.getCommandValues();
+                Node directory = userSession.getNode();
+                CommandValues values = parser.getCommandValues();
                 String removeNode = values.getNextParam();
 
-                Node node = search(directory, removeNode);
+                Node node = nodeService.search(directory, removeNode);
 
-                if(node == null)
-                {
-                    context.setErrorMessage("Node could not be found!");
-                    return;
-                }
-                else
-                {
-                    boolean isLocksWereFound = searchLocks(node);
-                    if(isLocksWereFound)
-                    {
-                        context.setErrorMessage("Node/nodes is/are locked! Please, unlock node/nodes and try again!");
+                if (node != null) {
+                    if (lockService.isLocked(node, true)) {
+                        clientWriter.send(newResponse(STATUS_OK, "Node or children nodes is / are locked!"));
                         return;
                     }
-                    boolean result = directory.removeNode(directory, removeNode);
-                    context.setCommandWasExecuted(result);
-                    context.setBroadcastCommand(true);
-                    context.setMessage("Node " + removeNode + " was removed!");
-                    if(!result)
-                    {
-                        context.setErrorMessage("Node could not be removed!");
+
+                    Node removedNode = nodeService.removeNode(directory, removeNode);
+                    if (removedNode == null) {
+                        clientWriter.send(newResponse(STATUS_OK, "Node was found, but wasn't deleted!"));
+                    } else {
+                        clientWriter.send(newResponse(STATUS_OK, "Node " + removedNode.getName() + " was deleted!"));
                     }
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "Node is not found!"));
                 }
             }
         });
@@ -360,69 +316,75 @@ public class CommandLine extends AbstractCommandLine
         put("unlock", new Runnable() {
             @Override
             public void run() {
-                User user = context.getUser();
-                Directory directory = (Directory)user.getDirectory();
-                CommandValues values = context.getCommandValues();
+                User user = userSession.getUser();
+                Node directory = userSession.getNode();
+                CommandValues values = parser.getCommandValues();
+                String key = values.getNextKey();
                 String unlockDirectory = values.getNextParam();
 
-                Node node = search(directory, unlockDirectory);
-                if(node != null)
-                {
-                    if(!node.isLock())
-                    {
-                        context.setErrorMessage("Node is already unlocked!");
+                Node node = nodeService.search(directory, unlockDirectory);
+                if (node != null) {
+                    boolean recursive = false;
+                    if(key != null && key.equals("r")) {
+                        recursive = true;
+                    }
+
+                    if (!lockService.isLocked(node, recursive)) {
+                        clientWriter.send(newResponse(STATUS_OK, "Node is already unlocked!"));
                         return;
                     }
-                    node.setLock(user, false);
-                    if(!node.isLock())
-                    {
-                        context.setCommandWasExecuted(true);
-                        context.setBroadcastCommand(true);
-                        context.setMessage("Node " + node.getFullPath() + " was unlocked!");
+                    if (lockService.unlock(user, node, recursive)) {
+                        clientWriter.send(newResponse(STATUS_OK, "Node " + nodeService.getFullPath(node) + " was unlocked!"));
+                    } else {
+                        clientWriter.send(newResponse(STATUS_OK, "Node is locked by different user!"));
                     }
-                    else
-                    {
-                        context.setErrorMessage("Node is locked by different user!");
-                    }
-                }
-                else
-                {
-                    context.setErrorMessage("Node not found!");
+                } else {
+                    clientWriter.send(newResponse(STATUS_OK, "Node is not found!"));
                 }
             }
         });
-
     }};
 
-    CommandValues commandValues;
-    UserSession userSession;
-    NodeService nodeService;
+    private final LockService lockService;
+    private final NodeService nodeService;
+    private final UserService userService;
+    private final UserSession userSession;
+    private final ClientWriter clientWriter;
+    private final XmlHelper xmlHelper;
+    private final CommandParser parser;
+    private User user;
 
-    public CommandLine(UserSession userSession, NodeService nodeService)
-    {
-        this.userSession = userSession;
+    public CommandLine(LockService lockService, NodeService nodeService, UserService userService, UserSession userSession, ClientWriter clientWriter) {
+        this.lockService = lockService;
         this.nodeService = nodeService;
+        this.userService = userService;
+        this.userSession = userSession;
+        this.clientWriter = clientWriter;
+        xmlHelper = new XmlHelper();
+        parser = new CommandParser();
     }
 
-    public synchronized Context execute(String login, String args)
-    {
-        args = nodeService.removeDoubleSeparators(args.toLowerCase().trim());
+    public void onUserInput(String message) {
 
-        UserCell userCell = userSession.getUserCell(login);
+        Request request = xmlHelper.unmarshal(Request.class, message);
+        user = request.getUser();
 
-        Context context = new Context();
-        context.setUser(userCell.getUser());
-        context.setCommand(args);
+        String fullCommand = request.getCommand();
+        parser.parse(fullCommand);
+        CommandValues commandValues = parser.getCommandValues();
 
-        commandValues = context.getCommandValues();
         String command = commandValues.getCommand();
 
-        if (commands.containsKey(command)) {
-            commands.get(command).run();
-        } else {
-            context.setErrorMessage("Such command doesn't exist! Please use help command for getting full list of available commands!");
+        try {
+            if (commands.containsKey(command)) {
+                commands.get(command).run();
+            } else {
+                clientWriter.send(newResponse(STATUS_OK, "No such command! Please check you syntax or type 'help'!"));
+            }
+        } catch(Exception e) {
+            clientWriter.send(newResponse(STATUS_FAIL, e.getMessage()));
         }
-        return context;
     }
 
 }
+

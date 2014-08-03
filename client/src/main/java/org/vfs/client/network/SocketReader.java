@@ -27,7 +27,7 @@ public class SocketReader {
                     BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(networkManager.getSocket().getInputStream()));
                     StringBuilder stringBuilder = new StringBuilder();
                     while (bufferedReader.ready()) {
-                        stringBuilder.append(bufferedReader.readLine());
+                        stringBuilder.append(bufferedReader.readLine()).append("\n");
                     }
                     if (stringBuilder.length() == 0) {
                         continue;

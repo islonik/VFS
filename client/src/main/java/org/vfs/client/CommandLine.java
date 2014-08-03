@@ -17,7 +17,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @author Lipatov Nikita
  */
 public class CommandLine {
-    private final Map<String, Runnable> commands = new HashMap<String, Runnable>() {{
+    final Map<String, Runnable> commands = new HashMap<String, Runnable>() {{
         put("connect", new Runnable() {
             @Override
             public void run() {
@@ -40,7 +40,7 @@ public class CommandLine {
 
                     userManager.setUser(user);
 
-                    // create request and send it to server
+                    // newRequest request and send it to server
                     networkManager.getMessageSender().send(user, "connect " + user.getLogin());
 
                 } catch (IOException ioe) {
@@ -77,7 +77,7 @@ public class CommandLine {
 
     }};
 
-    private CommandValues commandValues;
+    CommandValues commandValues;
     private final UserManager userManager;
     private final NetworkManager networkManager;
 
