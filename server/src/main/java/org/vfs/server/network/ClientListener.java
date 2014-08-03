@@ -8,7 +8,6 @@ import org.vfs.server.services.UserService;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Queue;
 
 /**
  * @author Lipatov Nikita

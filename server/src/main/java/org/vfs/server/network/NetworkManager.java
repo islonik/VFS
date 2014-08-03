@@ -8,9 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wait() / notifyAll() - notes:
- * When threads try to get socket(method getSocket()) then the threads will stop until the Main thread will open socket(method openSocket()).
- *
  * @author Lipatov Nikita
  */
 public class NetworkManager {
