@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.network.protocol.*;
+import org.vfs.server.exceptions.QuitException;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 import org.vfs.server.network.ClientWriter;
@@ -12,6 +13,7 @@ import org.vfs.server.services.LockService;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.UserService;
+import org.vfs.server.utils.NodePrinter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -246,17 +248,18 @@ public class CommandLine {
             @Override
             public void run() {
                 Node directory = userSession.getNode();
-                clientWriter.send(newResponse(STATUS_OK, nodeService.printTree(directory)));
+                clientWriter.send(newResponse(STATUS_OK, nodePrinter.print(directory)));
             }
         });
 
         put("quit", new Runnable() {
             @Override
             public void run() {
-                // TODO: WTF with thread??
-                lockService.unlockAllNodes(userSession.getUser());
+                String login = userSession.getUser().getLogin();
+                lockService.unlockAll(userSession.getUser());
                 userService.stopSession(userSession.getUser().getId());
                 clientWriter.send(newResponse(STATUS_SUCCESS_QUIT, "You are disconnected from server!"));
+                throw new QuitException(login);
             }
         });
 
@@ -343,6 +346,14 @@ public class CommandLine {
                 }
             }
         });
+
+        put("whoami", new Runnable() {
+            @Override
+            public void run() {
+                User user = userSession.getUser();
+                clientWriter.send(newResponse(STATUS_OK, user.getLogin()));
+            }
+        });
     }};
 
     private final LockService lockService;
@@ -353,6 +364,7 @@ public class CommandLine {
     private final XmlHelper xmlHelper;
     private final CommandParser parser;
     private User user;
+    private NodePrinter nodePrinter;
 
     public CommandLine(LockService lockService, NodeService nodeService, UserService userService, UserSession userSession, ClientWriter clientWriter) {
         this.lockService = lockService;
@@ -362,6 +374,7 @@ public class CommandLine {
         this.clientWriter = clientWriter;
         xmlHelper = new XmlHelper();
         parser = new CommandParser();
+        nodePrinter = new NodePrinter(this.lockService);
     }
 
     public void onUserInput(String message) {
@@ -381,8 +394,12 @@ public class CommandLine {
             } else {
                 clientWriter.send(newResponse(STATUS_OK, "No such command! Please check you syntax or type 'help'!"));
             }
-        } catch(Exception e) {
+        } catch(IllegalArgumentException e) {
             clientWriter.send(newResponse(STATUS_FAIL, e.getMessage()));
+        } catch(IllegalAccessError e) {
+            clientWriter.send(newResponse(STATUS_FAIL, e.getMessage()));
+        } catch (NullPointerException npe) {
+            clientWriter.send(newResponse(STATUS_FAIL, npe.getMessage()));
         }
     }
 

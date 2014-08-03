@@ -27,17 +27,28 @@ public class IncomingMessageHandler {
         String message = response.getMessage();
 
         User user = userManager.getUser();
-        if (Response.STATUS_SUCCESS_CONNECT == code) {  // success authorization
-            user.setId(response.getSpecificCode());
-            userManager.setUser(user);
-        } else if (Response.STATUS_FAIL_CONNECT == code) { // fail authorization
-            userManager.setUser(null);
-            networkManager.closeSocket();
-        } else if (Response.STATUS_SUCCESS_QUIT == code) { // quit response
-            userManager.setUser(null);
-            networkManager.closeSocket();
-        }
 
-        System.out.println(message);
+        switch (code) {
+            case Response.STATUS_SUCCESS_CONNECT:  // success authorization
+                user.setId(response.getSpecificCode());
+                userManager.setUser(user);
+                System.out.println(message);
+                break;
+            case Response.STATUS_FAIL_CONNECT:     // fail authorization
+                userManager.setUser(null);
+                networkManager.closeSocket();
+                System.err.println(message);
+                break;
+            case Response.STATUS_SUCCESS_QUIT:     // quit response
+                userManager.setUser(null);
+                networkManager.closeSocket();
+                System.out.println(message);
+                break;
+            case Response.STATUS_FAIL:
+                System.err.println(message);
+                break;
+            default:
+                System.out.println(message);
+        }
     }
 }

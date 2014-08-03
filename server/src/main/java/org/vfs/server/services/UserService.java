@@ -4,17 +4,17 @@ import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author Lipatov Nikita
  */
 public class UserService {
-    private NodeService nodeService;
-    private Map<String, UserSession> registry = new HashMap<String, UserSession>();
+    private final NodeService nodeService;
+    private final Map<String, UserSession> registry = new ConcurrentHashMap<>();
 
     public UserService(NodeService nodeService) {
         this.nodeService = nodeService;

@@ -4,6 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
+import org.vfs.server.utils.NodePrinter;
 
 /**
  * @author Lipatov Nikita
@@ -12,11 +13,12 @@ public class NodeServiceTest {
 
     private LockService lockService = new LockService();
     private NodeService nodeService = new NodeService("/", lockService);
+    private NodePrinter nodePrinter = new NodePrinter(lockService);
 
     @Test
     public void testCreateNode() throws Exception {
         nodeService.createNode(nodeService.getRoot(), "test", NodeTypes.DIR);
-        String tree = nodeService.printTree(nodeService.getRoot());
+        String tree = nodePrinter.print(nodeService.getRoot());
         Assert.assertEquals(
                 "/\n" +
                         "|__home\n" +
@@ -27,7 +29,7 @@ public class NodeServiceTest {
     @Test
     public void testCreateNodeStartSlash() throws Exception {
         nodeService.createNode(nodeService.getRoot(), "/test", NodeTypes.DIR);
-        String tree = nodeService.printTree(nodeService.getRoot());
+        String tree = nodePrinter.print(nodeService.getRoot());
         Assert.assertEquals(
                 "/\n" +
                         "|__home\n" +
@@ -38,7 +40,7 @@ public class NodeServiceTest {
     @Test
     public void testCreateNodeThreeDirs() throws Exception {
         nodeService.createNode(nodeService.getRoot(), "/test1/test2/test3", NodeTypes.DIR);
-        String tree = nodeService.printTree(nodeService.getRoot());
+        String tree = nodePrinter.print(nodeService.getRoot());
         Assert.assertEquals(
                 "/\n" +
                         "|__home\n" +
@@ -51,7 +53,7 @@ public class NodeServiceTest {
     @Test
     public void testCreateNodeTwoDirsAndFile() throws Exception {
         nodeService.createNode(nodeService.getRoot(), "/test1/test2/weblogic.log", NodeTypes.FILE);
-        String tree = nodeService.printTree(nodeService.getRoot());
+        String tree = nodePrinter.print(nodeService.getRoot());
         Assert.assertEquals(
                 "/\n" +
                         "|__home\n" +
@@ -71,7 +73,7 @@ public class NodeServiceTest {
         root.setParent(nodeService.getRoot());
 
         nodeService.createNode(nodeService.getRoot(), "/root/logs/weblogic_clust1.log", NodeTypes.FILE);
-        String tree = nodeService.printTree(nodeService.getRoot());
+        String tree = nodePrinter.print(nodeService.getRoot());
         Assert.assertEquals(
                 "/\n" +
                         "|__home\n" +

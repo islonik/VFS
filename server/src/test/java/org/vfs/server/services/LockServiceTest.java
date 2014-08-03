@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
+import org.vfs.server.utils.NodePrinter;
 
 /**
  * @author Lipatov Nikita
@@ -12,10 +13,12 @@ import org.vfs.server.model.NodeTypes;
 public class LockServiceTest {
     private LockService lockService;
     private NodeService nodeService;
+    private NodePrinter nodePrinter;
 
     @Test
     public void testAddNode() throws Exception {
         lockService = new LockService();
+        nodePrinter = new NodePrinter(lockService);
 
         Node node = new Node("/", NodeTypes.DIR);
         Node home = new Node("home", NodeTypes.DIR);
@@ -28,6 +31,7 @@ public class LockServiceTest {
     @Test
     public void testRemoveNode() throws Exception {
         lockService = new LockService();
+        nodePrinter = new NodePrinter(lockService);
 
         Node node = new Node("/", NodeTypes.DIR);
         Node home = new Node("home", NodeTypes.DIR);
@@ -43,6 +47,7 @@ public class LockServiceTest {
     public void testIsLock() throws Exception {
         lockService = new LockService();
         nodeService = new NodeService("/", lockService);
+        nodePrinter = new NodePrinter(lockService);
 
         Node home = nodeService.getHome();
         Node servers = nodeService.newNode("servers", NodeTypes.DIR);
@@ -61,13 +66,14 @@ public class LockServiceTest {
                         "|__home\n" +
                         "|  |__servers [Locked by r1d1 ]\n" +
                         "|  |  |__weblogic\n",
-                nodeService.printTree(nodeService.getRoot()));
+                nodePrinter.print(nodeService.getRoot()));
     }
 
     @Test
     public void testLock() throws Exception {
         lockService = new LockService();
         nodeService = new NodeService("/", lockService);
+        nodePrinter = new NodePrinter(lockService);
 
         Node home = nodeService.getHome();
         Node servers = nodeService.newNode("servers", NodeTypes.DIR);
@@ -84,7 +90,7 @@ public class LockServiceTest {
                         "|__home [Locked by nikita ]\n" +
                         "|  |__servers\n" +
                         "|  |  |__weblogic\n",
-                nodeService.printTree(nodeService.getRoot()));
+                nodePrinter.print(nodeService.getRoot()));
 
         Assert.assertTrue(lockService.isLocked(home));
         Assert.assertEquals(user1, lockService.getUser(home));
@@ -95,6 +101,7 @@ public class LockServiceTest {
     public void testUnlock() throws Exception {
         lockService = new LockService();
         nodeService = new NodeService("/", lockService);
+        nodePrinter = new NodePrinter(lockService);
 
         Node home = nodeService.getHome();
         Node servers = nodeService.newNode("servers", NodeTypes.DIR);
@@ -113,7 +120,7 @@ public class LockServiceTest {
                         "|__home [Locked by nikita ]\n" +
                         "|  |__servers\n" +
                         "|  |  |__weblogic\n",
-                nodeService.printTree(nodeService.getRoot()));
+                nodePrinter.print(nodeService.getRoot()));
 
         Assert.assertEquals(user1, lockService.getUser(home));
 
@@ -125,6 +132,6 @@ public class LockServiceTest {
                         "|__home\n" +
                         "|  |__servers\n" +
                         "|  |  |__weblogic\n",
-                nodeService.printTree(nodeService.getRoot()));
+                nodePrinter.print(nodeService.getRoot()));
     }
 }

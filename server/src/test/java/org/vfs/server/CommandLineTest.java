@@ -12,6 +12,7 @@ import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.LockService;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.services.UserService;
+import org.vfs.server.utils.NodePrinter;
 
 import static org.mockito.Mockito.*;
 
@@ -23,15 +24,18 @@ public class CommandLineTest {
 
     private LockService lockService;
     private NodeService nodeService;
+    private NodePrinter nodePrinter;
 
     private Node root;
 
     @Test
     public void testCopy() throws Exception {
         lockService = new LockService();
+        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
+        
         root = nodeService.getRoot();
-
+        
         UserService userService = new UserService(nodeService);
         UserSession userSession1 = new UserSession();
 
@@ -60,13 +64,14 @@ public class CommandLineTest {
                         "|  |__applications\n" +
                         "|  |  |__servers\n" +
                         "|  |  |  |__weblogic\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
     }
 
     @Test
     public void testMove() throws Exception {
         lockService = new LockService();
+        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
@@ -95,13 +100,14 @@ public class CommandLineTest {
                         "|  |__applications\n" +
                         "|  |  |__servers\n" +
                         "|  |  |  |__weblogic\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
     }
 
     @Test
     public void testRm() throws Exception {
         lockService = new LockService();
+        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
@@ -127,13 +133,14 @@ public class CommandLineTest {
                 "/\n" +
                         "|__home\n" +
                         "|__logs\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
     }
 
     @Test
     public void testLockScenario() throws Exception {
         lockService = new LockService();
+        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
@@ -177,7 +184,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "lock applications/databases"));
@@ -194,7 +201,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
 
         cmd2.onUserInput(RequestFactory.newRequest("22", "r2d2", "lock applications"));
@@ -211,13 +218,14 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
     }
 
     @Test
     public void testRecursiveLockScenario() throws Exception {
         lockService = new LockService();
+        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
@@ -261,7 +269,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "lock -r applications/databases"));
@@ -278,7 +286,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
 
         cmd2.onUserInput(RequestFactory.newRequest("22", "r2d2", "lock -r applications"));
@@ -295,13 +303,14 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
     }
 
     @Test
     public void testRename() throws Exception {
         lockService = new LockService();
+        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
@@ -342,7 +351,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs [Locked by r1d1 ]\n" +
                         "|  |  |  |  |__weblogic.log [Locked by r1d1 ]\n" +
                         "|__home\n",
-                nodeService.printTree(root)
+                nodePrinter.print(root)
         );
 
     }

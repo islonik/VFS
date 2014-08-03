@@ -90,11 +90,11 @@ public class LockService {
         return false;
     }
 
-    public void unlockAllNodes(User user) {
+    public void unlockAll(User user) {
         Set<Node> nodes = lockMap.keySet();
         for(Node node : nodes) {
             NodeLock nodeLock = lockMap.get(node);
-            if(nodeLock.getUser().equals(user)) {
+            if(nodeLock.getUser() != null && nodeLock.getUser().equals(user)) {
                 nodeLock.release();
             }
         }
