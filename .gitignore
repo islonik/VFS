@@ -6,6 +6,13 @@
 target
 
 #################
+## maven-release-plugin
+#################
+
+*.releaseBackup
+release.properties
+
+#################
 ## Eclipse
 #################
 

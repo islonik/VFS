@@ -4,7 +4,7 @@
     <groupId>org.vfs</groupId>
     <artifactId>root</artifactId>
 	<name>Virtual File Server</name>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 	
 	<modules>

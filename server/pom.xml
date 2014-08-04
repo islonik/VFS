@@ -4,13 +4,13 @@
     <groupId>org.vfs</groupId>
     <artifactId>server</artifactId>
 	<name>Virtual File Server:Server</name>
-    <version>1.0.0</version>
+    <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 	
 	<parent>
         <groupId>org.vfs</groupId>
 		<artifactId>root</artifactId>
-		<version>1.0.0</version>
+		<version>1.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
         
