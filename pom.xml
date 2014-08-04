@@ -4,7 +4,7 @@
     <groupId>org.vfs</groupId>
     <artifactId>root</artifactId>
 	<name>Virtual File Server</name>
-    <version>1.0.0</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 	
 	<modules>
@@ -23,6 +23,10 @@
     <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+	<scm>
+		<connection>scm:git:git://github.com/islonik/VFS.git</connection>
+	</scm>
 	
 	<dependencyManagement>
 		<dependencies>
@@ -75,6 +79,7 @@
     
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -84,6 +89,25 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.4.2</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.scm</groupId>
+						<artifactId>maven-scm-provider-gitexe</artifactId>
+						<version>1.9</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<tagNameFormat>v@{project.version}</tagNameFormat>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<pushChanges>false</pushChanges> <!--Release Plugin don't push to remote-->
+					<localCheckout>true</localCheckout> <!--Release Plugin clone from local repo-->
+				</configuration>
+			</plugin>
 			
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
