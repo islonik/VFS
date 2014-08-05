@@ -29,7 +29,7 @@
         <dependency>
             <groupId>org.vfs</groupId>
             <artifactId>core</artifactId>
-            <version>1.0.0</version>
+            <version>${project.parent.version}</version>
         </dependency>
 		<dependency>
 			<groupId>com.google.inject</groupId>
