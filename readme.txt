@@ -13,7 +13,7 @@ Short version:
 1) 	Create a release branch from develop
 execute: git checkout -b release/1.0 develop
 2) 	Do maven release
-execute: mvn release:perform 
+execute: mvn release:prepare 
 3) 	Merge Release branch in Develop branch
 execute: git checkout develop             
 		 git merge --no-ff release/1.0 
