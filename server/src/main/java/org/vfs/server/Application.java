@@ -2,6 +2,9 @@ package org.vfs.server;
 
 import java.io.IOException;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 /**
  * Entry point
  * TODO: maven release plugin:
@@ -9,7 +12,7 @@ import java.io.IOException;
     + merge into master branch;
     + increase release version and convert release version to snapshot version;
    TODO: spring-develop branch (after maven-release-plugin)
-    + class Server should be injected through spring injection system (xml configuration + annotations (PassScan?!))
+    + class Server should be injected through spring injection system (xml configuration + annotations (classpath-scan!))
    // http://habrahabr.ru/post/231953/
 
  *
@@ -21,7 +24,9 @@ public class Application {
      * @param args no arguments
      */
     public static void main(String[] args) throws IOException {
-        Server server = new Server();
+        ApplicationContext context = new ClassPathXmlApplicationContext("context/application.xml");
+
+        Server server = (Server) context.getBean("Server");
         server.run();
     }
 }

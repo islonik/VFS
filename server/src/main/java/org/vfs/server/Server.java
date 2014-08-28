@@ -28,12 +28,12 @@ public class Server {
     private final NodeService nodeService;
     private final UserService userService;
 
-    public Server() throws IOException {
-        executorService = Executors.newCachedThreadPool();
-        networkManager = new NetworkManager("localhost", 4499, 100);
-        lockService = new LockService();
-        nodeService = new NodeService("/", lockService);
-        userService = new UserService(nodeService);
+    public Server(ExecutorService executorService, NetworkManager networkManager, LockService lockService, NodeService nodeService, UserService userService) throws IOException {
+        this.executorService = executorService;
+        this.networkManager = networkManager;
+        this.lockService = lockService;
+        this.nodeService = nodeService;
+        this.userService = userService;
 
         String out = "Server has been run!";
         System.out.println(out);
@@ -41,9 +41,7 @@ public class Server {
     }
 
     public void run() throws IOException {
-
-        while(true)
-        {
+        while (true) {
             Socket socket = networkManager.accept();
 
             UserSession userSession = userService.startSession();
@@ -61,7 +59,7 @@ public class Server {
                 public void run() {
                     try {
                         clientListener.listen();
-                    } catch(QuitException qe) {
+                    } catch (QuitException qe) {
                         System.out.println(qe.getMessage());
                     }
                 }
