@@ -1,5 +1,6 @@
 package org.vfs.server.services;
 
+import org.springframework.stereotype.Component;
 import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeLock;
@@ -12,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Lipatov Nikita
  */
+@Component
 public class LockService {
     private final Map<Node, NodeLock> lockMap = new ConcurrentHashMap<>();
 

@@ -7,6 +7,8 @@ import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.vfs.server.exceptions.QuitException;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.*;
@@ -19,6 +21,7 @@ import org.vfs.server.services.UserService;
  *
  * @author Lipatov Nikita
  */
+@Component("Server")
 public class Server {
     private static final Logger log = LoggerFactory.getLogger(Server.class);
 
@@ -28,6 +31,7 @@ public class Server {
     private final NodeService nodeService;
     private final UserService userService;
 
+    @Autowired
     public Server(ExecutorService executorService, NetworkManager networkManager, LockService lockService, NodeService nodeService, UserService userService) throws IOException {
         this.executorService = executorService;
         this.networkManager = networkManager;

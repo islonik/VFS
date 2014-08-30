@@ -1,5 +1,8 @@
 package org.vfs.server.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 
@@ -8,13 +11,17 @@ import java.util.*;
 /**
  * @author Lipatov Nikita
  */
+@Component
 public class NodeService {
+    private String separator;
     private LockService lockService;
+
     private Node root;
     private Node home;
-    private String separator;
 
-    public NodeService(String separator, LockService lockService) {
+    @Autowired
+    //public NodeService(@Value("${delimiter}")String separator, LockService lockService) {
+    public NodeService(@Value("#{properties['delimiter']}") String separator, LockService lockService) {
         if (separator.length() != 1) {
             throw new IllegalArgumentException("Separator should consist from one symbol!");
         }
@@ -167,6 +174,9 @@ public class NodeService {
     }
 
     public Node search(Node root, String path) {
+        if(path == null){
+            return null;
+        }
         if (path.contains(separator)) {
             String directoryName = path.substring(0, path.indexOf(separator));
             if (directoryName.isEmpty()) {

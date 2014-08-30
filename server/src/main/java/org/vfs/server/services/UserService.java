@@ -1,5 +1,7 @@
 package org.vfs.server.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
@@ -12,10 +14,12 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * @author Lipatov Nikita
  */
+@Component
 public class UserService {
     private final NodeService nodeService;
     private final Map<String, UserSession> registry = new ConcurrentHashMap<>();
 
+    @Autowired
     public UserService(NodeService nodeService) {
         this.nodeService = nodeService;
     }
