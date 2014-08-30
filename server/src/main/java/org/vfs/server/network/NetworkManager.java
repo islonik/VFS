@@ -19,17 +19,11 @@ public class NetworkManager {
     private final ServerSocket serverSocket;
     private final List<Socket> sockets;
 
-    /*@Autowired
+    @Autowired
     public NetworkManager(
             @Value("${server.name}") String address,
             @Value("${server.port}") String port,
-            @Value("${server.pool}") String pool) throws IOException {*/
-
-    @Autowired
-    public NetworkManager(
-            @Value("#{properties['server.name']}") String address,
-            @Value("#{properties['server.port']}")  String port,
-            @Value("#{properties['server.pool']}")  String pool) throws IOException {
+            @Value("${server.pool}") String pool) throws IOException {
 
         InetAddress inetAddress = InetAddress.getByName(address);
         serverSocket = new ServerSocket(Integer.parseInt(port), Integer.parseInt(pool), inetAddress);

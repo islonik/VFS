@@ -21,7 +21,7 @@ import org.vfs.server.services.UserService;
  *
  * @author Lipatov Nikita
  */
-@Component("Server")
+@Component
 public class Server {
     private static final Logger log = LoggerFactory.getLogger(Server.class);
 

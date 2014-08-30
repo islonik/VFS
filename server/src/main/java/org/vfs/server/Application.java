@@ -18,7 +18,7 @@ public class Application {
     public static void main(String[] args) throws IOException {
         ApplicationContext context = new ClassPathXmlApplicationContext("application.xml");
 
-        Server server = (Server) context.getBean("Server");
+        Server server = context.getBean(Server.class);
         server.run();
     }
 }

@@ -20,8 +20,7 @@ public class NodeService {
     private Node home;
 
     @Autowired
-    //public NodeService(@Value("${delimiter}")String separator, LockService lockService) {
-    public NodeService(@Value("#{properties['delimiter']}") String separator, LockService lockService) {
+    public NodeService(@Value("${delimiter}")String separator, LockService lockService) {
         if (separator.length() != 1) {
             throw new IllegalArgumentException("Separator should consist from one symbol!");
         }
