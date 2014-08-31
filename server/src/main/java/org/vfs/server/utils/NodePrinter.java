@@ -1,5 +1,7 @@
 package org.vfs.server.utils;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 import org.vfs.server.services.LockService;
@@ -12,10 +14,12 @@ import java.util.List;
 /**
  * @author Lipatov Nikita
  */
+@Component
 public class NodePrinter {
 
     private final LockService lockService;
 
+    @Autowired
     public NodePrinter(LockService lockService) {
         this.lockService = lockService;
     }

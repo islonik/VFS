@@ -3,9 +3,14 @@ package org.vfs.server;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.core.network.protocol.RequestFactory;
 import org.vfs.core.network.protocol.User;
+import org.vfs.server.commands.Command;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
@@ -14,29 +19,34 @@ import org.vfs.server.services.NodeService;
 import org.vfs.server.services.UserService;
 import org.vfs.server.utils.NodePrinter;
 
+import java.util.Map;
+
 import static org.mockito.Mockito.*;
 
 /**
  * @author: Lipatov Nikita
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/application.xml" })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CommandLineTest {
 
+    @Autowired
+    private Map<String, Command> commands;
+    @Autowired
     private LockService lockService;
+    @Autowired
     private NodeService nodeService;
+    @Autowired
     private NodePrinter nodePrinter;
 
     private Node root;
 
     @Test
     public void testCopy() throws Exception {
-        lockService = new LockService();
-        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
-        
         root = nodeService.getRoot();
         
-        UserService userService = new UserService(nodeService);
         UserSession userSession1 = new UserSession();
 
         User user1 = new User();
@@ -48,7 +58,7 @@ public class CommandLineTest {
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
-        CommandLine cmd = new CommandLine(lockService, nodeService, userService, userSession1, clientWriter);
+        CommandLine cmd = new CommandLine(commands, userSession1, clientWriter);
 
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir applications/servers/weblogic"));
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir logs"));
@@ -70,12 +80,9 @@ public class CommandLineTest {
 
     @Test
     public void testMove() throws Exception {
-        lockService = new LockService();
-        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
-        UserService userService = new UserService(nodeService);
         UserSession userSession1 = new UserSession();
 
         User user1 = new User();
@@ -87,7 +94,7 @@ public class CommandLineTest {
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
-        CommandLine cmd = new CommandLine(lockService, nodeService, userService, userSession1, clientWriter);
+        CommandLine cmd = new CommandLine(commands, userSession1, clientWriter);
 
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir applications/servers/weblogic"));
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir logs"));
@@ -106,12 +113,9 @@ public class CommandLineTest {
 
     @Test
     public void testRm() throws Exception {
-        lockService = new LockService();
-        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
-        UserService userService = new UserService(nodeService);
         UserSession userSession1 = new UserSession();
 
         User user1 = new User();
@@ -123,7 +127,7 @@ public class CommandLineTest {
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
-        CommandLine cmd = new CommandLine(lockService, nodeService, userService, userSession1, clientWriter);
+        CommandLine cmd = new CommandLine(commands, userSession1, clientWriter);
 
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir applications/servers"));
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir logs"));
@@ -139,12 +143,9 @@ public class CommandLineTest {
 
     @Test
     public void testLockScenario() throws Exception {
-        lockService = new LockService();
-        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
-        UserService userService = new UserService(nodeService);
         UserSession userSession1 = new UserSession();
         UserSession userSession2 = new UserSession();
 
@@ -164,9 +165,9 @@ public class CommandLineTest {
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
-        CommandLine cmd1 = new CommandLine(lockService, nodeService, userService, userSession1, clientWriter);
+        CommandLine cmd1 = new CommandLine(commands, userSession1, clientWriter);
 
-        CommandLine cmd2 = new CommandLine(lockService, nodeService, userService, userSession2, clientWriter);
+        CommandLine cmd2 = new CommandLine(commands, userSession2, clientWriter);
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "mkfile applications/servers/weblogic/logs/weblogic.log"));
 
@@ -224,12 +225,9 @@ public class CommandLineTest {
 
     @Test
     public void testRecursiveLockScenario() throws Exception {
-        lockService = new LockService();
-        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
-        UserService userService = new UserService(nodeService);
         UserSession userSession1 = new UserSession();
         UserSession userSession2 = new UserSession();
 
@@ -249,9 +247,9 @@ public class CommandLineTest {
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
-        CommandLine cmd1 = new CommandLine(lockService, nodeService, userService, userSession1, clientWriter);
+        CommandLine cmd1 = new CommandLine(commands, userSession1, clientWriter);
 
-        CommandLine cmd2 = new CommandLine(lockService, nodeService, userService, userSession2, clientWriter);
+        CommandLine cmd2 = new CommandLine(commands, userSession2, clientWriter);
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "mkfile applications/servers/weblogic/logs/weblogic.log"));
 
@@ -309,12 +307,9 @@ public class CommandLineTest {
 
     @Test
     public void testRename() throws Exception {
-        lockService = new LockService();
-        nodePrinter = new NodePrinter(lockService);
         nodeService = new NodeService("/", lockService);
         root = nodeService.getRoot();
 
-        UserService userService = new UserService(nodeService);
         UserSession userSession1 = new UserSession();
         UserSession userSession2 = new UserSession();
 
@@ -334,9 +329,9 @@ public class CommandLineTest {
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
-        CommandLine cmd1 = new CommandLine(lockService, nodeService, userService, userSession1, clientWriter);
+        CommandLine cmd1 = new CommandLine(commands, userSession1, clientWriter);
 
-        CommandLine cmd2 = new CommandLine(lockService, nodeService, userService, userSession2, clientWriter);
+        CommandLine cmd2 = new CommandLine(commands, userSession2, clientWriter);
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "mkfile applications/servers/weblogic/logs/weblogic.log"));
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "lock -r applications/servers/weblogic"));
