@@ -28,11 +28,11 @@ public class MakeDirectory implements Command {
     @Override
     public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
         Node directory = userSession.getNode();
-        String createNode = values.getNextParam();
+        String newNodeName = values.getNextParam();
 
-        Node node = nodeService.search(directory, createNode);
+        Node node = nodeService.getNode(directory, newNodeName);
         if (node == null) {
-            node = nodeService.createNode(directory, createNode, NodeTypes.DIR);
+            node = nodeService.createNode(directory, newNodeName, NodeTypes.DIR);
             if(node != null) {
                 clientWriter.send(newResponse(STATUS_OK, "Directory " + nodeService.getFullPath(node) + " was created!"));
             } else {

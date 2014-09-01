@@ -30,9 +30,9 @@ public class Remove implements Command {
     @Override
     public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
         Node directory = userSession.getNode();
-        String removeNode = values.getNextParam();
+        String nodeName = values.getNextParam();
 
-        Node node = nodeService.search(directory, removeNode);
+        Node node = nodeService.getNode(directory, nodeName);
 
         if (node != null) {
             if (lockService.isLocked(node, true)) {
@@ -40,11 +40,11 @@ public class Remove implements Command {
                 return;
             }
 
-            Node removedNode = nodeService.removeNode(directory, removeNode);
-            if (removedNode == null) {
-                clientWriter.send(newResponse(STATUS_OK, "Node was found, but wasn't deleted!"));
+            boolean isRemoved = nodeService.removeNode(directory, nodeName);
+            if (isRemoved) {
+                clientWriter.send(newResponse(STATUS_OK, "Node " + nodeName + " was deleted!"));
             } else {
-                clientWriter.send(newResponse(STATUS_OK, "Node " + removedNode.getName() + " was deleted!"));
+                clientWriter.send(newResponse(STATUS_OK, "Node was found, but wasn't deleted!"));
             }
         } else {
             clientWriter.send(newResponse(STATUS_OK, "Node is not found!"));

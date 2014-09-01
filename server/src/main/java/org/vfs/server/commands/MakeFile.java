@@ -30,7 +30,7 @@ public class MakeFile implements Command {
         Node directory = userSession.getNode();
         String createNode = values.getNextParam();
 
-        Node node = nodeService.search(directory, createNode);
+        Node node = nodeService.getNode(directory, createNode);
         if (node == null) {
             node = nodeService.createNode(directory, createNode, NodeTypes.FILE);
             if(node != null) {

@@ -34,8 +34,8 @@ public class Move implements Command {
         String source = values.getNextParam();
         String destination = values.getNextParam();
 
-        Node sourceNode = nodeService.search(directory, source);
-        Node destinationNode = nodeService.search(directory, destination);
+        Node sourceNode = nodeService.getNode(directory, source);
+        Node destinationNode = nodeService.getNode(directory, destination);
 
         if (sourceNode == null) {
             clientWriter.send(newResponse(STATUS_OK, "Source path/node not found!"));

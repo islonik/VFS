@@ -35,7 +35,7 @@ public class Lock implements Command {
         String key = values.getNextKey();
         String lockDirectory = values.getNextParam();
 
-        Node node = nodeService.search(directory, lockDirectory);
+        Node node = nodeService.getNode(directory, lockDirectory);
         if (node != null) {
             boolean recursive = false;
             if(key != null && key.equals("r")) {

@@ -35,7 +35,7 @@ public class Unlock implements Command {
         String key = values.getNextKey();
         String unlockDirectory = values.getNextParam();
 
-        Node node = nodeService.search(directory, unlockDirectory);
+        Node node = nodeService.getNode(directory, unlockDirectory);
         if (node != null) {
             boolean recursive = false;
             if(key != null && key.equals("r")) {

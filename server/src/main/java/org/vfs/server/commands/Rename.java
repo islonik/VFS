@@ -33,7 +33,7 @@ public class Rename implements Command {
         String renameNode = values.getNextParam();
         String newName = values.getNextParam();
 
-        Node node = nodeService.search(directory, renameNode);
+        Node node = nodeService.getNode(directory, renameNode);
         String oldName = node.getName();
 
         if (node != null) {

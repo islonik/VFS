@@ -32,17 +32,13 @@ public class ChangeDirectory implements Command {
             source = ".";
         }
 
-        Node node = nodeService.search(directory, source);
+        Node node = nodeService.getNode(directory, source);
         if(node != null) {
             if (node.getType() == NodeTypes.FILE) {
                 clientWriter.send(newResponse(STATUS_OK, "Source node is file!"));
             } else {
-                if (node != null) {
-                    userSession.setNode(node);
-                    clientWriter.send(newResponse(STATUS_OK, nodeService.getFullPath(node)));
-                } else {
-                    clientWriter.send(newResponse(STATUS_OK, "Directory wasn't found!"));
-                }
+                userSession.setNode(node);
+                clientWriter.send(newResponse(STATUS_OK, nodeService.getFullPath(node)));
             }
         } else {
             clientWriter.send(newResponse(STATUS_OK, "Destination node is not found!"));

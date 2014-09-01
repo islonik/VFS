@@ -22,6 +22,8 @@ import org.vfs.server.services.UserService;
  * Server class.
  *
  * @author Lipatov Nikita
+ * TODO: 1) Test на LockService (несколько потоков - попытаться заблокировать одну и ту же ноду)
+ * TODO: 2) @NodeRegisterAware создать аннотацию, которая будет инструментировать автоматически через spring-advice ноды, добавляя и удаляя их из LockService
  */
 @Component
 public class Server {

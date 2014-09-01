@@ -172,7 +172,7 @@ public class NodeService {
         }
     }
 
-    public Node search(Node root, String path) {
+    public Node getNode(Node root, String path) {
         if(path == null){
             return null;
         }
@@ -180,7 +180,7 @@ public class NodeService {
             String directoryName = path.substring(0, path.indexOf(separator));
             if (directoryName.isEmpty()) {
                 directoryName = path.substring(path.indexOf(separator) + 1, path.length());
-                return search(root, directoryName);
+                return getNode(root, directoryName);
             }
             Node directoryNode = findByName(root, directoryName);
 
@@ -192,14 +192,14 @@ public class NodeService {
                 return directoryNode;
             } else {
                 path = path.substring(path.indexOf(separator) + 1, path.length());
-                return search(directoryNode, path);
+                return getNode(directoryNode, path);
             }
         } else {
             return findByName(root, path);
         }
     }
 
-    public Node removeNode(Node root, String path) {
+    public boolean removeNode(Node root, String path) {
         if (path.contains(separator)) {
             String directoryName = path.substring(0, path.indexOf(separator));
             path = path.substring(path.indexOf(separator) + 1, path.length());
@@ -210,7 +210,7 @@ public class NodeService {
             Node directoryNode = findByName(root, directoryName);
 
             if (directoryNode == null) {
-                return null;
+                return false;
             }
 
             return this.removeNode(directoryNode, path);
@@ -221,7 +221,7 @@ public class NodeService {
                 Node parent = leafNode.getParent();
                 parent.removeChild(leafNode);
             }
-            return leafNode;
+            return true;
         }
     }
 
