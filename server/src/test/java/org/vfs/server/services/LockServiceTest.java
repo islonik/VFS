@@ -7,6 +7,9 @@ import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 import org.vfs.server.utils.NodePrinter;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * @author Lipatov Nikita
  */
@@ -132,6 +135,64 @@ public class LockServiceTest {
                         "|__home\n" +
                         "|  |__servers\n" +
                         "|  |  |__weblogic\n",
+                nodePrinter.print(nodeService.getRoot()));
+    }
+
+    @Test
+    public void testLockMultithreading() throws Exception {
+        lockService = new LockService();
+        nodeService = new NodeService("/", lockService);
+        nodePrinter = new NodePrinter(lockService);
+
+        final Node home = nodeService.getHome();
+        final Node servers = nodeService.newNode("servers", NodeTypes.DIR);
+        nodeService.setParent(servers, home);
+        final Node weblogic = nodeService.newNode("weblogic", NodeTypes.DIR);
+        nodeService.setParent(weblogic, servers);
+
+        final User user1 = new User("121", "nikita");
+        final User user2 = new User("122", "admin");
+        final User user3 = new User("123", "r2d2");
+
+        Runnable thread1 = new Runnable() {
+            public void run() {
+                if(!lockService.isLocked(weblogic)) {
+                    lockService.lock(user1, weblogic);
+                }
+            }
+        };
+
+        Runnable thread2 = new Runnable() {
+            public void run() {
+                if(!lockService.isLocked(weblogic)) {
+                    lockService.lock(user2, weblogic);
+                }
+            }
+        };
+
+        Runnable thread3 = new Runnable() {
+            public void run() {
+                if(!lockService.isLocked(weblogic)) {
+                    lockService.lock(user3, weblogic);
+                }
+            }
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(3);
+        executor.execute(thread1);
+        executor.execute(thread2);
+        executor.execute(thread3);
+
+        executor.shutdown();
+
+        Assert.assertTrue(lockService.isLocked(weblogic));
+        Assert.assertEquals(user1.getLogin(), lockService.getUser(weblogic).getLogin());
+
+        Assert.assertEquals(
+                "/\n" +
+                        "|__home\n" +
+                        "|  |__servers\n" +
+                        "|  |  |__weblogic [Locked by nikita ]\n",
                 nodePrinter.print(nodeService.getRoot()));
     }
 }
