@@ -10,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+//import org.vfs.server.aspects.NodeRegister;
 import org.vfs.server.commands.Command;
 import org.vfs.server.exceptions.QuitException;
+import org.vfs.server.model.NodeTypes;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.*;
 import org.vfs.server.services.LockService;
@@ -48,9 +50,11 @@ public class Server {
         String out = "Server has been run!";
         System.out.println(out);
         log.info(out);
+        nodeService.newNode("test", NodeTypes.DIR);
     }
 
     public void run() throws IOException {
+
         while (true) {
             Socket socket = networkManager.accept();
 

@@ -14,7 +14,7 @@ import java.util.*;
 @Component
 public class NodeService {
     private String separator;
-    private LockService lockService;
+    private final LockService lockService;
 
     private Node root;
     private Node home;
@@ -29,12 +29,12 @@ public class NodeService {
 
         root = newNode("/", NodeTypes.DIR);
         home = newNode("home", NodeTypes.DIR);
-
         setParent(home, root);
     }
 
     public Node newNode(String name, NodeTypes type) {
         Node node = new Node(name, type);
+        System.out.println("newNode!");
         lockService.addNode(node);
         return node;
     }
@@ -132,12 +132,6 @@ public class NodeService {
         return null;
     }
 
-    public Node createHomeDirectory(String login) {
-        Node node = newNode(login, NodeTypes.DIR);
-        setParent(node, home);
-        return node;
-    }
-
     public Node createNode(Node root, String path, NodeTypes nodeType) {
         if (path.contains(separator)) {
             String directoryName = path.substring(0, path.indexOf(separator));
@@ -149,7 +143,7 @@ public class NodeService {
             Node directoryNode = findByName(root, directoryName);
 
             if (directoryNode == null) {
-                directoryNode = newNode(directoryName, NodeTypes.DIR);
+                directoryNode = this.newNode(directoryName, NodeTypes.DIR);
                 setParent(directoryNode, root);
             } else {
                 if (directoryNode.getType() == NodeTypes.FILE) {
@@ -165,7 +159,7 @@ public class NodeService {
             Node leafNode = findByName(root, path);
 
             if (leafNode == null) {
-                leafNode = newNode(path, nodeType);
+                leafNode = this.newNode(path, nodeType);
                 setParent(leafNode, root);
             }
             return leafNode;

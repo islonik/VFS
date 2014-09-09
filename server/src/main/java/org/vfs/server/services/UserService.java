@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.Node;
+import org.vfs.server.model.NodeTypes;
 import org.vfs.server.model.UserSession;
 
 import java.util.Map;
@@ -38,8 +39,11 @@ public class UserService {
     public void attachUser(String id, String login) {
         UserSession userSession = registry.get(id);
 
-        Node home = nodeService.createHomeDirectory(login);
-        userSession.setNode(home);
+        Node home = nodeService.getHome();
+        Node loginHome = nodeService.newNode(login, NodeTypes.DIR);
+        nodeService.setParent(loginHome, home);
+
+        userSession.setNode(loginHome);
         userSession.getUser().setLogin(login);
     }
 
