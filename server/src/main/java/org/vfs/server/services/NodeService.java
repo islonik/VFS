@@ -3,6 +3,7 @@ package org.vfs.server.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.vfs.server.aspects.NodeModifier;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 
@@ -32,6 +33,7 @@ public class NodeService {
         setParent(home, root);
     }
 
+    @NodeModifier
     public Node newNode(String name, NodeTypes type) {
         Node node = new Node(name, type);
         System.out.println("newNode!");

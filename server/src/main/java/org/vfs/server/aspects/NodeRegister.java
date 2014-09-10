@@ -5,18 +5,20 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.springframework.aop.AfterReturningAdvice;
 import org.springframework.stereotype.Component;
 import org.vfs.server.model.NodeTypes;
+import java.lang.reflect.Method;
 
 /**
  * @author Lipatov Nikita
  */
-@Aspect
-public class NodeRegister {
+@Component
+public class NodeRegister implements AfterReturningAdvice {
 
-    @After("execution(* org.vfs.server.services.NodeService.newNode(..))")
-    public void advice1(JoinPoint joinPoint) {
-        System.err.println("We are here!" + joinPoint.getKind() + "  " + joinPoint.getArgs()[0] + "  " + joinPoint.getArgs()[1]);
+    @Override
+    public void afterReturning(Object returnValue, Method method, Object[] args, Object target) {
+        System.err.println("We are here! " + method.getName() + "  " + args[0] + "  " + args[1]);
     }
 
 }
