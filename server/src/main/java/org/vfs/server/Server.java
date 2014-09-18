@@ -50,10 +50,13 @@ public class Server {
         String out = "Server has been run!";
         System.out.println(out);
         log.info(out);
-        nodeService.newNode("test", NodeTypes.DIR);
     }
 
     public void run() throws IOException {
+        nodeService.initDirs();
+
+        nodeService.newNode("test", NodeTypes.DIR);
+        nodeService.newNode("test", NodeTypes.DIR);
 
         while (true) {
             Socket socket = networkManager.accept();

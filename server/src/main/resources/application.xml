@@ -13,22 +13,11 @@
 	http://www.springframework.org/schema/context/spring-context-4.0.xsd
 	">
 
-    <bean id="NodeAspect" class="org.vfs.server.aspects.NodeRegister" />
+    <aop:aspectj-autoproxy />
+
+    <bean id="NodeAspect" class="org.vfs.server.aspects.NodeRegisterAspect" />
 
     <aop:config>
-        <!-- Performance logging pointcut -
-            run for every method in a control or facade class -->
-        <!--aop:pointcut id="newNodePointcut" expression="execution(* *.newNode(..))" />
-
-        <aop:advisor
-                advice-ref="NodeAspect"
-                pointcut-ref="newNodePointcut"
-                id="NewNodeInterceptorAdvisor"  /-->
-
-        <aop:advisor
-                advice-ref="NodeAspect"
-                pointcut="@annotation(org.vfs.server.aspects.NodeModifier)"
-                id="NewNodeInterceptorAdvisor"  />
     </aop:config>
 
     <bean id="ExecutorService" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool" />

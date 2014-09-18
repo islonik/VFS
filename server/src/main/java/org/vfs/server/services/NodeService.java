@@ -27,10 +27,6 @@ public class NodeService {
         }
         this.separator = separator;
         this.lockService = lockService;
-
-        root = newNode("/", NodeTypes.DIR);
-        home = newNode("home", NodeTypes.DIR);
-        setParent(home, root);
     }
 
     @NodeModifier
@@ -221,7 +217,9 @@ public class NodeService {
         }
     }
 
-
-
-
+    public void initDirs() {
+        root = this.newNode("/", NodeTypes.DIR);
+        home = this.newNode("home", NodeTypes.DIR);
+        setParent(home, root);
+    }
 }
