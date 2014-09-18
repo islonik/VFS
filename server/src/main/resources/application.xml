@@ -17,9 +17,6 @@
 
     <bean id="NodeAspect" class="org.vfs.server.aspects.NodeRegisterAspect" />
 
-    <aop:config>
-    </aop:config>
-
     <bean id="ExecutorService" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool" />
 
     <context:property-placeholder location="classpath:settings.properties"/>
