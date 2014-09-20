@@ -1,7 +1,14 @@
 package org.vfs.server.services;
 
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 import org.vfs.server.utils.NodePrinter;
@@ -9,11 +16,42 @@ import org.vfs.server.utils.NodePrinter;
 /**
  * @author Lipatov Nikita
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(locations = { "/application-test.xml" })
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class NodeServiceTest {
 
-    private LockService lockService = new LockService();
-    private NodeService nodeService = new NodeService("/", lockService);
-    private NodePrinter nodePrinter = new NodePrinter(lockService);
+    private LockService lockService;
+    private NodeManager nodeManager;
+    private NodeService nodeService;
+    private NodePrinter nodePrinter;
+
+    @Autowired
+    public void setServices(LockService lockService, NodeManager nodeManager, NodeService nodeService, NodePrinter nodePrinter) {
+        this.lockService = lockService;
+        this.nodeManager = nodeManager;
+        this.nodeService = nodeService;
+        this.nodePrinter = nodePrinter;
+        this.nodeService.initDirs();
+        System.err.println("init");
+    }
+
+    @Test
+    public void testClone() throws Exception {
+        Node home = this.nodeService.getHome();
+        Node boy  = this.nodeManager.newNode("boy",  NodeTypes.DIR);
+        Node girl = this.nodeManager.newNode("girl", NodeTypes.DIR);
+        this.nodeManager.setParent(boy, home);
+        this.nodeManager.setParent(girl, home);
+        Node homeClone = nodeService.clone(home);
+
+        Assert.assertEquals(home.getChildren().size(), homeClone.getChildren().size());
+        Assert.assertNotEquals(home.toString(), homeClone.toString());
+        Assert.assertNotEquals(home.getChildren().toArray()[0].toString(), homeClone.getChildren().toArray()[0].toString());
+        Assert.assertEquals(((Node) home.getChildren().toArray()[0]).getName(), ((Node) homeClone.getChildren().toArray()[0]).getName());
+        Assert.assertNotEquals(home.getChildren().toArray()[1].toString(), homeClone.getChildren().toArray()[1].toString());
+        Assert.assertEquals(((Node) home.getChildren().toArray()[1]).getName(), ((Node) homeClone.getChildren().toArray()[1]).getName());
+    }
 
     @Test
     public void testCreateNode() throws Exception {
@@ -84,34 +122,15 @@ public class NodeServiceTest {
                 tree);
     }
 
-    @Test
-    public void testClone() throws Exception {
-        Node root = new Node("/", NodeTypes.DIR);
-        Node home = new Node("home", NodeTypes.DIR);
-        home.setParent(root);
-        Node boy = new Node("boy", NodeTypes.DIR);
-        boy.setParent(home);
-        Node girl = new Node("girl", NodeTypes.DIR);
-        girl.setParent(home);
 
-        Node homeClone = nodeService.clone(home);
-
-        Assert.assertEquals(home.getChildren().size(), homeClone.getChildren().size());
-        Assert.assertNotEquals(home.toString(), homeClone.toString());
-        Assert.assertNotEquals(home.getChildren().toArray()[0].toString(), homeClone.getChildren().toArray()[0].toString());
-        Assert.assertEquals(((Node) home.getChildren().toArray()[0]).getName(), ((Node) homeClone.getChildren().toArray()[0]).getName());
-        Assert.assertNotEquals(home.getChildren().toArray()[1].toString(), homeClone.getChildren().toArray()[1].toString());
-        Assert.assertEquals(((Node) home.getChildren().toArray()[1]).getName(), ((Node) homeClone.getChildren().toArray()[1]).getName());
-
-    }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSetParentUniqueNames() throws Exception {
         Node root = new Node("/", NodeTypes.DIR);
         Node home1 = new Node("home", NodeTypes.DIR);
-        nodeService.setParent(home1, root);
+        nodeService.getNodeManager().setParent(home1, root);
         home1.setParent(root);
         Node home2 = new Node("home", NodeTypes.DIR);
-        nodeService.setParent(home2, root); // exception from here
+        nodeService.getNodeManager().setParent(home2, root); // exception from here
     }
 }

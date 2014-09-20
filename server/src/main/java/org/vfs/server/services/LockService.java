@@ -25,6 +25,18 @@ public class LockService {
         return true;
     }
 
+    public boolean removeLock(Node source, Node child) {
+        if (source.contains(child)) {
+            Collection<Node> nodes = child.getChildren();
+            for (Node node : nodes) {
+                removeLock(child, node);
+            }
+            removeNode(child);
+            return true;
+        }
+        return false;
+    }
+
     public boolean removeNode(Node node) {
         if (!lockMap.containsKey(node)) {
             return false;

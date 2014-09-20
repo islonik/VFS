@@ -54,8 +54,8 @@ public class Move implements Command {
             }
 
             Node parent = sourceNode.getParent();
-            nodeService.setParent(sourceNode, destinationNode);
-            nodeService.removeNode(parent, sourceNode);
+            nodeService.getNodeManager().setParent(sourceNode, destinationNode);
+            nodeService.getNodeManager().removeNode(parent, sourceNode);
 
             clientWriter.send(newResponse(STATUS_OK,
                     "Source node " + nodeService.getFullPath(sourceNode) + " was moved to destination node " + nodeService.getFullPath(destinationNode)));

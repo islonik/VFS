@@ -8,6 +8,7 @@ import org.vfs.server.model.NodeTypes;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.LockService;
+import org.vfs.server.services.NodeManager;
 import org.vfs.server.services.NodeService;
 
 import static org.vfs.core.network.protocol.Response.STATUS_OK;
@@ -54,7 +55,7 @@ public class Copy implements Command {
             }
 
             Node copyNode = nodeService.clone(sourceNode);
-            nodeService.setParent(copyNode, destinationNode);
+            nodeService.getNodeManager().setParent(copyNode, destinationNode);
             clientWriter.send(
                     newResponse(STATUS_OK,
                             "Source node " + nodeService.getFullPath(sourceNode) + " was copied to destination node " + nodeService.getFullPath(destinationNode)

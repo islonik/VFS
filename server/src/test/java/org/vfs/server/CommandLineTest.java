@@ -1,6 +1,7 @@
 package org.vfs.server;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,8 +16,8 @@ import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.LockService;
+import org.vfs.server.services.NodeManager;
 import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
 import org.vfs.server.utils.NodePrinter;
 
 import java.util.Map;
@@ -24,10 +25,11 @@ import java.util.Map;
 import static org.mockito.Mockito.*;
 
 /**
+ * All common tests, except LockTests.
  * @author: Lipatov Nikita
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/application.xml" })
+@ContextConfiguration(locations = { "/application-test.xml" })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CommandLineTest {
 
@@ -38,15 +40,21 @@ public class CommandLineTest {
     @Autowired
     private NodeService nodeService;
     @Autowired
+    private NodeManager nodeManager;
+    @Autowired
     private NodePrinter nodePrinter;
 
     private Node root;
 
+    @Before
+    public void cleanup() {
+        nodeService = new NodeService("/", lockService, nodeManager);
+        nodeService.initDirs();
+        root = nodeService.getRoot();
+    }
+
     @Test
     public void testCopy() throws Exception {
-        nodeService = new NodeService("/", lockService);
-        root = nodeService.getRoot();
-        
         UserSession userSession1 = new UserSession();
 
         User user1 = new User();
@@ -80,9 +88,6 @@ public class CommandLineTest {
 
     @Test
     public void testMove() throws Exception {
-        nodeService = new NodeService("/", lockService);
-        root = nodeService.getRoot();
-
         UserSession userSession1 = new UserSession();
 
         User user1 = new User();
@@ -113,9 +118,6 @@ public class CommandLineTest {
 
     @Test
     public void testRm() throws Exception {
-        nodeService = new NodeService("/", lockService);
-        root = nodeService.getRoot();
-
         UserSession userSession1 = new UserSession();
 
         User user1 = new User();
@@ -143,9 +145,6 @@ public class CommandLineTest {
 
     @Test
     public void testLockScenario() throws Exception {
-        nodeService = new NodeService("/", lockService);
-        root = nodeService.getRoot();
-
         UserSession userSession1 = new UserSession();
         UserSession userSession2 = new UserSession();
 
@@ -225,9 +224,6 @@ public class CommandLineTest {
 
     @Test
     public void testRecursiveLockScenario() throws Exception {
-        nodeService = new NodeService("/", lockService);
-        root = nodeService.getRoot();
-
         UserSession userSession1 = new UserSession();
         UserSession userSession2 = new UserSession();
 
@@ -307,9 +303,6 @@ public class CommandLineTest {
 
     @Test
     public void testRename() throws Exception {
-        nodeService = new NodeService("/", lockService);
-        root = nodeService.getRoot();
-
         UserSession userSession1 = new UserSession();
         UserSession userSession2 = new UserSession();
 

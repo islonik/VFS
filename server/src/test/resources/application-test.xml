@@ -15,10 +15,12 @@
 
     <aop:aspectj-autoproxy />
 
-	<context:property-placeholder location="classpath:settings.properties"/>
+    <context:property-placeholder location="classpath:settings.properties"/>
 
     <bean id="ExecutorService" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool" />
 
-    <context:component-scan base-package="org.vfs.server"/>
+	<context:component-scan base-package="org.vfs.server">
+		<context:exclude-filter type="regex" expression="org\.vfs\.server\.Server"/>
+	</context:component-scan>
 
 </beans>

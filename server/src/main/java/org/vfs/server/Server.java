@@ -24,8 +24,6 @@ import org.vfs.server.services.UserService;
  * Server class.
  *
  * @author Lipatov Nikita
- * TODO: 1) Test на LockService (несколько потоков - попытаться заблокировать одну и ту же ноду)
- * TODO: 2) @NodeRegisterAware создать аннотацию, которая будет инструментировать автоматически через spring-advice ноды, добавляя и удаляя их из LockService
  */
 @Component
 public class Server {
@@ -33,16 +31,14 @@ public class Server {
 
     private final ExecutorService executorService;
     private final NetworkManager networkManager;
-    private final LockService lockService;
     private final NodeService nodeService;
     private final UserService userService;
     private final Map<String, Command> commands;
 
     @Autowired
-    public Server(ExecutorService executorService, NetworkManager networkManager, LockService lockService, NodeService nodeService, UserService userService, Map<String, Command> commands) throws IOException {
+    public Server(ExecutorService executorService, NetworkManager networkManager, NodeService nodeService, UserService userService, Map<String, Command> commands) throws IOException {
         this.executorService = executorService;
         this.networkManager = networkManager;
-        this.lockService = lockService;
         this.nodeService = nodeService;
         this.userService = userService;
         this.commands = commands;
@@ -54,9 +50,6 @@ public class Server {
 
     public void run() throws IOException {
         nodeService.initDirs();
-
-        nodeService.newNode("test", NodeTypes.DIR);
-        nodeService.newNode("test", NodeTypes.DIR);
 
         while (true) {
             Socket socket = networkManager.accept();

@@ -13,7 +13,8 @@ public class UserServiceTest {
     @Test
     public void testGetSession() throws Exception {
         LockService lockService = new LockService();
-        NodeService nodeService = new NodeService("/", lockService);
+        NodeManager nodeManager = new NodeManager();
+        NodeService nodeService = new NodeService("/", lockService, nodeManager);
         UserService userService = new UserService(nodeService);
 
         Assert.assertNull(userService.getSession(""));
@@ -25,7 +26,8 @@ public class UserServiceTest {
     @Test
     public void testStopSession() throws Exception {
         LockService lockService = new LockService();
-        NodeService nodeService = new NodeService("/", lockService);
+        NodeManager nodeManager = new NodeManager();
+        NodeService nodeService = new NodeService("/", lockService, nodeManager);
         UserService userService = new UserService(nodeService);
 
         UserSession userSession = userService.startSession();

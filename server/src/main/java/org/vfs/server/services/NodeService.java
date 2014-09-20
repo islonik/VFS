@@ -3,7 +3,6 @@ package org.vfs.server.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.vfs.server.aspects.NodeModifier;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 
@@ -16,29 +15,23 @@ import java.util.*;
 public class NodeService {
     private String separator;
     private final LockService lockService;
+    private final NodeManager nodeManager;
 
     private Node root;
     private Node home;
 
     @Autowired
-    public NodeService(@Value("${delimiter}")String separator, LockService lockService) {
+    public NodeService(@Value("${delimiter}")String separator, LockService lockService, NodeManager nodeManager) {
         if (separator.length() != 1) {
             throw new IllegalArgumentException("Separator should consist from one symbol!");
         }
         this.separator = separator;
         this.lockService = lockService;
-    }
-
-    @NodeModifier
-    public Node newNode(String name, NodeTypes type) {
-        Node node = new Node(name, type);
-        System.out.println("newNode!");
-        lockService.addNode(node);
-        return node;
+        this.nodeManager = nodeManager;
     }
 
     public Node clone(Node source) {
-        Node clone = newNode(source.getName(), source.getType());
+        Node clone = nodeManager.newNode(source.getName(), source.getType());
         Collection<Node> children = source.getChildren();
         for (Node child : children) {
             Node copyChild = clone(child);
@@ -47,51 +40,16 @@ public class NodeService {
         return clone;
     }
 
-    public void setParent(Node node, Node parent) {
-        if (duplicateExist(node, parent)) {
-            throw new IllegalArgumentException("Name already exist for " + parent.getName());
-        }
-        node.setParent(parent);
-    }
-
-    public boolean removeNode(Node source, Node child) {
-        if (source.removeChild(child)) {
-            setParent(child, null);
-            return removeLock(source, child);
-        }
-        return false;
-    }
-
-    private boolean removeLock(Node source, Node child) {
-        if (source.contains(child)) {
-            Collection<Node> nodes = child.getChildren();
-            for (Node node : nodes) {
-                removeLock(child, node);
-            }
-            lockService.removeNode(child);
-            return true;
-        }
-        return false;
-    }
-
-    private boolean duplicateExist(Node node, Node parent) {
-        if (parent == null) {
-            return false;
-        }
-        for (Node child : parent.getChildren()) {
-            if (child.getName().equals(node.getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public Node getRoot() {
         return root;
     }
 
     public Node getHome() {
         return home;
+    }
+
+    public NodeManager getNodeManager() {
+        return nodeManager;
     }
 
     public String removeDoubleSeparators(String path) {
@@ -141,11 +99,11 @@ public class NodeService {
             Node directoryNode = findByName(root, directoryName);
 
             if (directoryNode == null) {
-                directoryNode = this.newNode(directoryName, NodeTypes.DIR);
-                setParent(directoryNode, root);
+                directoryNode = nodeManager.newNode(directoryName, NodeTypes.DIR);
+                nodeManager.setParent(directoryNode, root);
             } else {
                 if (directoryNode.getType() == NodeTypes.FILE) {
-                    throw new IllegalArgumentException("You try create node through file node!");
+                    throw new IllegalArgumentException("You try to create the node through file node!");
                 }
             }
 
@@ -157,8 +115,8 @@ public class NodeService {
             Node leafNode = findByName(root, path);
 
             if (leafNode == null) {
-                leafNode = this.newNode(path, nodeType);
-                setParent(leafNode, root);
+                leafNode = nodeManager.newNode(path, nodeType);
+                nodeManager.setParent(leafNode, root);
             }
             return leafNode;
         }
@@ -211,15 +169,17 @@ public class NodeService {
 
             if (leafNode != null) {
                 Node parent = leafNode.getParent();
-                parent.removeChild(leafNode);
+                nodeManager.removeNode(parent, leafNode);
             }
             return true;
         }
     }
 
     public void initDirs() {
-        root = this.newNode("/", NodeTypes.DIR);
-        home = this.newNode("home", NodeTypes.DIR);
-        setParent(home, root);
+        if(root == null) {
+            root = nodeManager.newNode("/", NodeTypes.DIR);
+            home = nodeManager.newNode("home", NodeTypes.DIR);
+            nodeManager.setParent(home, root);
+        }
     }
 }

@@ -40,8 +40,8 @@ public class UserService {
         UserSession userSession = registry.get(id);
 
         Node home = nodeService.getHome();
-        Node loginHome = nodeService.newNode(login, NodeTypes.DIR);
-        nodeService.setParent(loginHome, home);
+        Node loginHome = nodeService.getNodeManager().newNode(login, NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(loginHome, home);
 
         userSession.setNode(loginHome);
         userSession.getUser().setLogin(login);
