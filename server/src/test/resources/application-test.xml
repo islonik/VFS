@@ -20,7 +20,9 @@
     <bean id="ExecutorService" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool" />
 
 	<context:component-scan base-package="org.vfs.server">
+		<context:exclude-filter type="regex" expression="org\.vfs\.server\.Application"/>
 		<context:exclude-filter type="regex" expression="org\.vfs\.server\.Server"/>
+		<context:exclude-filter type="regex" expression="org\.vfs\.server\.network\.NetworkManager"/>
 	</context:component-scan>
 
 </beans>

@@ -169,10 +169,24 @@ public class NodeService {
 
             if (leafNode != null) {
                 Node parent = leafNode.getParent();
-                nodeManager.removeNode(parent, leafNode);
+                Collection<Node> removingNodes = getAllNodes(leafNode);
+                removingNodes.add(leafNode);
+                for(Node removingNode : removingNodes) {
+                    nodeManager.removeNode(parent, removingNode);
+                }
             }
             return true;
         }
+    }
+
+    public Collection<Node> getAllNodes(Node node) {
+        Collection<Node> nodes = new ArrayList<>();
+        for(Node child: node.getChildren()) {
+            nodes.add(child);
+            Collection<Node> children = getAllNodes(child);
+            nodes.addAll(children);
+        }
+        return nodes;
     }
 
     public void initDirs() {

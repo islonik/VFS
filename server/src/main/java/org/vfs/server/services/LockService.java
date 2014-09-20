@@ -6,6 +6,7 @@ import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeLock;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -15,6 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component
 public class LockService {
+
     private final Map<Node, NodeLock> lockMap = new ConcurrentHashMap<>();
 
     public boolean addNode(Node node) {
@@ -45,6 +47,10 @@ public class LockService {
         return true;
     }
 
+    public int getLockMapSize() {
+        return lockMap.size();
+    }
+
     public boolean isLocked(Node node) {
         if (lockMap.containsKey(node)) {
             return !lockMap.get(node).isLocked();
@@ -67,6 +73,20 @@ public class LockService {
             return !lockMap.get(node).isLocked();
         }
         return false;
+    }
+
+    public Collection<Node> getAllLockedNodes(Node node) {
+        Collection<Node> lockedNodes = Collections.EMPTY_LIST;
+        if(lockMap.containsKey(node)) {
+            Collection<Node> children = node.getChildren();
+            for(Node child : children) {
+                if(isLocked(child)) {
+                    lockedNodes.add(child);
+                }
+                lockedNodes.addAll(getAllLockedNodes(child));
+            }
+        }
+        return lockedNodes;
     }
 
     public boolean lock(User user, Node node) {

@@ -1,11 +1,13 @@
 package org.vfs.server.services;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.core.network.protocol.User;
@@ -24,23 +26,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/application-test.xml" })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class LockServiceTest {
-    private LockService lockService;
-    private NodeManager nodeManager;
-    private NodeService nodeService;
-    private NodePrinter nodePrinter;
 
     @Autowired
-    public void setServices(LockService lockService, NodeManager nodeManager, NodeService nodeService, NodePrinter nodePrinter) {
-        this.lockService = lockService;
-        this.nodeManager = nodeManager;
-        this.nodeService = nodeService;
-        this.nodePrinter = nodePrinter;
-        this.nodeService.initDirs();
+    private LockService lockService;
+    @Autowired
+    private NodeService nodeService;
+    @Autowired
+    private NodePrinter nodePrinter;
+
+    @Before
+    public void cleanup() throws InterruptedException {
+        nodeService.initDirs();
     }
 
     @Test
     public void testAddNode() throws Exception {
+        Assert.assertTrue("This test is checked the impossibility of double adding into LockService", true);
+
         Node home = nodeService.getHome();
         Node servers = new Node("servers", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(servers, home);
@@ -52,7 +56,8 @@ public class LockServiceTest {
     @Test
     public void testIsLock() throws Exception {
         Node home = nodeService.getHome();
-        Node servers  = nodeService.findByName(nodeService.getHome(), "servers");
+        Node servers = nodeService.getNodeManager().newNode("servers", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(servers, home);
         Node weblogic = nodeService.getNodeManager().newNode("weblogic", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(weblogic, servers);
 
@@ -81,8 +86,6 @@ public class LockServiceTest {
 
     @Test
     public void testRemoveNode() throws Exception {
-        nodePrinter = new NodePrinter(lockService);
-
         Node node = new Node("/", NodeTypes.DIR);
         Node home = new Node("home", NodeTypes.DIR);
         home.setParent(node);
@@ -94,8 +97,31 @@ public class LockServiceTest {
     }
 
     @Test
+    public void testRemoveNodes() throws Exception {
+        Node home = nodeService.getHome();
+        Node applications = nodeService.getNodeManager().newNode("applications", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(applications, home);
+        Node weblogic     = nodeService.getNodeManager().newNode("weblogic",     NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(weblogic, applications);
+        Node oracle       = nodeService.getNodeManager().newNode("oracle",       NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(oracle, weblogic);
+        Node logs = nodeService.getNodeManager().newNode("logs", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(logs, home);
+        Node clone = nodeService.clone(applications);
+        nodeService.getNodeManager().setParent(clone, logs);
+        nodeService.removeNode(home, "applications");
+
+        // 6 node should exist
+        Assert.assertEquals(6, lockService.getLockMapSize());
+    }
+
+    @Test
     public void testLock() throws Exception {
         Node home = nodeService.getHome();
+        Node servers = nodeService.getNodeManager().newNode("servers", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(servers, home);
+        Node weblogic = nodeService.getNodeManager().newNode("weblogic", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(weblogic, servers);
 
         User user1 = new User("121", "nikita");
 
@@ -123,8 +149,10 @@ public class LockServiceTest {
     @Test
     public void testLockMultithreading() throws Exception {
         final Node home = nodeService.getHome();
-        final Node servers  = nodeService.findByName(home, "servers");
-        final Node weblogic = nodeService.findByName(servers, "weblogic");
+        final Node servers = nodeService.getNodeManager().newNode("servers", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(servers, home);
+        final Node weblogic = nodeService.getNodeManager().newNode("weblogic", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(weblogic, servers);
 
         int threads = 100;
 
@@ -158,17 +186,16 @@ public class LockServiceTest {
                                 "|  |  |__weblogic [Locked by nikita"
                 )
         );
-
-        for(int i = 1; i <= threads; i++) {
-            User user = users.get(i);
-            lockService.unlockAll(user);
-        }
-
     }
 
     @Test
     public void testUnlock() throws Exception {
         final Node home = nodeService.getHome();
+        Node servers = nodeService.getNodeManager().newNode("servers", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(servers, home);
+        Node weblogic = nodeService.getNodeManager().newNode("weblogic", NodeTypes.DIR);
+        nodeService.getNodeManager().setParent(weblogic, servers);
+
 
         User user1 = new User("121", "nikita");
         User user2 = new User("122", "admin");

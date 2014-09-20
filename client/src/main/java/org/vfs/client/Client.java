@@ -9,6 +9,7 @@ import org.vfs.client.network.IncomingMessageListener;
 import org.vfs.client.network.NetworkManager;
 import org.vfs.client.network.SocketReader;
 import org.vfs.client.network.SocketWriter;
+import org.vfs.core.exceptions.QuitException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -97,6 +98,8 @@ public class Client {
                     commandLine.execute(inputCommand);
                 } catch (IOException e) {
                     System.err.println(e.getLocalizedMessage());
+                } catch (QuitException qe) {
+                    System.out.println(qe.getMessage());
                 }
             }
         } catch (Exception error) {

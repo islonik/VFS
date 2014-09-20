@@ -4,6 +4,7 @@ import org.vfs.client.network.UserManager;
 import org.vfs.client.network.NetworkManager;
 import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
+import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.network.protocol.User;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class CommandLine {
                 if (userManager.isAuthorized()) {
                     networkManager.getMessageSender().send(userManager.getUser(), "quit");
                 }
-                System.exit(0); // close all thread and app
+                throw new QuitException("Successful exit!"); // close all thread and app
             }
         });
 

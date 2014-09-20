@@ -7,16 +7,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.core.network.protocol.RequestFactory;
 import org.vfs.core.network.protocol.User;
 import org.vfs.server.commands.Command;
-import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
-import org.vfs.server.services.LockService;
-import org.vfs.server.services.NodeManager;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.utils.NodePrinter;
 
@@ -31,26 +29,19 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/application-test.xml" })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CommandLineTest {
 
     @Autowired
     private Map<String, Command> commands;
     @Autowired
-    private LockService lockService;
-    @Autowired
     private NodeService nodeService;
-    @Autowired
-    private NodeManager nodeManager;
     @Autowired
     private NodePrinter nodePrinter;
 
-    private Node root;
-
     @Before
-    public void cleanup() {
-        nodeService = new NodeService("/", lockService, nodeManager);
+    public void cleanup() throws InterruptedException {
         nodeService.initDirs();
-        root = nodeService.getRoot();
     }
 
     @Test
@@ -62,7 +53,7 @@ public class CommandLineTest {
         user1.setLogin("r1d1");
 
         userSession1.setUser(user1);
-        userSession1.setNode(root);
+        userSession1.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
@@ -82,7 +73,7 @@ public class CommandLineTest {
                         "|  |__applications\n" +
                         "|  |  |__servers\n" +
                         "|  |  |  |__weblogic\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
     }
 
@@ -95,7 +86,7 @@ public class CommandLineTest {
         user1.setLogin("r1d1");
 
         userSession1.setUser(user1);
-        userSession1.setNode(root);
+        userSession1.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
@@ -112,7 +103,7 @@ public class CommandLineTest {
                         "|  |__applications\n" +
                         "|  |  |__servers\n" +
                         "|  |  |  |__weblogic\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
     }
 
@@ -125,7 +116,7 @@ public class CommandLineTest {
         user1.setLogin("r1d1");
 
         userSession1.setUser(user1);
-        userSession1.setNode(root);
+        userSession1.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
@@ -139,7 +130,7 @@ public class CommandLineTest {
                 "/\n" +
                         "|__home\n" +
                         "|__logs\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
     }
 
@@ -157,10 +148,10 @@ public class CommandLineTest {
         user2.setLogin("r2d2");
 
         userSession1.setUser(user1);
-        userSession1.setNode(root);
+        userSession1.setNode(nodeService.getRoot());
 
         userSession2.setUser(user2);
-        userSession2.setNode(root);
+        userSession2.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
@@ -184,7 +175,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "lock applications/databases"));
@@ -201,7 +192,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
 
         cmd2.onUserInput(RequestFactory.newRequest("22", "r2d2", "lock applications"));
@@ -218,7 +209,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
     }
 
@@ -236,10 +227,10 @@ public class CommandLineTest {
         user2.setLogin("r2d2");
 
         userSession1.setUser(user1);
-        userSession1.setNode(root);
+        userSession1.setNode(nodeService.getRoot());
 
         userSession2.setUser(user2);
-        userSession2.setNode(root);
+        userSession2.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
@@ -263,7 +254,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "lock -r applications/databases"));
@@ -280,7 +271,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
 
         cmd2.onUserInput(RequestFactory.newRequest("22", "r2d2", "lock -r applications"));
@@ -297,7 +288,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs\n" +
                         "|  |  |  |  |__weblogic.log\n" +
                         "|__home\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
     }
 
@@ -315,10 +306,10 @@ public class CommandLineTest {
         user2.setLogin("r2d2");
 
         userSession1.setUser(user1);
-        userSession1.setNode(root);
+        userSession1.setNode(nodeService.getRoot());
 
         userSession2.setUser(user2);
-        userSession2.setNode(root);
+        userSession2.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
 
@@ -339,7 +330,7 @@ public class CommandLineTest {
                         "|  |  |  |__logs [Locked by r1d1 ]\n" +
                         "|  |  |  |  |__weblogic.log [Locked by r1d1 ]\n" +
                         "|__home\n",
-                nodePrinter.print(root)
+                nodePrinter.print(nodeService.getRoot())
         );
 
     }

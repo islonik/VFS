@@ -6,6 +6,8 @@ import org.vfs.server.aspects.RemoveNodeModifier;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 
+import java.util.Collection;
+
 /**
  * @author Lipatov Nikita
  */

@@ -1,6 +1,5 @@
 package org.vfs.server.aspects;
 
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -26,13 +25,11 @@ public class NodeManagerAspect {
     @AfterReturning(pointcut="@annotation(NewNodeModifier)", returning="node")
     public void newNode(Node node) {
         lockService.addNode(node);
-        System.err.println("New node was captured! " + node.getName());
     }
 
     @After("@annotation(RemoveNodeModifier) && args(source, child)")
     public void removeNode(Node source, Node child) {
-        lockService.removeLock(source, child);
-        System.err.println("Remove node was captured! " + source.getName()  + " child = " + child.getName());
+        lockService.removeNode(child);
     }
 
 }

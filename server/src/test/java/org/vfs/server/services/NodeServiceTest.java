@@ -1,12 +1,10 @@
 package org.vfs.server.services;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.server.model.Node;
@@ -19,21 +17,19 @@ import org.vfs.server.utils.NodePrinter;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "/application-test.xml" })
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class NodeServiceTest {
 
-    private LockService lockService;
+    @Autowired
     private NodeManager nodeManager;
+    @Autowired
     private NodeService nodeService;
+    @Autowired
     private NodePrinter nodePrinter;
 
-    @Autowired
-    public void setServices(LockService lockService, NodeManager nodeManager, NodeService nodeService, NodePrinter nodePrinter) {
-        this.lockService = lockService;
-        this.nodeManager = nodeManager;
-        this.nodeService = nodeService;
-        this.nodePrinter = nodePrinter;
-        this.nodeService.initDirs();
-        System.err.println("init");
+    @Before
+    public void cleanup() throws InterruptedException {
+        nodeService.initDirs();
     }
 
     @Test

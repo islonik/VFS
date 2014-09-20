@@ -1,5 +1,7 @@
 package org.vfs.client.network;
 
+import org.vfs.core.exceptions.QuitException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
