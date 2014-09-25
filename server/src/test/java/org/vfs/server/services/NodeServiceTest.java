@@ -28,7 +28,7 @@ public class NodeServiceTest {
     private NodePrinter nodePrinter;
 
     @Before
-    public void cleanup() throws InterruptedException {
+    public void setUp() throws InterruptedException {
         nodeService.initDirs();
     }
 

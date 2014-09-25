@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.server.commands.Command;
+import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.*;
 import org.vfs.server.services.NodeService;
@@ -41,13 +43,13 @@ public class Server {
         this.commands = commands;
 
         String out = "Server has been run!";
+        nodeService.initDirs();
+
         System.out.println(out);
         log.info(out);
     }
 
     public void run() throws IOException {
-        nodeService.initDirs();
-
         while (true) {
             Socket socket = networkManager.accept();
 
@@ -56,13 +58,15 @@ public class Server {
 
             System.out.println("New socket has been accepted! User id is " + userSession.getUser().getId());
 
-            MessageReader messageReader = new MessageReader(socket.getInputStream());
+            final Timer timer = new Timer();
+
+            final MessageReader messageReader = new MessageReader(socket.getInputStream());
             final ClientWriter clientWriter = new ClientWriter(userSession);
 
             final CommandLine commandLine = new CommandLine(commands, userSession, clientWriter);
-            final ClientListener clientListener = new ClientListener(messageReader, userService, commandLine);
+            final ClientListener clientListener = new ClientListener(messageReader, userService, userSession, commandLine, timer);
 
-            executorService.execute(new Runnable() {
+            Runnable connection = new Runnable() {
                 @Override
                 public void run() {
                     try {
@@ -71,7 +75,11 @@ public class Server {
                         System.out.println(qe.getMessage());
                     }
                 }
-            });
+            };
+            Future ftask = executorService.submit(connection);
+
+            userSession.setTimer(timer);
+            userSession.setTask(ftask);
 
         }
 

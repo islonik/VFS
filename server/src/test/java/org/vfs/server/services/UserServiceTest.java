@@ -15,7 +15,7 @@ public class UserServiceTest {
         LockService lockService = new LockService();
         NodeManager nodeManager = new NodeManager();
         NodeService nodeService = new NodeService("/", lockService, nodeManager);
-        UserService userService = new UserService(nodeService);
+        UserService userService = new UserService(nodeService, lockService);
 
         Assert.assertNull(userService.getSession(""));
         UserSession userSession = userService.startSession();
@@ -28,11 +28,14 @@ public class UserServiceTest {
         LockService lockService = new LockService();
         NodeManager nodeManager = new NodeManager();
         NodeService nodeService = new NodeService("/", lockService, nodeManager);
-        UserService userService = new UserService(nodeService);
+        UserService userService = new UserService(nodeService, lockService);
 
         UserSession userSession = userService.startSession();
 
-        Assert.assertNotNull(userService.stopSession(userSession.getUser().getId()));
-        Assert.assertNull(userService.stopSession(userSession.getUser().getId()));
+        Assert.assertEquals(1, userService.getRegistry().size());
+        userService.stopSession(userSession.getUser().getId());
+        Assert.assertEquals(0, userService.getRegistry().size());
+        userService.stopSession(userSession.getUser().getId());
+        Assert.assertEquals(0, userService.getRegistry().size());
     }
 }

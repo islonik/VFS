@@ -3,6 +3,7 @@ package org.vfs.server.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 
@@ -195,5 +196,24 @@ public class NodeService {
             home = nodeManager.newNode("home", NodeTypes.DIR);
             nodeManager.setParent(home, root);
         }
+    }
+
+    public Node createHomeDirectory(String login) {
+        Node loginHome = nodeManager.newNode(login, NodeTypes.DIR);
+        this.nodeManager.setParent(loginHome, home);
+        return loginHome;
+    }
+
+    public void removeHomeDirectory(String login) {
+        Node home = this.getHome();
+        Node userHomeDir = this.findByName(home, login);
+        if(lockService.isLocked(userHomeDir, true)) {
+            Collection<Node> lockingNodes= lockService.getAllLockedNodes(userHomeDir);
+            for(Node lockingNode : lockingNodes) {
+                User lockingUser = lockService.getUser(lockingNode);
+                lockService.unlock(lockingUser, userHomeDir);
+            }
+        }
+        this.removeNode(home, login);
     }
 }

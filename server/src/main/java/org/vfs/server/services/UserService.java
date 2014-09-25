@@ -18,11 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class UserService {
     private final NodeService nodeService;
+    private final LockService lockService;
+
     private final Map<String, UserSession> registry = new ConcurrentHashMap<>();
 
     @Autowired
-    public UserService(NodeService nodeService) {
+    public UserService(NodeService nodeService, LockService lockService) {
         this.nodeService = nodeService;
+        this.lockService = lockService;
     }
 
     public UserSession startSession() {
@@ -39,9 +42,7 @@ public class UserService {
     public void attachUser(String id, String login) {
         UserSession userSession = registry.get(id);
 
-        Node home = nodeService.getHome();
-        Node loginHome = nodeService.getNodeManager().newNode(login, NodeTypes.DIR);
-        nodeService.getNodeManager().setParent(loginHome, home);
+        Node loginHome = nodeService.createHomeDirectory(login);
 
         userSession.setNode(loginHome);
         userSession.getUser().setLogin(login);
@@ -63,8 +64,24 @@ public class UserService {
         return registry.get(id);
     }
 
-    public UserSession stopSession(String id) {
-        return registry.remove(id);
+    /**
+     * Do not kill thread.
+     * @param id
+     */
+    public void stopSession(String id) {
+        if(registry.containsKey(id)) {
+            UserSession userSession = registry.get(id);
+            String login = userSession.getUser().getLogin();
+            if(login != null) { // sessions without user
+                this.nodeService.removeHomeDirectory(login);
+                lockService.unlockAll(userSession.getUser());
+            }
+            registry.remove(id);
+        }
+    }
+
+    public final Map<String, UserSession> getRegistry() {
+        return registry;
     }
 
 
