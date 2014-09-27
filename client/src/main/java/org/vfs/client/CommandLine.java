@@ -108,7 +108,7 @@ public class CommandLine {
                 commands.get("default").run();
             }
         } catch (ValidationException e) {
-            System.err.println("Validation error : " + e.getMessage());
+            System.err.println("Warning : " + e.getMessage());
         }
 
     }

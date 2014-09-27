@@ -44,12 +44,17 @@ public class TimeoutService {
         Set<String> keySet = sessions.keySet();
         for(String key : keySet) {
             UserSession userSession = sessions.get(key);
+            String login = userSession.getUser().getLogin();
             int diff = userSession.getTimer().difference();
-            System.out.println("key = " + key + " login = " + userSession.getUser().getLogin() + " diff = " + diff);
-            if(diff >= timeout) { // kill session
+            System.out.println("key = " + key + " login = " + login + " diff = " + diff);
+            if(diff >= 1 && login == null) { // very rare case
+                System.out.println("Rare thread was killed!");
+                userService.stopSession(key);
+                userSession.getTask().cancel(true);
+            }
+            if(diff >= timeout && login != null) { // kill session
                 System.out.println("Thread was killed!");
-                String id = userSession.getUser().getId();
-                userService.stopSession(id);
+                userService.stopSession(key);
                 userSession.getTask().cancel(true); // kill thread
             }
         }

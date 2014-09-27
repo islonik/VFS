@@ -16,7 +16,6 @@ public class UserSession {
     private volatile Timer timer;
     private volatile Future task;
     private volatile ClientWriter clientWriter;
-    private volatile boolean isAuth;
 
     public UserSession() {
     }
@@ -78,11 +77,4 @@ public class UserSession {
         this.clientWriter = clientWriter;
     }
 
-    public boolean isAuth() {
-        return isAuth;
-    }
-
-    public void setAuth(boolean isAuth) {
-        this.isAuth = isAuth;
-    }
 }

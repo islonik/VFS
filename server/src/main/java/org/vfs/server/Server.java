@@ -4,7 +4,6 @@ import java.net.*;
 import java.io.*;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.slf4j.Logger;
@@ -53,7 +52,7 @@ public class Server {
         while (true) {
             Socket socket = networkManager.accept();
 
-            UserSession userSession = userService.startSession();
+            final UserSession userSession = userService.startSession();
             userSession.setSocket(socket);
 
             System.out.println("New socket has been accepted! User id is " + userSession.getUser().getId());
@@ -70,10 +69,12 @@ public class Server {
             Runnable connection = new Runnable() {
                 @Override
                 public void run() {
+                    UserSession localUserSession = userSession;
                     try {
                         clientListener.listen();
                     } catch (QuitException qe) {
                         System.out.println(qe.getMessage());
+                        userService.stopSession(localUserSession.getUser().getId());
                     }
                 }
             };

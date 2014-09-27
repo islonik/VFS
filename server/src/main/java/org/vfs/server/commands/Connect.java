@@ -3,6 +3,7 @@ package org.vfs.server.commands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
+import org.vfs.core.exceptions.QuitException;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.NodeService;
@@ -38,6 +39,7 @@ public class Connect implements Command {
                             "Such user already exits. Please, change the login!"
                     )
             );
+            throw new QuitException("Such user already exist!");
         } else {
             userService.attachUser(userSession.getUser().getId(), login);
             clientWriter.send(

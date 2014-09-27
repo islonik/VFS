@@ -7,7 +7,6 @@ import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -51,7 +50,6 @@ public class UserService {
 
         userSession.setNode(loginHome);
         userSession.getUser().setLogin(login);
-        userSession.setAuth(true);
     }
 
     public boolean isLogged(String login) {
@@ -81,23 +79,13 @@ public class UserService {
             if(login != null) { // sessions without user
                 nodeService.removeHomeDirectory(login);
                 lockService.unlockAll(userSession.getUser());
+                userSession.getClientWriter().send(
+                        newResponse(
+                                STATUS_SUCCESS_QUIT,
+                                "Timeout disconnect"
+                        )
+                );
             }
-            if(userSession.getSocket() != null && !userSession.getSocket().isClosed()) {
-                try {
-                    if(userSession.isAuth()) {
-                        userSession.getClientWriter().send(
-                                newResponse(
-                                        STATUS_SUCCESS_QUIT,
-                                        "Timeout disconnect"
-                                )
-                        );
-                    }
-                    userSession.getSocket().close();
-                } catch(IOException ioe) {
-                    System.err.println("UserService.stopSession.IOException=" + ioe.getMessage());
-                }
-            }
-            userSession.setAuth(false);
             registry.remove(id);
         }
     }
@@ -110,7 +98,8 @@ public class UserService {
         Set<String> keySet = registry.keySet();
         for (String key : keySet) {
             UserSession userSession = registry.get(key);
-            if(!userSession.getUser().getId().equals(idMySession) && userSession.isAuth()) { // to all users except mine
+            String login = userSession.getUser().getLogin();
+            if(!userSession.getUser().getId().equals(idMySession) && login != null) { // to all users except mine
                 ClientWriter clientWriter = userSession.getClientWriter();
                 clientWriter.send(newResponse(STATUS_OK, message));
             }
