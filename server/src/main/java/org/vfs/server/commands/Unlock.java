@@ -9,6 +9,7 @@ import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.LockService;
 import org.vfs.server.services.NodeService;
+import org.vfs.server.services.UserService;
 
 import static org.vfs.core.network.protocol.Response.STATUS_OK;
 import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
@@ -21,15 +22,18 @@ public class Unlock implements Command {
 
     private final NodeService nodeService;
     private final LockService lockService;
+    private final UserService userService;
 
     @Autowired
-    public Unlock(NodeService nodeService, LockService lockService) {
+    public Unlock(NodeService nodeService, LockService lockService, UserService userService) {
         this.nodeService = nodeService;
         this.lockService = lockService;
+        this.userService = userService;
     }
 
     @Override
-    public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
+    public void apply(UserSession userSession, CommandValues values) {
+        ClientWriter clientWriter = userSession.getClientWriter();
         User user = userSession.getUser();
         Node directory = userSession.getNode();
         String key = values.getNextKey();
@@ -38,21 +42,45 @@ public class Unlock implements Command {
         Node node = nodeService.getNode(directory, unlockDirectory);
         if (node != null) {
             boolean recursive = false;
-            if(key != null && key.equals("r")) {
+            if (key != null && key.equals("r")) {
                 recursive = true;
             }
 
             if (!lockService.isLocked(node, recursive)) {
-                clientWriter.send(newResponse(STATUS_OK, "Node is already unlocked!"));
+                clientWriter.send(
+                        newResponse(
+                                STATUS_OK,
+                                "Node is already unlocked!"
+                        )
+                );
                 return;
             }
             if (lockService.unlock(user, node, recursive)) {
-                clientWriter.send(newResponse(STATUS_OK, "Node " + nodeService.getFullPath(node) + " was unlocked!"));
+                clientWriter.send(
+                        newResponse(
+                                STATUS_OK,
+                                "Node '" + nodeService.getFullPath(node) + "' was unlocked!"
+                        )
+                );
+                userService.sendMessageToUsers(
+                        userSession.getUser().getId(),
+                        "Node '" + nodeService.getFullPath(node) + "' was unlocked by user '" + user.getLogin() + "'"
+                );
             } else {
-                clientWriter.send(newResponse(STATUS_OK, "Node is locked by different user!"));
+                clientWriter.send(
+                        newResponse(
+                                STATUS_OK,
+                                "Node is locked by different user!"
+                        )
+                );
             }
         } else {
-            clientWriter.send(newResponse(STATUS_OK, "Node is not found!"));
+            clientWriter.send(
+                    newResponse(
+                            STATUS_OK,
+                            "Node is not found!"
+                    )
+            );
         }
     }
 }

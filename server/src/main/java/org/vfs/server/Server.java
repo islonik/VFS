@@ -61,9 +61,10 @@ public class Server {
             final Timer timer = new Timer();
 
             final MessageReader messageReader = new MessageReader(socket.getInputStream());
-            final ClientWriter clientWriter = new ClientWriter(userSession);
+            final ClientWriter clientWriter = new ClientWriter(userSession.getSocket());
+            userSession.setClientWriter(clientWriter);
 
-            final CommandLine commandLine = new CommandLine(commands, userSession, clientWriter);
+            final CommandLine commandLine = new CommandLine(commands, userSession);
             final ClientListener clientListener = new ClientListener(messageReader, userService, userSession, commandLine, timer);
 
             Runnable connection = new Runnable() {
@@ -80,7 +81,7 @@ public class Server {
 
             userSession.setTimer(timer);
             userSession.setTask(ftask);
-
+            userSession.setClientWriter(clientWriter);
         }
 
     }

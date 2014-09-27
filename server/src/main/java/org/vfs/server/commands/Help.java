@@ -15,7 +15,8 @@ import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 public class Help implements Command {
 
     @Override
-    public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
+    public void apply(UserSession userSession, CommandValues values) {
+        ClientWriter clientWriter = userSession.getClientWriter();
         clientWriter.send(newResponse(STATUS_OK,
                 "You can use next commands:\n" +
                         "    * - cd directory \n" +

@@ -8,6 +8,7 @@ import org.vfs.server.model.NodeTypes;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.NodeService;
+import org.vfs.server.services.UserService;
 
 import static org.vfs.core.network.protocol.Response.STATUS_OK;
 import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
@@ -24,7 +25,8 @@ public class ChangeDirectory implements Command {
         this.nodeService = nodeService;
     }
 
-    public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
+    public void apply(UserSession userSession, CommandValues values) {
+        ClientWriter clientWriter = userSession.getClientWriter();
         Node directory = userSession.getNode();
         String source = values.getNextParam();
 
@@ -33,15 +35,30 @@ public class ChangeDirectory implements Command {
         }
 
         Node node = nodeService.getNode(directory, source);
-        if(node != null) {
+        if (node != null) {
             if (node.getType() == NodeTypes.FILE) {
-                clientWriter.send(newResponse(STATUS_OK, "Source node is file!"));
+                clientWriter.send(
+                        newResponse(
+                                STATUS_OK,
+                                "Source node is file!"
+                        )
+                );
             } else {
                 userSession.setNode(node);
-                clientWriter.send(newResponse(STATUS_OK, nodeService.getFullPath(node)));
+                clientWriter.send(
+                        newResponse(
+                                STATUS_OK,
+                                nodeService.getFullPath(node)
+                        )
+                );
             }
         } else {
-            clientWriter.send(newResponse(STATUS_OK, "Destination node is not found!"));
+            clientWriter.send(
+                    newResponse(
+                            STATUS_OK,
+                            "Destination node is not found!"
+                    )
+            );
         }
     }
 }

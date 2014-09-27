@@ -56,8 +56,9 @@ public class CommandLineTest {
         userSession1.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
+        userSession1.setClientWriter(clientWriter);
 
-        CommandLine cmd = new CommandLine(commands, userSession1, clientWriter);
+        CommandLine cmd = new CommandLine(commands, userSession1);
 
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir applications/servers/weblogic"));
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir logs"));
@@ -89,8 +90,9 @@ public class CommandLineTest {
         userSession1.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
+        userSession1.setClientWriter(clientWriter);
 
-        CommandLine cmd = new CommandLine(commands, userSession1, clientWriter);
+        CommandLine cmd = new CommandLine(commands, userSession1);
 
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir applications/servers/weblogic"));
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir logs"));
@@ -119,8 +121,9 @@ public class CommandLineTest {
         userSession1.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
+        userSession1.setClientWriter(clientWriter);
 
-        CommandLine cmd = new CommandLine(commands, userSession1, clientWriter);
+        CommandLine cmd = new CommandLine(commands, userSession1);
 
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir applications/servers"));
         cmd.onUserInput(RequestFactory.newRequest("12", "nikita", "mkdir logs"));
@@ -154,10 +157,12 @@ public class CommandLineTest {
         userSession2.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
+        userSession1.setClientWriter(clientWriter);
+        userSession2.setClientWriter(clientWriter);
 
-        CommandLine cmd1 = new CommandLine(commands, userSession1, clientWriter);
+        CommandLine cmd1 = new CommandLine(commands, userSession1);
 
-        CommandLine cmd2 = new CommandLine(commands, userSession2, clientWriter);
+        CommandLine cmd2 = new CommandLine(commands, userSession2);
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "mkfile applications/servers/weblogic/logs/weblogic.log"));
 
@@ -233,10 +238,12 @@ public class CommandLineTest {
         userSession2.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
+        userSession1.setClientWriter(clientWriter);
+        userSession2.setClientWriter(clientWriter);
 
-        CommandLine cmd1 = new CommandLine(commands, userSession1, clientWriter);
+        CommandLine cmd1 = new CommandLine(commands, userSession1);
 
-        CommandLine cmd2 = new CommandLine(commands, userSession2, clientWriter);
+        CommandLine cmd2 = new CommandLine(commands, userSession2);
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "mkfile applications/servers/weblogic/logs/weblogic.log"));
 
@@ -312,10 +319,12 @@ public class CommandLineTest {
         userSession2.setNode(nodeService.getRoot());
 
         ClientWriter clientWriter = mock(ClientWriter.class);
+        userSession1.setClientWriter(clientWriter);
+        userSession2.setClientWriter(clientWriter);
 
-        CommandLine cmd1 = new CommandLine(commands, userSession1, clientWriter);
+        CommandLine cmd1 = new CommandLine(commands, userSession1);
 
-        CommandLine cmd2 = new CommandLine(commands, userSession2, clientWriter);
+        CommandLine cmd2 = new CommandLine(commands, userSession2);
 
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "mkfile applications/servers/weblogic/logs/weblogic.log"));
         cmd1.onUserInput(RequestFactory.newRequest("11", "r1d1", "lock -r applications/servers/weblogic"));

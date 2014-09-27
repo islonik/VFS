@@ -5,14 +5,16 @@ import org.vfs.client.network.NetworkManager;
 import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
+import org.vfs.core.exceptions.ValidationException;
 import org.vfs.core.network.protocol.User;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.vfs.core.utils.Preconditions.checkArgument;
+import static org.vfs.core.utils.Preconditions.checkNotNull;
 
 /**
  * @author Lipatov Nikita
@@ -44,6 +46,8 @@ public class CommandLine {
                     // newRequest request and send it to server
                     networkManager.getMessageSender().send(user, "connect " + user.getLogin());
 
+                } catch (ConnectException ce) {
+                    throw new ValidationException(ce.getMessage());
                 } catch (IOException ioe) {
                     System.err.println("CommandLine.IOException.Message=" + ioe.getMessage());
                 }
@@ -103,7 +107,7 @@ public class CommandLine {
             } else {
                 commands.get("default").run();
             }
-        } catch (IllegalArgumentException e) {
+        } catch (ValidationException e) {
             System.err.println("Validation error : " + e.getMessage());
         }
 

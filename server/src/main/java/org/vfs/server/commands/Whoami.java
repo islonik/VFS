@@ -16,8 +16,14 @@ import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 public class Whoami implements Command {
 
     @Override
-    public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
+    public void apply(UserSession userSession, CommandValues values) {
+        ClientWriter clientWriter = userSession.getClientWriter();
         User user = userSession.getUser();
-        clientWriter.send(newResponse(STATUS_OK, user.getLogin()));
+        clientWriter.send(
+                newResponse(
+                        STATUS_OK,
+                        user.getLogin()
+                )
+        );
     }
 }

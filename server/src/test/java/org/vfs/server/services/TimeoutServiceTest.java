@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
 
+import java.net.Socket;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,9 +41,9 @@ public class TimeoutServiceTest {
 
         UserSession nikita = userService.startSession();
         userService.attachUser(nikita.getUser().getId(), "nikita");
-        Timer nikitaMock = Mockito.mock(Timer.class);
-        Mockito.when(nikitaMock.difference()).thenReturn(15);
-        nikita.setTimer(nikitaMock);
+        Timer nikitaMockTimer = Mockito.mock(Timer.class);
+        Mockito.when(nikitaMockTimer.difference()).thenReturn(15);
+        nikita.setTimer(nikitaMockTimer);
         nikita.setTask(new RunnableFuture() {
             @Override
             public void run() {
@@ -74,11 +75,14 @@ public class TimeoutServiceTest {
                 return null;
             }
         });
+        Socket nikitaMockSocket = Mockito.mock(Socket.class);
+        Mockito.when(nikitaMockSocket.isClosed()).thenReturn(true);
+        nikita.setSocket(nikitaMockSocket);
 
         UserSession empty = userService.startSession();
-        Timer emptyMock = Mockito.mock(Timer.class);
-        Mockito.when(emptyMock.difference()).thenReturn(10);
-        empty.setTimer(emptyMock);
+        Timer emptyMockTimer = Mockito.mock(Timer.class);
+        Mockito.when(emptyMockTimer.difference()).thenReturn(10);
+        empty.setTimer(emptyMockTimer);
         empty.setTask(new Future() {
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
@@ -105,12 +109,15 @@ public class TimeoutServiceTest {
                 return null;
             }
         });
+        Socket emptyMockSocket = Mockito.mock(Socket.class);
+        Mockito.when(emptyMockSocket.isClosed()).thenReturn(true);
+        empty.setSocket(emptyMockSocket);
 
         UserSession r2d2 = userService.startSession();
         userService.attachUser(nikita.getUser().getId(), "r2d2");
-        Timer r2d2Mock = Mockito.mock(Timer.class);
-        Mockito.when(r2d2Mock.difference()).thenReturn(100);
-        r2d2.setTimer(r2d2Mock);
+        Timer r2d2MockTimer = Mockito.mock(Timer.class);
+        Mockito.when(r2d2MockTimer.difference()).thenReturn(100);
+        r2d2.setTimer(r2d2MockTimer);
         r2d2.setTask(new Future() {
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
@@ -137,6 +144,9 @@ public class TimeoutServiceTest {
                 return null;
             }
         });
+        Socket r2d2MockSocket = Mockito.mock(Socket.class);
+        Mockito.when(r2d2MockSocket.isClosed()).thenReturn(true);
+        r2d2.setSocket(r2d2MockSocket);
 
         Map<String, UserSession> userSessions = new HashMap<>();
         userSessions.put(nikita.getUser().getId(), nikita);

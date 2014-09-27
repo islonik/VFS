@@ -18,23 +18,39 @@ import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 @Component("connect")
 public class Connect implements Command {
 
-    private final UserService userService;
     private final NodeService nodeService;
+    private final UserService userService;
 
     @Autowired
-    public Connect(UserService userService, NodeService nodeService) {
-        this.userService = userService;
+    public Connect(NodeService nodeService, UserService userService) {
         this.nodeService = nodeService;
+        this.userService = userService;
     }
 
     @Override
-    public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
+    public void apply(UserSession userSession, CommandValues values) {
+        ClientWriter clientWriter = userSession.getClientWriter();
         String login = values.getNextParam();
         if (userService.isLogged(login)) {
-            clientWriter.send(newResponse(STATUS_FAIL_CONNECT, "User was registered before with such login already. Please, change the login!"));
+            clientWriter.send(
+                    newResponse(
+                            STATUS_FAIL_CONNECT,
+                            "Such user already exits. Please, change the login!"
+                    )
+            );
         } else {
             userService.attachUser(userSession.getUser().getId(), login);
-            clientWriter.send(newResponse(STATUS_SUCCESS_CONNECT, nodeService.getFullPath(userSession.getNode()), userSession.getUser().getId()));
+            clientWriter.send(
+                    newResponse(
+                            STATUS_SUCCESS_CONNECT,
+                            nodeService.getFullPath(userSession.getNode()),
+                            userSession.getUser().getId()
+                    )
+            );
+            userService.sendMessageToUsers(
+                    userSession.getUser().getId(),
+                    "User '" + login + "' has connected to Virtual File Server!"
+            );
         }
     }
 }

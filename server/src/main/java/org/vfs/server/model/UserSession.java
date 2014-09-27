@@ -1,21 +1,22 @@
 package org.vfs.server.model;
 
 import org.vfs.core.network.protocol.User;
-import org.vfs.server.model.Node;
+import org.vfs.server.network.ClientWriter;
 
 import java.net.Socket;
-import java.util.*;
 import java.util.concurrent.Future;
 
 /**
  * @author Lipatov Nikita
  */
 public class UserSession {
-    private User user;
-    private Node node;
-    private Socket socket;
+    private volatile User user;
+    private volatile Node node;
+    private volatile Socket socket;
     private volatile Timer timer;
     private volatile Future task;
+    private volatile ClientWriter clientWriter;
+    private volatile boolean isAuth;
 
     public UserSession() {
     }
@@ -45,7 +46,7 @@ public class UserSession {
         }
     }
 
-    public Socket getSocket() {
+    public final Socket getSocket() {
         return socket;
     }
 
@@ -53,7 +54,7 @@ public class UserSession {
         this.socket = socket;
     }
 
-    public Future getTask() {
+    public final Future getTask() {
         return task;
     }
 
@@ -61,11 +62,27 @@ public class UserSession {
         this.task = task;
     }
 
-    public Timer getTimer() {
+    public final Timer getTimer() {
         return timer;
     }
 
     public void setTimer(Timer timer) {
         this.timer = timer;
+    }
+
+    public final ClientWriter getClientWriter() {
+        return clientWriter;
+    }
+
+    public void setClientWriter(ClientWriter clientWriter) {
+        this.clientWriter = clientWriter;
+    }
+
+    public boolean isAuth() {
+        return isAuth;
+    }
+
+    public void setAuth(boolean isAuth) {
+        this.isAuth = isAuth;
     }
 }

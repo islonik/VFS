@@ -25,8 +25,14 @@ public class Print implements Command {
     }
 
     @Override
-    public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
+    public void apply(UserSession userSession, CommandValues values) {
+        ClientWriter clientWriter = userSession.getClientWriter();
         Node directory = userSession.getNode();
-        clientWriter.send(newResponse(STATUS_OK, nodePrinter.print(directory)));
+        clientWriter.send(
+                newResponse(
+                        STATUS_OK,
+                        nodePrinter.print(directory)
+                )
+        );
     }
 }

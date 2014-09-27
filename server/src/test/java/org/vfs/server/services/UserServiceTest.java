@@ -2,7 +2,6 @@ package org.vfs.server.services;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.UserSession;
 
 /**

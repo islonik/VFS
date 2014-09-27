@@ -9,5 +9,5 @@ import org.vfs.server.network.ClientWriter;
  */
 public interface Command {
 
-    public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter);
+    public void apply(UserSession userSession, CommandValues values);
 }

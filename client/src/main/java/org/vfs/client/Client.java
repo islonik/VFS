@@ -98,12 +98,14 @@ public class Client {
                     commandLine.execute(inputCommand);
                 } catch (IOException e) {
                     System.err.println(e.getLocalizedMessage());
-                } catch (QuitException qe) {
-                    System.out.println(qe.getMessage());
                 }
             }
+        } catch (QuitException qe) {
+            System.out.println(qe.getMessage());
         } catch (Exception error) {
             System.err.println(error.getLocalizedMessage());
+        } finally {
+            System.exit(1);
         }
     }
 }

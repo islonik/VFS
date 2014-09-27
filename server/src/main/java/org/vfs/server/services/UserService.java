@@ -4,13 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.Node;
-import org.vfs.server.model.NodeTypes;
 import org.vfs.server.model.UserSession;
+import org.vfs.server.network.ClientWriter;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static org.vfs.core.network.protocol.Response.STATUS_OK;
+import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_QUIT;
+import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
@@ -46,6 +51,7 @@ public class UserService {
 
         userSession.setNode(loginHome);
         userSession.getUser().setLogin(login);
+        userSession.setAuth(true);
     }
 
     public boolean isLogged(String login) {
@@ -73,15 +79,42 @@ public class UserService {
             UserSession userSession = registry.get(id);
             String login = userSession.getUser().getLogin();
             if(login != null) { // sessions without user
-                this.nodeService.removeHomeDirectory(login);
+                nodeService.removeHomeDirectory(login);
                 lockService.unlockAll(userSession.getUser());
             }
+            if(userSession.getSocket() != null && !userSession.getSocket().isClosed()) {
+                try {
+                    if(userSession.isAuth()) {
+                        userSession.getClientWriter().send(
+                                newResponse(
+                                        STATUS_SUCCESS_QUIT,
+                                        "Timeout disconnect"
+                                )
+                        );
+                    }
+                    userSession.getSocket().close();
+                } catch(IOException ioe) {
+                    System.err.println("UserService.stopSession.IOException=" + ioe.getMessage());
+                }
+            }
+            userSession.setAuth(false);
             registry.remove(id);
         }
     }
 
     public final Map<String, UserSession> getRegistry() {
         return registry;
+    }
+
+    public void sendMessageToUsers(String idMySession, String message) {
+        Set<String> keySet = registry.keySet();
+        for (String key : keySet) {
+            UserSession userSession = registry.get(key);
+            if(!userSession.getUser().getId().equals(idMySession) && userSession.isAuth()) { // to all users except mine
+                ClientWriter clientWriter = userSession.getClientWriter();
+                clientWriter.send(newResponse(STATUS_OK, message));
+            }
+        }
     }
 
 

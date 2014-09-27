@@ -25,12 +25,23 @@ public class Quit implements Command {
     }
 
     @Override
-    public void apply(UserSession userSession, CommandValues values, ClientWriter clientWriter) {
+    public void apply(UserSession userSession, CommandValues values) {
+        ClientWriter clientWriter = userSession.getClientWriter();
         String login = userSession.getUser().getLogin();
 
         userService.stopSession(userSession.getUser().getId());
 
-        clientWriter.send(newResponse(STATUS_SUCCESS_QUIT, "You are disconnected from server!"));
+        clientWriter.send(
+                newResponse(
+                        STATUS_SUCCESS_QUIT,
+                        "You are disconnected from server!"
+                )
+        );
+        userService.sendMessageToUsers(
+                userSession.getUser().getId(),
+                "User '" + login + "' has disconnected from Virtual File Server!"
+        );
+
         throw new QuitException("User " + login + " has been disconnected!");
     }
 

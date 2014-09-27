@@ -27,10 +27,10 @@ public class CommandLine {
     private final XmlHelper xmlHelper;
     private final CommandParser parser;
 
-    public CommandLine(Map<String, Command> commands, UserSession userSession, ClientWriter clientWriter) {
+    public CommandLine(Map<String, Command> commands, UserSession userSession) {
         this.commands = commands;
         this.userSession = userSession;
-        this.clientWriter = clientWriter;
+        clientWriter = userSession.getClientWriter();
 
         xmlHelper = new XmlHelper();
         parser = new CommandParser();
@@ -48,16 +48,36 @@ public class CommandLine {
 
         try {
             if (commands.containsKey(command)) {
-                commands.get(command).apply(userSession, commandValues, clientWriter);
+                commands.get(command).apply(userSession, commandValues);
             } else {
-                clientWriter.send(newResponse(STATUS_OK, "No such command! Please check you syntax or type 'help'!"));
+                clientWriter.send(
+                        newResponse(
+                                STATUS_OK,
+                                "No such command! Please check you syntax or type 'help'!"
+                        )
+                );
             }
         } catch(IllegalArgumentException e) {
-            clientWriter.send(newResponse(STATUS_FAIL, e.getMessage()));
+            clientWriter.send(
+                    newResponse(
+                            STATUS_FAIL,
+                            e.getMessage()
+                    )
+            );
         } catch(IllegalAccessError e) {
-            clientWriter.send(newResponse(STATUS_FAIL, e.getMessage()));
+            clientWriter.send(
+                    newResponse(
+                            STATUS_FAIL,
+                            e.getMessage()
+                    )
+            );
         } catch (NullPointerException npe) {
-            clientWriter.send(newResponse(STATUS_FAIL, npe.getMessage()));
+            clientWriter.send(
+                    newResponse(
+                            STATUS_FAIL,
+                            npe.getMessage()
+                    )
+            );
         }
     }
 
