@@ -22,12 +22,12 @@ public class NodeManagerAspect {
         this.lockService = lockService;
     }
 
-    @AfterReturning(pointcut="@annotation(NewNodeModifier)", returning="node")
+    @AfterReturning(pointcut="@annotation(org.vfs.server.aspects.CreateNode)", returning="node")
     public void newNode(Node node) {
         lockService.addNode(node);
     }
 
-    @After("@annotation(RemoveNodeModifier) && args(source, child)")
+    @After("@annotation(org.vfs.server.aspects.RemoveNode) && args(source, child)")
     public void removeNode(Node source, Node child) {
         lockService.removeNode(child);
     }

@@ -1,4 +1,4 @@
-package org.vfs.server.services;
+package org.vfs.server.jobs;
 
 import java.util.Map;
 import java.util.Set;
@@ -9,19 +9,23 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.vfs.server.model.UserSession;
+import org.vfs.server.services.UserService;
+
+import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_QUIT;
+import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
  */
 @Component
 @EnableScheduling
-public class TimeoutService {
+public class TimeoutJob {
 
     private final UserService userService;
     private final int timeout;
 
     @Autowired
-    public TimeoutService(UserService userService, @Value("${server.timeout}") String timeout) {
+    public TimeoutJob(UserService userService, @Value("${server.timeout}") String timeout) {
         this.userService = userService;
         this.timeout = Integer.parseInt(timeout);
     }
@@ -54,6 +58,14 @@ public class TimeoutService {
             }
             if(diff >= timeout && login != null) { // kill session
                 System.out.println("Thread was killed!");
+
+                userSession.getClientWriter().send(
+                        newResponse(
+                                STATUS_SUCCESS_QUIT,
+                                "Timeout disconnect"
+                        )
+                );
+
                 userService.stopSession(key);
                 userSession.getTask().cancel(true); // kill thread
             }

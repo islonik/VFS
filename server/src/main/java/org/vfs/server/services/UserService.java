@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.network.protocol.User;
 import org.vfs.server.model.Node;
+import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 
+import java.net.Socket;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -32,12 +34,11 @@ public class UserService {
         this.lockService = lockService;
     }
 
-    public UserSession startSession() {
+    public UserSession startSession(Socket socket, Timer timer, ClientWriter clientWriter) {
         User user = new User();
         user.setId(UUID.randomUUID().toString());
 
-        UserSession userSession = new UserSession();
-        userSession.setUser(user);
+        UserSession userSession = new UserSession(user, socket, timer, clientWriter);
 
         registry.put(user.getId(), userSession);
         return userSession;
@@ -73,20 +74,13 @@ public class UserService {
      * @param id
      */
     public void stopSession(String id) {
-        if(registry.containsKey(id)) {
-            UserSession userSession = registry.get(id);
+        UserSession userSession = registry.remove(id);
+        if(userSession != null) { // can be null
             String login = userSession.getUser().getLogin();
-            if(login != null) { // sessions without user
+            if(login != null) { // can be null
                 nodeService.removeHomeDirectory(login);
                 lockService.unlockAll(userSession.getUser());
-                userSession.getClientWriter().send(
-                        newResponse(
-                                STATUS_SUCCESS_QUIT,
-                                "Timeout disconnect"
-                        )
-                );
             }
-            registry.remove(id);
         }
     }
 
@@ -94,7 +88,7 @@ public class UserService {
         return registry;
     }
 
-    public void sendMessageToUsers(String idMySession, String message) {
+    public void notifyUsers(String idMySession, String message) {
         Set<String> keySet = registry.keySet();
         for (String key : keySet) {
             UserSession userSession = registry.get(key);

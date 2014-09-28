@@ -10,28 +10,35 @@ import java.util.concurrent.Future;
  * @author Lipatov Nikita
  */
 public class UserSession {
-    private volatile User user;
+    private final User user;
+    private final Socket socket;
+    private final Timer timer;
+    private final ClientWriter clientWriter;
+
     private volatile Node node;
-    private volatile Socket socket;
-    private volatile Timer timer;
     private volatile Future task;
-    private volatile ClientWriter clientWriter;
 
-    public UserSession() {
-    }
-
-    public UserSession(User user, Node node, Socket socket) {
+    public UserSession(User user, Socket socket, Timer timer, ClientWriter clientWriter) {
         this.user = user;
-        setNode(node);
         this.socket = socket;
+        this.timer = timer;
+        this.clientWriter = clientWriter;
     }
 
-    public User getUser() {
+    public final User getUser() {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public final Socket getSocket() {
+        return socket;
+    }
+
+    public final Timer getTimer() {
+        return timer;
+    }
+
+    public final ClientWriter getClientWriter() {
+        return clientWriter;
     }
 
     public Node getNode() {
@@ -45,14 +52,6 @@ public class UserSession {
         }
     }
 
-    public final Socket getSocket() {
-        return socket;
-    }
-
-    public void setSocket(Socket socket) {
-        this.socket = socket;
-    }
-
     public final Future getTask() {
         return task;
     }
@@ -61,20 +60,5 @@ public class UserSession {
         this.task = task;
     }
 
-    public final Timer getTimer() {
-        return timer;
-    }
-
-    public void setTimer(Timer timer) {
-        this.timer = timer;
-    }
-
-    public final ClientWriter getClientWriter() {
-        return clientWriter;
-    }
-
-    public void setClientWriter(ClientWriter clientWriter) {
-        this.clientWriter = clientWriter;
-    }
 
 }

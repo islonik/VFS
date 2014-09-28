@@ -10,7 +10,7 @@ import java.util.concurrent.Semaphore;
 public class NodeLock {
 
     private volatile User user;
-    private final Semaphore semaphore;
+    private final Semaphore semaphore; // or AtomicBoolean
 
     public NodeLock() {
         this.semaphore = new Semaphore(1);

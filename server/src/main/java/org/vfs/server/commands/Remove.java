@@ -17,7 +17,7 @@ import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
  * @author Lipatov Nikita
  */
 @Component("rm")
-public class Remove implements Command {
+public class Remove extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
     private final LockService lockService;
@@ -32,7 +32,7 @@ public class Remove implements Command {
 
     @Override
     public void apply(UserSession userSession, CommandValues values) {
-        ClientWriter clientWriter = userSession.getClientWriter();
+        clientWriter = userSession.getClientWriter();
         Node directory = userSession.getNode();
         String nodeName = values.getNextParam();
 
@@ -40,42 +40,23 @@ public class Remove implements Command {
 
         if (node != null) {
             if (lockService.isLocked(node, true)) {
-                clientWriter.send(
-                        newResponse(
-                                STATUS_OK,
-                                "Node or children nodes is / are locked!"
-                        )
-                );
+                sendFail("Node or children nodes is / are locked!");
                 return;
             }
 
             boolean isRemoved = nodeService.removeNode(directory, nodeName);
             if (isRemoved) {
-                clientWriter.send(
-                        newResponse(
-                                STATUS_OK,
-                                "Node '" + nodeName + "' was deleted!"
-                        )
-                );
-                userService.sendMessageToUsers(
+                sendOK(String.format("Node '%s' was deleted!", nodeName));
+
+                userService.notifyUsers(
                         userSession.getUser().getId(),
-                        "Node '" + nodeName + "' was deleted by user '" + userSession.getUser().getLogin() + "'"
+                        String.format("Node '%s' was deleted by user '%s'", userSession.getUser().getLogin())
                 );
             } else {
-                clientWriter.send(
-                        newResponse(
-                                STATUS_OK,
-                                "Node was found, but wasn't deleted!"
-                        )
-                );
+                sendFail("Node was found, but wasn't deleted!");
             }
         } else {
-            clientWriter.send(
-                    newResponse(
-                            STATUS_OK,
-                            "Node is not found!"
-                    )
-            );
+            sendFail("Node is not found!");
         }
     }
 }

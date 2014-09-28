@@ -5,17 +5,15 @@ import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.server.model.UserSession;
-import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.UserService;
 
 import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_QUIT;
-import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
  */
 @Component("quit")
-public class Quit implements Command {
+public class Quit extends AbstractCommand implements Command {
 
     private final UserService userService;
 
@@ -26,23 +24,21 @@ public class Quit implements Command {
 
     @Override
     public void apply(UserSession userSession, CommandValues values) {
-        ClientWriter clientWriter = userSession.getClientWriter();
+        clientWriter = userSession.getClientWriter();
         String login = userSession.getUser().getLogin();
 
         userService.stopSession(userSession.getUser().getId());
 
-        clientWriter.send(
-                newResponse(
-                        STATUS_SUCCESS_QUIT,
-                        "You are disconnected from server!"
-                )
-        );
-        userService.sendMessageToUsers(
+        send(STATUS_SUCCESS_QUIT, "You disconnected from server!");
+
+        userService.notifyUsers(
                 userSession.getUser().getId(),
-                "User '" + login + "' has disconnected from Virtual File Server!"
+                String.format("User '%s' has been disconnected", login)
         );
 
-        throw new QuitException("User " + login + " has been disconnected!");
+        throw new QuitException(
+                String.format("User '%s' has been disconnected", login)
+        );
     }
 
 }

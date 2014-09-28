@@ -78,6 +78,9 @@ public class NodeService {
         if (path.equals(".") || path.isEmpty()) {
             return root;
         } else if (path.equals("..")) {
+            if(root.getParent() == null) {
+                return root;
+            }
             return root.getParent();
         }
         Collection<Node> children = root.getChildren();

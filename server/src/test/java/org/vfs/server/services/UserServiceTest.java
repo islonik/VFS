@@ -2,7 +2,12 @@ package org.vfs.server.services;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
+import org.vfs.server.network.ClientWriter;
+
+import java.net.Socket;
 
 /**
  * @author Lipatov Nikita
@@ -17,7 +22,15 @@ public class UserServiceTest {
         UserService userService = new UserService(nodeService, lockService);
 
         Assert.assertNull(userService.getSession(""));
-        UserSession userSession = userService.startSession();
+
+        // UserSession #1
+        Socket nikitaSocketMock = Mockito.mock(Socket.class);
+        Mockito.when(nikitaSocketMock.isClosed()).thenReturn(true);
+        Timer nikitaTimerMock = Mockito.mock(Timer.class);
+        Mockito.when(nikitaTimerMock.difference()).thenReturn(15);
+        ClientWriter nikitaCWMock = Mockito.mock(ClientWriter.class);
+
+        UserSession userSession = userService.startSession(nikitaSocketMock, nikitaTimerMock, nikitaCWMock);
 
         Assert.assertNotNull(userService.getSession(userSession.getUser().getId()));
     }
@@ -29,7 +42,14 @@ public class UserServiceTest {
         NodeService nodeService = new NodeService("/", lockService, nodeManager);
         UserService userService = new UserService(nodeService, lockService);
 
-        UserSession userSession = userService.startSession();
+        // UserSession #1
+        Socket nikitaSocketMock = Mockito.mock(Socket.class);
+        Mockito.when(nikitaSocketMock.isClosed()).thenReturn(true);
+        Timer nikitaTimerMock = Mockito.mock(Timer.class);
+        Mockito.when(nikitaTimerMock.difference()).thenReturn(15);
+        ClientWriter nikitaCWMock = Mockito.mock(ClientWriter.class);
+
+        UserSession userSession = userService.startSession(nikitaSocketMock, nikitaTimerMock, nikitaCWMock);
 
         Assert.assertEquals(1, userService.getRegistry().size());
         userService.stopSession(userSession.getUser().getId());

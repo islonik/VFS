@@ -1,12 +1,10 @@
 package org.vfs.server.services;
 
 import org.springframework.stereotype.Component;
-import org.vfs.server.aspects.NewNodeModifier;
-import org.vfs.server.aspects.RemoveNodeModifier;
+import org.vfs.server.aspects.CreateNode;
+import org.vfs.server.aspects.RemoveNode;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
-
-import java.util.Collection;
 
 /**
  * @author Lipatov Nikita
@@ -33,13 +31,13 @@ public class NodeManager {
         return false;
     }
 
-    @NewNodeModifier
+    @CreateNode
     public Node newNode(String name, NodeTypes type) {
         Node node = new Node(name, type);
         return node;
     }
 
-    @RemoveNodeModifier
+    @RemoveNode
     public boolean removeNode(Node source, Node child) {
         if (source.removeChild(child)) {
             setParent(child, null);

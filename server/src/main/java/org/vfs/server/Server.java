@@ -18,6 +18,9 @@ import org.vfs.server.network.*;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.services.UserService;
 
+import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_QUIT;
+import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
+
 /**
  * Server class.
  *
@@ -42,7 +45,7 @@ public class Server {
         this.commands = commands;
 
         String out = "Server has been run!";
-        nodeService.initDirs();
+        this.nodeService.initDirs();
 
         System.out.println(out);
         log.info(out);
@@ -50,18 +53,16 @@ public class Server {
 
     public void run() throws IOException {
         while (true) {
-            Socket socket = networkManager.accept();
-
-            final UserSession userSession = userService.startSession();
-            userSession.setSocket(socket);
-
-            System.out.println("New socket has been accepted! User id is " + userSession.getUser().getId());
+            final Socket socket = networkManager.accept();
 
             final Timer timer = new Timer();
 
             final MessageReader messageReader = new MessageReader(socket.getInputStream());
-            final ClientWriter clientWriter = new ClientWriter(userSession.getSocket());
-            userSession.setClientWriter(clientWriter);
+            final ClientWriter clientWriter = new ClientWriter(socket);
+
+            final UserSession userSession = userService.startSession(socket, timer, clientWriter);
+
+            System.out.println("New socket has been accepted! User id is " + userSession.getUser().getId());
 
             final CommandLine commandLine = new CommandLine(commands, userSession);
             final ClientListener clientListener = new ClientListener(messageReader, userService, userSession, commandLine, timer);
@@ -74,17 +75,16 @@ public class Server {
                         clientListener.listen();
                     } catch (QuitException qe) {
                         System.out.println(qe.getMessage());
+
+                        // 'quit response' should be already sent in QuitCommand
                         userService.stopSession(localUserSession.getUser().getId());
                     }
                 }
             };
             Future ftask = executorService.submit(connection);
 
-            userSession.setTimer(timer);
             userSession.setTask(ftask);
-            userSession.setClientWriter(clientWriter);
         }
-
     }
 }
 

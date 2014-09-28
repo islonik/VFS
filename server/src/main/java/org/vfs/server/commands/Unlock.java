@@ -18,7 +18,7 @@ import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
  * @author Lipatov Nikita
  */
 @Component("unlock")
-public class Unlock implements Command {
+public class Unlock extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
     private final LockService lockService;
@@ -33,7 +33,7 @@ public class Unlock implements Command {
 
     @Override
     public void apply(UserSession userSession, CommandValues values) {
-        ClientWriter clientWriter = userSession.getClientWriter();
+        clientWriter = userSession.getClientWriter();
         User user = userSession.getUser();
         Node directory = userSession.getNode();
         String key = values.getNextKey();
@@ -47,40 +47,21 @@ public class Unlock implements Command {
             }
 
             if (!lockService.isLocked(node, recursive)) {
-                clientWriter.send(
-                        newResponse(
-                                STATUS_OK,
-                                "Node is already unlocked!"
-                        )
-                );
+                sendFail("Node is already unlocked!");
                 return;
             }
             if (lockService.unlock(user, node, recursive)) {
-                clientWriter.send(
-                        newResponse(
-                                STATUS_OK,
-                                "Node '" + nodeService.getFullPath(node) + "' was unlocked!"
-                        )
-                );
-                userService.sendMessageToUsers(
+                sendOK(String.format("Node '%s' was unlocked!", nodeService.getFullPath(node)));
+
+                userService.notifyUsers(
                         userSession.getUser().getId(),
-                        "Node '" + nodeService.getFullPath(node) + "' was unlocked by user '" + user.getLogin() + "'"
+                        String.format("Node '%s' was unlocked by user '%s'", nodeService.getFullPath(node), user.getLogin())
                 );
             } else {
-                clientWriter.send(
-                        newResponse(
-                                STATUS_OK,
-                                "Node is locked by different user!"
-                        )
-                );
+                sendOK("Node is locked by different user!");
             }
         } else {
-            clientWriter.send(
-                    newResponse(
-                            STATUS_OK,
-                            "Node is not found!"
-                    )
-            );
+            sendOK("Node is not found!");
         }
     }
 }

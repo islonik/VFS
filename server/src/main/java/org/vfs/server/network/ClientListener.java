@@ -10,6 +10,9 @@ import org.vfs.server.services.UserService;
 import java.io.IOException;
 import java.net.Socket;
 
+import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_QUIT;
+import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
+
 /**
  * @author Lipatov Nikita
  */
@@ -48,9 +51,16 @@ public class ClientListener {
                         log.error(ie.getMessage(), ie);
                     }
                 }
+                userSession.getClientWriter().send(
+                        newResponse(
+                                STATUS_SUCCESS_QUIT,
+                                "Server critical error. Unable read client message!"
+                        )
+                );
                 userService.stopSession(userSession.getUser().getId());
                 break;
             }
         }
     }
+
 }

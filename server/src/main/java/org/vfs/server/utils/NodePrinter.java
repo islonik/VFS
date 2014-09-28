@@ -28,7 +28,7 @@ public class NodePrinter {
         if (directory.getType() != NodeTypes.DIR) {
             throw new IllegalArgumentException("Node directory is FILE!");
         }
-        return simplePrintTreeDir(directory, new StringBuilder(), 0).toString();
+        return printTreeDir(directory, new StringBuilder(), 0).toString();
     }
 
     /**
@@ -39,8 +39,8 @@ public class NodePrinter {
      * @param deep      Depth from root.
      * @return
      */
-    private StringBuilder simplePrintTreeDir(Node parentDir, StringBuilder textTree, int deep) {
-        simplePrintTreeNode(parentDir, textTree, deep);
+    private StringBuilder printTreeDir(Node parentDir, StringBuilder textTree, int deep) {
+        printTreeNode(parentDir, textTree, deep);
 
         deep++;
 
@@ -58,11 +58,11 @@ public class NodePrinter {
         Collections.sort(files);
 
         for (Node directory : directories) {
-            simplePrintTreeDir(directory, textTree, deep);
+            printTreeDir(directory, textTree, deep);
         }
 
         for (Node file : files) {
-            simplePrintTreeNode(file, textTree, deep);
+            printTreeNode(file, textTree, deep);
         }
 
         return textTree;
@@ -75,7 +75,7 @@ public class NodePrinter {
      * @param textTree StringTree.
      * @param deep     Depth from root.
      */
-    private void simplePrintTreeNode(Node node, StringBuilder textTree, int deep) {
+    private void printTreeNode(Node node, StringBuilder textTree, int deep) {
         if (deep != 0) {
             simplePrintHorizontalLine(textTree, deep);
         }
