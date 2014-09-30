@@ -1,8 +1,11 @@
 package org.vfs.client.network;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -14,6 +17,8 @@ import java.util.concurrent.BlockingQueue;
 public class SocketReader {
     private final BlockingQueue<String> toUserQueue;
     private final NetworkManager networkManager;
+    private volatile Socket socket;
+    private volatile DataInputStream dataInputStream;
 
     public SocketReader(BlockingQueue<String> queue, NetworkManager networkManager) throws IOException {
         this.toUserQueue = queue;
@@ -24,15 +29,17 @@ public class SocketReader {
         try {
             while (true) {
                 try {
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(networkManager.getSocket().getInputStream()));
-                    StringBuilder stringBuilder = new StringBuilder();
-                    while (bufferedReader.ready()) {
-                        stringBuilder.append(bufferedReader.readLine()).append("\n");
+                    if(socket == null || !socket.equals(networkManager.getSocket())) {
+                        socket = networkManager.getSocket();
+                        dataInputStream = new DataInputStream(socket.getInputStream());
                     }
-                    if (stringBuilder.length() == 0) {
-                        continue;
+                    String serverMessage = dataInputStream.readUTF();
+                    toUserQueue.put(serverMessage);
+
+                } catch (SocketException se) {
+                    if(!se.getMessage().toLowerCase().equals("socket closed")) {
+                        System.err.println("SocketReader.SocketException.Message=" + se.getMessage());
                     }
-                    this.toUserQueue.put(stringBuilder.toString());
                 } catch (IOException ioe) {
                     System.err.println("SocketReader.IOException.Message=" + ioe.getMessage());
                     throw new RuntimeException(ioe);

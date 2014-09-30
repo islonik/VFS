@@ -1,6 +1,7 @@
 package org.vfs.client.network;
 
 import java.io.*;
+import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -12,6 +13,8 @@ import java.util.concurrent.BlockingQueue;
 public class SocketWriter {
     private final BlockingQueue<String> toServerQueue;
     private final NetworkManager networkManager;
+    private volatile Socket socket;
+    private volatile DataOutputStream dataOutputStream;
 
     public SocketWriter(BlockingQueue<String> queue, NetworkManager networkManager) throws IOException {
         this.toServerQueue = queue;
@@ -20,15 +23,18 @@ public class SocketWriter {
 
     public void run() {
         try {
+
             while (true) {
                 try {
                     String message = this.toServerQueue.take();
 
-                    BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(networkManager.getSocket().getOutputStream()));
+                    if(socket == null || !socket.equals(networkManager.getSocket())) {
+                        socket = networkManager.getSocket();
+                        dataOutputStream = new DataOutputStream(socket.getOutputStream());
+                    }
 
-                    bufferedWriter.write(message, 0, message.length());
-                    bufferedWriter.newLine();
-                    bufferedWriter.flush();
+                    dataOutputStream.writeUTF(message);
+                    dataOutputStream.flush();
                 } catch (IOException ioe) {
                     System.err.println("SocketWriter.IOException.Message=" + ioe.getMessage());
                     throw new RuntimeException(ioe);

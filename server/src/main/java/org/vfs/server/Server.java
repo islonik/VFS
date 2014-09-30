@@ -18,9 +18,6 @@ import org.vfs.server.network.*;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.services.UserService;
 
-import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_QUIT;
-import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
-
 /**
  * Server class.
  *
