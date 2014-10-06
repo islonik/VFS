@@ -24,3 +24,9 @@ execute: git checkout master
 execute: git branch -D release/1.0
 6) 	Push everything to remote (Tag/Master and Develop)
 execute: git push --all && git push --tags
+
+*******************************************
+*** Release & How to make tag
+*******************************************
+1) git tag -a 'name-version' -m 'message/description'
+2) git push origin 'name-version'
