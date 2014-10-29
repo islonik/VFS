@@ -1,7 +1,5 @@
 package org.vfs.server.services;
 
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,15 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.vfs.core.network.protocol.User;
-import org.vfs.server.model.Node;
-import org.vfs.server.model.NodeTypes;
 import org.vfs.server.utils.NodePrinter;
-
-import java.util.HashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Lipatov Nikita
@@ -36,7 +26,12 @@ public class LockServiceTest {
     @Autowired
     private NodePrinter nodePrinter;
 
-    @Before
+    @Test
+    public void test() {
+
+    }
+
+    /*@Before
     public void setUp() throws InterruptedException {
         nodeService.initDirs();
     }
@@ -221,7 +216,7 @@ public class LockServiceTest {
                         "|  |__servers\n" +
                         "|  |  |__weblogic\n",
                 nodePrinter.print(nodeService.getRoot()));
-    }
+    }*/
 
 
 }

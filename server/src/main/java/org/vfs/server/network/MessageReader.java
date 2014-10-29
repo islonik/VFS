@@ -1,5 +1,7 @@
 package org.vfs.server.network;
 
+import org.vfs.core.network.protocol.proto.RequestProto;
+
 import java.io.*;
 
 /**
@@ -7,15 +9,13 @@ import java.io.*;
  */
 public class MessageReader {
 
-    private final DataInputStream dataInputStream;
+    private final InputStream inputStream;
 
-    public MessageReader(InputStream inputStream)
-    {
-        this.dataInputStream = new DataInputStream(inputStream);
+    public MessageReader(InputStream inputStream) {
+        this.inputStream = inputStream;
     }
 
-    public String read() throws IOException
-    {
-        return dataInputStream.readUTF();
+    public RequestProto.Request read() throws IOException {
+        return RequestProto.Request.parseDelimitedFrom(inputStream);
     }
 }

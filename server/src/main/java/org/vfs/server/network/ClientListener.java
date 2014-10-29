@@ -2,6 +2,8 @@ package org.vfs.server.network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.proto.ResponseProto;
 import org.vfs.server.CommandLine;
 import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
@@ -10,8 +12,7 @@ import org.vfs.server.services.UserService;
 import java.io.IOException;
 import java.net.Socket;
 
-import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_QUIT;
-import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
+import static org.vfs.core.network.protocol.proto.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
@@ -36,11 +37,11 @@ public class ClientListener {
     public void listen() {
         while (true) {
             try {
-                String message = reader.read();
+                RequestProto.Request request = reader.read();
 
                 timer.updateTime();
 
-                commandLine.onUserInput(message);
+                commandLine.onUserInput(request);
             } catch (IOException e) {
                 log.error("Unable read client message!", e);
                 Socket socket = userSession.getSocket();
@@ -53,7 +54,7 @@ public class ClientListener {
                 }
                 userSession.getClientWriter().send(
                         newResponse(
-                                STATUS_SUCCESS_QUIT,
+                                ResponseProto.Response.ResponseType.SUCCESS_QUIT,
                                 "Server critical error. Unable read client message!"
                         )
                 );

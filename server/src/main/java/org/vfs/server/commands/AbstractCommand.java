@@ -1,10 +1,9 @@
 package org.vfs.server.commands;
 
+import org.vfs.core.network.protocol.proto.ResponseProto.Response.ResponseType;
 import org.vfs.server.network.ClientWriter;
 
-import static org.vfs.core.network.protocol.Response.STATUS_OK;
-import static org.vfs.core.network.protocol.Response.STATUS_FAIL;
-import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
+import static org.vfs.core.network.protocol.proto.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
@@ -13,7 +12,7 @@ public abstract class AbstractCommand {
 
     protected volatile ClientWriter clientWriter;
 
-    public void send(int status, String message) {
+    public void send(ResponseType status, String message) {
         clientWriter.send(
                 newResponse(
                         status,
@@ -25,7 +24,7 @@ public abstract class AbstractCommand {
     public void sendOK(String message) {
         clientWriter.send(
                 newResponse(
-                        STATUS_OK,
+                        ResponseType.OK,
                         message
                 )
         );
@@ -34,7 +33,7 @@ public abstract class AbstractCommand {
     public void sendFail(String message) {
         clientWriter.send(
                 newResponse(
-                        STATUS_FAIL,
+                        ResponseType.FAIL,
                         message
                 )
         );

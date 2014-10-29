@@ -28,7 +28,14 @@
     <scm>
         <connection>scm:git:git://github.com/islonik/VFS.git</connection>
     </scm>
-    
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>dtrott</id>
+            <url>http://maven.davidtrott.com/repository</url>
+        </pluginRepository>
+    </pluginRepositories>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -45,6 +52,12 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-core</artifactId>
                 <version>1.1.2</version>
+            </dependency>
+            <!-- required installed proto -->
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>2.6.0</version>
             </dependency>
 
             <dependency>

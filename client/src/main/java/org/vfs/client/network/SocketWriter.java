@@ -1,7 +1,8 @@
 package org.vfs.client.network;
 
+import org.vfs.core.network.protocol.proto.RequestProto;
+
 import java.io.*;
-import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -11,12 +12,10 @@ import java.util.concurrent.BlockingQueue;
  * @author Lipatov Nikita
  */
 public class SocketWriter {
-    private final BlockingQueue<String> toServerQueue;
+    private final BlockingQueue<RequestProto.Request> toServerQueue;
     private final NetworkManager networkManager;
-    private volatile Socket socket;
-    private volatile DataOutputStream dataOutputStream;
 
-    public SocketWriter(BlockingQueue<String> queue, NetworkManager networkManager) throws IOException {
+    public SocketWriter(BlockingQueue<RequestProto.Request> queue, NetworkManager networkManager) throws IOException {
         this.toServerQueue = queue;
         this.networkManager = networkManager;
     }
@@ -26,15 +25,10 @@ public class SocketWriter {
 
             while (true) {
                 try {
-                    String message = this.toServerQueue.take();
+                    RequestProto.Request request = this.toServerQueue.take();
 
-                    if(socket == null || !socket.equals(networkManager.getSocket())) {
-                        socket = networkManager.getSocket();
-                        dataOutputStream = new DataOutputStream(socket.getOutputStream());
-                    }
-
-                    dataOutputStream.writeUTF(message);
-                    dataOutputStream.flush();
+                    OutputStream os = networkManager.getSocket().getOutputStream();
+                    request.writeDelimitedTo(os);
                 } catch (IOException ioe) {
                     System.err.println("SocketWriter.IOException.Message=" + ioe.getMessage());
                     throw new RuntimeException(ioe);

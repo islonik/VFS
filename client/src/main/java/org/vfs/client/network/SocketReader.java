@@ -1,10 +1,9 @@
 package org.vfs.client.network;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.vfs.core.network.protocol.proto.ResponseProto;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 
@@ -15,12 +14,10 @@ import java.util.concurrent.BlockingQueue;
  * @author Lipatov Nikita
  */
 public class SocketReader {
-    private final BlockingQueue<String> toUserQueue;
+    private final BlockingQueue<ResponseProto.Response> toUserQueue;
     private final NetworkManager networkManager;
-    private volatile Socket socket;
-    private volatile DataInputStream dataInputStream;
 
-    public SocketReader(BlockingQueue<String> queue, NetworkManager networkManager) throws IOException {
+    public SocketReader(BlockingQueue<ResponseProto.Response> queue, NetworkManager networkManager) throws IOException {
         this.toUserQueue = queue;
         this.networkManager = networkManager;
     }
@@ -29,16 +26,12 @@ public class SocketReader {
         try {
             while (true) {
                 try {
-                    if(socket == null || !socket.equals(networkManager.getSocket())) {
-                        socket = networkManager.getSocket();
-                        dataInputStream = new DataInputStream(socket.getInputStream());
-                    }
-                    String serverMessage = dataInputStream.readUTF();
-                    toUserQueue.put(serverMessage);
-
-                } catch (SocketException se) {
+                    ResponseProto.Response response = ResponseProto.Response.parseDelimitedFrom(networkManager.getSocket().getInputStream());
+                    this.toUserQueue.put(response);
+                } catch (SocketException | InvalidProtocolBufferException se) {
                     if(!se.getMessage().toLowerCase().equals("socket closed")) {
                         System.err.println("SocketReader.SocketException.Message=" + se.getMessage());
+                        throw new RuntimeException(se);
                     }
                 } catch (IOException ioe) {
                     System.err.println("SocketReader.IOException.Message=" + ioe.getMessage());

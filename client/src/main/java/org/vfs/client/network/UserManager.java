@@ -1,6 +1,6 @@
 package org.vfs.client.network;
 
-import org.vfs.core.network.protocol.User;
+import org.vfs.core.network.protocol.proto.RequestProto;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -12,13 +12,13 @@ import java.util.concurrent.CountDownLatch;
  */
 public class UserManager {
     private CountDownLatch latch = new CountDownLatch(1);
-    private volatile User user;
+    private volatile RequestProto.Request.User user;
 
     public boolean isAuthorized() {
         return (user != null);
     }
 
-    public User getUser() {
+    public RequestProto.Request.User getUser() {
         try {
             latch.await();
         } catch (InterruptedException e) {
@@ -28,7 +28,7 @@ public class UserManager {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(RequestProto.Request.User user) {
         this.user = user;
         latch.countDown();
     }

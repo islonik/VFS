@@ -10,6 +10,8 @@ import org.vfs.client.network.NetworkManager;
 import org.vfs.client.network.SocketReader;
 import org.vfs.client.network.SocketWriter;
 import org.vfs.core.exceptions.QuitException;
+import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.proto.ResponseProto;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,8 +34,8 @@ public class Client {
         userManager = new UserManager();
         ExecutorService executorService = Executors.newFixedThreadPool(3);
 
-        BlockingQueue<String> toUserQueue = new ArrayBlockingQueue<String>(1024);
-        BlockingQueue<String> toServerQueue = new ArrayBlockingQueue<String>(1024);
+        BlockingQueue<ResponseProto.Response> toUserQueue = new ArrayBlockingQueue<ResponseProto.Response>(1024);
+        BlockingQueue<RequestProto.Request> toServerQueue = new ArrayBlockingQueue<RequestProto.Request>(1024);
 
         final MessageSender messageSender = new MessageSender(toServerQueue);
         networkManager = new NetworkManager();

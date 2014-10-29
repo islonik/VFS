@@ -27,7 +27,7 @@ public class RequestFactoryTest {
                     "    <command>connect nikita</command>\n" +
                     "</request>\n";
 
-    @Test
+    /*@Test
     public void testNewRequest() {
         String xml = RequestFactory.newRequest("1234345", "admin", "cd applications");
 
@@ -45,7 +45,7 @@ public class RequestFactoryTest {
         Assert.assertTrue(xml.contains("<id>0</id>"));
         Assert.assertTrue(xml.contains("<login>nikita</login>"));
         Assert.assertEquals(CONNECT_REQUEST, xml);
-    }
+    }*/
 
 
 }

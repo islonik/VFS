@@ -22,7 +22,7 @@ public class ResponseFactoryTest {
                     "    <specificCode>123456</specificCode>\n" +
                     "</response>\n";
 
-    @Test
+   /* @Test
     public void testNewResponse() {
         String xml = ResponseFactory.newResponse(Response.STATUS_OK, "/home/nikita");
 
@@ -34,6 +34,6 @@ public class ResponseFactoryTest {
         String xml = ResponseFactory.newResponse(Response.STATUS_OK, "/home/nikita", "123456");
 
         Assert.assertEquals(SPECIFIC_RESPONSE, xml);
-    }
+    }*/
 
 }

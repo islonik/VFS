@@ -1,0 +1,21 @@
+package protocol;
+
+option java_package = "org.vfs.core.network.protocol.proto";
+option java_outer_classname = "ResponseProto";
+
+message Response {
+
+    enum ResponseType {
+        OK = 0;
+        FAIL = 1;
+        SUCCESS_CONNECT = 2;
+        FAIL_CONNECT = 3;
+        SUCCESS_QUIT = 4;
+        FAIL_QUIT = 5;
+    }
+
+    required ResponseType code = 1;
+    required string message = 2;
+    optional string specificCode = 3;
+
+}

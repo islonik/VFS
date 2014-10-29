@@ -1,4 +1,4 @@
-package org.vfs.core.network.protocol;
+package org.vfs.core.network.protocol.xml;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class XmlHelper
     private Schema getSchema(String name) throws SAXException
     {
         SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        URL xsdURL = getClass().getResource("/schema/" + name + ".xsd");
+        URL xsdURL = getClass().getResource("/xml/" + name + ".xsd");
         Schema schema = sf.newSchema(xsdURL);
         return schema;
     }

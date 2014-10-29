@@ -8,11 +8,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.vfs.core.network.protocol.proto.ResponseFactory;
+import org.vfs.core.network.protocol.proto.ResponseProto;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.UserService;
-
-import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_QUIT;
-import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
@@ -60,8 +59,8 @@ public class TimeoutJob {
                 System.out.println("Thread was killed!");
 
                 userSession.getClientWriter().send(
-                        newResponse(
-                                STATUS_SUCCESS_QUIT,
+                        ResponseFactory.newResponse(
+                                ResponseProto.Response.ResponseType.SUCCESS_QUIT,
                                 "Timeout disconnect"
                         )
                 );

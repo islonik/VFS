@@ -1,4 +1,4 @@
-package org.vfs.core.network.protocol;
+package org.vfs.core.network.protocol.xml;
 
 /**
  * @author Lipatov Nikita
@@ -7,7 +7,7 @@ public class ResponseFactory {
 
     private static XmlHelper xmlHelper = new XmlHelper();
 
-    public static String newResponse(int status, String message)
+    /*public static String newResponse(int status, String message)
     {
         Response response = new Response();
         response.setCode(status);
@@ -26,5 +26,5 @@ public class ResponseFactory {
 
         String xmlResponse = xmlHelper.marshal(Response.class, response);
         return xmlResponse;
-    }
+    }*/
 }

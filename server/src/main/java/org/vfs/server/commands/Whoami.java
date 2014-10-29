@@ -2,7 +2,7 @@ package org.vfs.server.commands;
 
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
-import org.vfs.core.network.protocol.User;
+import org.vfs.core.network.protocol.proto.RequestProto;
 import org.vfs.server.model.UserSession;
 
 /**
@@ -14,7 +14,7 @@ public class Whoami extends AbstractCommand implements Command {
     @Override
     public void apply(UserSession userSession, CommandValues values) {
         clientWriter = userSession.getClientWriter();
-        User user = userSession.getUser();
+        RequestProto.Request.User user = userSession.getUser();
 
         sendOK(user.getLogin());
     }

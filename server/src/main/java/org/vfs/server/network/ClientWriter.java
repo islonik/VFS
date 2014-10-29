@@ -2,6 +2,7 @@ package org.vfs.server.network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vfs.core.network.protocol.proto.ResponseProto;
 
 import java.io.*;
 import java.net.Socket;
@@ -13,18 +14,20 @@ import java.net.SocketException;
 public class ClientWriter {
     private static final Logger log = LoggerFactory.getLogger(ClientWriter.class);
 
+    private final OutputStream outputStream;
+
     private final Socket socket;
-    private final DataOutputStream dataOutputStream;
 
     public ClientWriter(Socket socket) throws IOException {
         this.socket = socket;
-        this.dataOutputStream = new DataOutputStream(socket.getOutputStream());
+        this.outputStream = this.socket.getOutputStream();
     }
 
-    public void send(String message) {
+    public void send(ResponseProto.Response response) {
         try {
-            dataOutputStream.writeUTF(message);
-            dataOutputStream.flush();
+            if(!socket.isClosed()) {
+                response.writeDelimitedTo(outputStream);
+           }
         } catch(SocketException se) {
             Thread.currentThread().interrupt(); // socket was closed, we should kill this thread
         } catch (IOException ioe) {

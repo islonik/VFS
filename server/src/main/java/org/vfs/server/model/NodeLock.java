@@ -1,6 +1,6 @@
 package org.vfs.server.model;
 
-import org.vfs.core.network.protocol.User;
+import org.vfs.core.network.protocol.proto.RequestProto;
 
 import java.util.concurrent.Semaphore;
 
@@ -9,7 +9,7 @@ import java.util.concurrent.Semaphore;
  */
 public class NodeLock {
 
-    private volatile User user;
+    private volatile RequestProto.Request.User user;
     private final Semaphore semaphore; // or AtomicBoolean
 
     public NodeLock() {
@@ -21,7 +21,7 @@ public class NodeLock {
         return (permitCount > 0) ? true : false;
     }
 
-    public void acquire(User user) {
+    public void acquire(RequestProto.Request.User user) {
         try {
             this.user = user;
             semaphore.acquire();
@@ -35,7 +35,7 @@ public class NodeLock {
         semaphore.release();
     }
 
-    public User getUser() {
+    public RequestProto.Request.User getUser() {
         return user;
     }
 

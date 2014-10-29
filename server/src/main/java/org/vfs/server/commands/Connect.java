@@ -4,13 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
+import org.vfs.core.network.protocol.proto.ResponseFactory;
+import org.vfs.core.network.protocol.proto.ResponseProto;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.services.UserService;
-
-import static org.vfs.core.network.protocol.Response.STATUS_FAIL_CONNECT;
-import static org.vfs.core.network.protocol.Response.STATUS_SUCCESS_CONNECT;
-import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
@@ -32,14 +30,14 @@ public class Connect extends AbstractCommand implements Command {
         clientWriter = userSession.getClientWriter();
         String login = values.getNextParam();
         if (userService.isLogged(login)) {
-            send(STATUS_FAIL_CONNECT, "Such user already exits. Please, change the login!");
+            send(ResponseProto.Response.ResponseType.FAIL_CONNECT, "Such user already exits. Please, change the login!");
 
             throw new QuitException("Such user already exist!");
         } else {
             userService.attachUser(userSession.getUser().getId(), login);
             clientWriter.send( // send id from server to client
-                    newResponse(
-                            STATUS_SUCCESS_CONNECT,
+                    ResponseFactory.newResponse(
+                            ResponseProto.Response.ResponseType.SUCCESS_CONNECT,
                             nodeService.getFullPath(userSession.getNode()),
                             userSession.getUser().getId()
                     )

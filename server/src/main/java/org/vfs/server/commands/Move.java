@@ -10,9 +10,6 @@ import org.vfs.server.services.LockService;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.services.UserService;
 
-import static org.vfs.core.network.protocol.Response.STATUS_OK;
-import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
-
 /**
  * @author Lipatov Nikita
  */

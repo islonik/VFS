@@ -6,7 +6,7 @@ import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.exceptions.ValidationException;
-import org.vfs.core.network.protocol.User;
+import org.vfs.core.network.protocol.proto.RequestProto;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -37,9 +37,11 @@ public class CommandLine {
                     networkManager.openSocket(serverHost, serverPort);
 
                     // connection was established
-                    User user = new User();
-                    user.setId("0");
-                    user.setLogin(userLogin);
+
+                    RequestProto.Request.User user = RequestProto.Request.User.newBuilder()
+                            .setId("0")
+                            .setLogin(userLogin)
+                            .build();
 
                     userManager.setUser(user);
 

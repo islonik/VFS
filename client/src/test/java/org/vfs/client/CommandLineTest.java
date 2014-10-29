@@ -1,20 +1,11 @@
 package org.vfs.client;
 
-import org.junit.Test;
-import org.vfs.client.network.MessageSender;
-import org.vfs.client.network.NetworkManager;
-import org.vfs.client.network.UserManager;
-import org.vfs.core.command.CommandParser;
-import org.vfs.core.network.protocol.User;
-
-import static org.mockito.Mockito.*;
-
 /**
  * @author Lipatov Nikita
  */
 public class CommandLineTest {
 
-    @Test
+    /*@Test
     public void testConnectCommand() throws Exception {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
@@ -110,6 +101,6 @@ public class CommandLineTest {
         verify(networkManager, atLeastOnce()).getMessageSender();
         verify(userManager, atLeastOnce()).getUser();
         verify(messageSender, atLeastOnce()).send(user, "default");
-    }
+    }*/
 
 }

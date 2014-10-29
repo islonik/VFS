@@ -1,8 +1,7 @@
 package org.vfs.client.network;
 
-import org.vfs.core.network.protocol.RequestFactory;
-import org.vfs.core.network.protocol.User;
-import org.vfs.core.network.protocol.XmlHelper;
+import org.vfs.core.network.protocol.proto.RequestFactory;
+import org.vfs.core.network.protocol.proto.RequestProto;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -12,17 +11,17 @@ import java.util.concurrent.BlockingQueue;
  * @author Lipatov Nikita
  */
 public class MessageSender {
-    private BlockingQueue<String> toServerQueue;
+    private BlockingQueue<RequestProto.Request> toServerQueue;
 
-    public MessageSender(BlockingQueue<String> queue) {
+    public MessageSender(BlockingQueue<RequestProto.Request> queue) {
         this.toServerQueue = queue;
     }
 
-    public boolean send(User user, String command) {
+    public boolean send(RequestProto.Request.User user, String command) {
         if (user != null) {
-            String requestXml = RequestFactory.newRequest(user.getId(), user.getLogin(), command);
+            RequestProto.Request request = RequestFactory.newRequest(user.getId(), user.getLogin(), command);
 
-            return this.toServerQueue.add(requestXml);
+            return this.toServerQueue.add(request);
         }
         return false;
     }

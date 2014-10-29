@@ -1,6 +1,6 @@
 package org.vfs.server.model;
 
-import org.vfs.core.network.protocol.User;
+import org.vfs.core.network.protocol.proto.RequestProto;
 import org.vfs.server.network.ClientWriter;
 
 import java.net.Socket;
@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
  * @author Lipatov Nikita
  */
 public class UserSession {
-    private final User user;
+    private volatile RequestProto.Request.User user;
     private final Socket socket;
     private final Timer timer;
     private final ClientWriter clientWriter;
@@ -18,15 +18,19 @@ public class UserSession {
     private volatile Node node;
     private volatile Future task;
 
-    public UserSession(User user, Socket socket, Timer timer, ClientWriter clientWriter) {
+    public UserSession(RequestProto.Request.User user, Socket socket, Timer timer, ClientWriter clientWriter) {
         this.user = user;
         this.socket = socket;
         this.timer = timer;
         this.clientWriter = clientWriter;
     }
 
-    public final User getUser() {
+    public RequestProto.Request.User getUser() {
         return user;
+    }
+
+    public void setUser(RequestProto.Request.User user) {
+        this.user = user;
     }
 
     public final Socket getSocket() {

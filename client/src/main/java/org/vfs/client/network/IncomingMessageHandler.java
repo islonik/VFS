@@ -1,8 +1,7 @@
 package org.vfs.client.network;
 
-import org.vfs.core.network.protocol.Response;
-import org.vfs.core.network.protocol.User;
-import org.vfs.core.network.protocol.XmlHelper;
+import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.proto.ResponseProto;
 
 /**
  * @author Lipatov Nikita
@@ -11,40 +10,40 @@ public class IncomingMessageHandler {
 
     private final UserManager userManager;
     private final NetworkManager networkManager;
-    private XmlHelper xmlHelper;
 
     public IncomingMessageHandler(UserManager userManager, NetworkManager networkManager) {
         this.userManager = userManager;
         this.networkManager = networkManager;
-        this.xmlHelper = new XmlHelper();
     }
 
-    public void handle(String messageFromServer) {
+    public void handle(ResponseProto.Response response) {
 
-        Response response = xmlHelper.unmarshal(Response.class, messageFromServer);
+        ResponseProto.Response.ResponseType code = response.getCode();
 
-        int code = response.getCode();
         String message = response.getMessage();
 
-        User user = userManager.getUser();
+        RequestProto.Request.User user = userManager.getUser();
 
         switch (code) {
-            case Response.STATUS_SUCCESS_CONNECT:  // success authorization
-                user.setId(response.getSpecificCode());
+            case SUCCESS_CONNECT:  // success authorization
+                user = RequestProto.Request.User.newBuilder()
+                        .setId(response.getSpecificCode())
+                        .setLogin(user.getLogin())
+                        .build();
                 userManager.setUser(user);
                 System.out.println(message);
                 break;
-            case Response.STATUS_FAIL_CONNECT:     // fail authorization
+            case FAIL_CONNECT:     // fail authorization
                 userManager.setUser(null);
                 networkManager.closeSocket();
                 System.err.println(message);
                 break;
-            case Response.STATUS_SUCCESS_QUIT:     // quit response
+            case SUCCESS_QUIT:     // quit response
                 userManager.setUser(null);
                 networkManager.closeSocket();
                 System.out.println(message);
                 break;
-            case Response.STATUS_FAIL:
+            case FAIL:
                 System.err.println(message);
                 break;
             default:

@@ -4,15 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
-import org.vfs.core.network.protocol.*;
+import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.proto.ResponseFactory;
+import org.vfs.core.network.protocol.proto.ResponseProto;
 import org.vfs.server.commands.Command;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.model.UserSession;
 
 import java.util.Map;
-
-import static org.vfs.core.network.protocol.Response.*;
-import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
@@ -24,7 +23,6 @@ public class CommandLine {
     private final UserSession userSession;
     private final ClientWriter clientWriter;
 
-    private final XmlHelper xmlHelper;
     private final CommandParser parser;
 
     public CommandLine(Map<String, Command> commands, UserSession userSession) {
@@ -32,13 +30,10 @@ public class CommandLine {
         this.userSession = userSession;
         clientWriter = userSession.getClientWriter();
 
-        xmlHelper = new XmlHelper();
         parser = new CommandParser();
     }
 
-    public void onUserInput(String message) {
-
-        Request request = xmlHelper.unmarshal(Request.class, message);
+    public void onUserInput(RequestProto.Request request) {
 
         String fullCommand = request.getCommand();
         parser.parse(fullCommand);
@@ -51,30 +46,30 @@ public class CommandLine {
                 commands.get(command).apply(userSession, commandValues);
             } else {
                 clientWriter.send(
-                        newResponse(
-                                STATUS_OK,
+                        ResponseFactory.newResponse(
+                                ResponseProto.Response.ResponseType.OK,
                                 "No such command! Please check you syntax or type 'help'!"
                         )
                 );
             }
         } catch(IllegalArgumentException e) {
             clientWriter.send(
-                    newResponse(
-                            STATUS_FAIL,
+                    ResponseFactory.newResponse(
+                            ResponseProto.Response.ResponseType.FAIL,
                             e.getMessage()
                     )
             );
         } catch(IllegalAccessError e) {
             clientWriter.send(
-                    newResponse(
-                            STATUS_FAIL,
+                    ResponseFactory.newResponse(
+                            ResponseProto.Response.ResponseType.FAIL,
                             e.getMessage()
                     )
             );
         } catch (NullPointerException npe) {
             clientWriter.send(
-                    newResponse(
-                            STATUS_FAIL,
+                    ResponseFactory.newResponse(
+                            ResponseProto.Response.ResponseType.FAIL,
                             npe.getMessage()
                     )
             );

@@ -1,4 +1,4 @@
-package org.vfs.core.network.protocol;
+package org.vfs.core.network.protocol.xml;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

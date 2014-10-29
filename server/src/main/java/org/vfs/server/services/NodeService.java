@@ -3,7 +3,7 @@ package org.vfs.server.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.vfs.core.network.protocol.User;
+import org.vfs.core.network.protocol.proto.RequestProto;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 
@@ -213,7 +213,7 @@ public class NodeService {
         if(lockService.isLocked(userHomeDir, true)) {
             Collection<Node> lockingNodes= lockService.getAllLockedNodes(userHomeDir);
             for(Node lockingNode : lockingNodes) {
-                User lockingUser = lockService.getUser(lockingNode);
+                RequestProto.Request.User lockingUser = lockService.getUser(lockingNode);
                 lockService.unlock(lockingUser, userHomeDir);
             }
         }

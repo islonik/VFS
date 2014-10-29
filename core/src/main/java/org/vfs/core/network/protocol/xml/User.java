@@ -1,4 +1,4 @@
-package org.vfs.core.network.protocol;
+package org.vfs.core.network.protocol.xml;
 
 import javax.xml.bind.annotation.*;
 
