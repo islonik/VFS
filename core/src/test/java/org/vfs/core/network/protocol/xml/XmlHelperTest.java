@@ -1,10 +1,7 @@
-package org.vfs.core.network.protocol;
+package org.vfs.core.network.protocol.xml;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.vfs.core.network.protocol.xml.Request;
-import org.vfs.core.network.protocol.xml.Response;
-import org.vfs.core.network.protocol.xml.XmlHelper;
 
 /**
  * @author Lipatov Nikita

@@ -210,13 +210,16 @@ public class NodeService {
     public void removeHomeDirectory(String login) {
         Node home = this.getHome();
         Node userHomeDir = this.findByName(home, login);
-        if(lockService.isLocked(userHomeDir, true)) {
-            Collection<Node> lockingNodes= lockService.getAllLockedNodes(userHomeDir);
-            for(Node lockingNode : lockingNodes) {
-                RequestProto.Request.User lockingUser = lockService.getUser(lockingNode);
-                lockService.unlock(lockingUser, userHomeDir);
+        if(userHomeDir != null) {
+            if(lockService.isLocked(userHomeDir, true)) {
+                Collection<Node> lockingNodes= lockService.getAllLockedNodes(userHomeDir);
+                for(Node lockingNode : lockingNodes) {
+                    RequestProto.Request.User lockingUser = lockService.getUser(lockingNode);
+                    lockService.unlock(lockingUser, userHomeDir);
+                }
             }
         }
+
         this.removeNode(home, login);
     }
 }

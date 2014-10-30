@@ -19,6 +19,7 @@ public class UserServiceTest {
         LockService lockService = new LockService();
         NodeManager nodeManager = new NodeManager();
         NodeService nodeService = new NodeService("/", lockService, nodeManager);
+        nodeService.initDirs();
         UserService userService = new UserService(nodeService, lockService);
 
         Assert.assertNull(userService.getSession(""));
@@ -36,11 +37,12 @@ public class UserServiceTest {
         Assert.assertNotNull(userService.getSession(userSession.getUser().getId()));
     }
 
-    /*@Test
+    @Test
     public void testStopSession() throws Exception {
         LockService lockService = new LockService();
         NodeManager nodeManager = new NodeManager();
         NodeService nodeService = new NodeService("/", lockService, nodeManager);
+        nodeService.initDirs();
         UserService userService = new UserService(nodeService, lockService);
 
         // UserSession #1
@@ -58,5 +60,5 @@ public class UserServiceTest {
         Assert.assertEquals(0, userService.getRegistry().size());
         userService.stopSession(userSession.getUser().getId());
         Assert.assertEquals(0, userService.getRegistry().size());
-    }*/
+    }
 }

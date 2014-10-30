@@ -1,32 +1,42 @@
 package org.vfs.client.network;
 
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+
+import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.proto.RequestProto.Request.User;
+
 /**
  * @author Lipatov Nikita
  */
 public class MessageSenderTest {
 
-   /* @Test
+    @Test
     public void testSend() throws Exception {
 
-        BlockingQueue<String> queue = new ArrayBlockingQueue<String>(2);
+        BlockingQueue<RequestProto.Request> queue = new ArrayBlockingQueue<>(2);
         MessageSender messageSender = new MessageSender(queue);
-        User user = new User("0", "nikita");
 
+        User user = RequestProto.Request.User.newBuilder()
+                .setId("0")
+                .setLogin("nikita")
+                .build();
         Assert.assertTrue(messageSender.send(user, "connect nikita"));
 
-        String requestXml = queue.take();
+        RequestProto.Request request = queue.take();
 
         Assert.assertEquals
-        (
-            "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" +
-            "<request>\n" +
-            "    <user>\n" +
-            "        <id>0</id>\n" +
-            "        <login>nikita</login>\n" +
-            "    </user>\n" +
-            "    <command>connect nikita</command>\n" +
-            "</request>\n", requestXml
-        );
+                (
+                        "user {\n" +
+                                "  id: \"0\"\n" +
+                                "  login: \"nikita\"\n" +
+                                "}\n" +
+                                "command: \"connect nikita\"\n",
+                        request.toString()
+                );
 
-    }*/
+    }
 }

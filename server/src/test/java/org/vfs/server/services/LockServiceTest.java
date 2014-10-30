@@ -1,5 +1,7 @@
 package org.vfs.server.services;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,7 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.server.model.Node;
+import org.vfs.server.model.NodeTypes;
 import org.vfs.server.utils.NodePrinter;
+
+import org.vfs.core.network.protocol.proto.RequestProto.Request.User;
+
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Lipatov Nikita
@@ -26,12 +38,7 @@ public class LockServiceTest {
     @Autowired
     private NodePrinter nodePrinter;
 
-    @Test
-    public void test() {
-
-    }
-
-    /*@Before
+    @Before
     public void setUp() throws InterruptedException {
         nodeService.initDirs();
     }
@@ -56,7 +63,10 @@ public class LockServiceTest {
         Node weblogic = nodeService.getNodeManager().newNode("weblogic", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(weblogic, servers);
 
-        User user1 = new User("121", "r1d1");
+        User user1 = RequestProto.Request.User.newBuilder()
+                .setId("121")
+                .setLogin("r1d1")
+                .build();
 
         Assert.assertTrue(lockService.lock(user1, servers));
         Assert.assertTrue(lockService.isLocked(servers));
@@ -118,7 +128,10 @@ public class LockServiceTest {
         Node weblogic = nodeService.getNodeManager().newNode("weblogic", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(weblogic, servers);
 
-        User user1 = new User("121", "nikita");
+        User user1 = RequestProto.Request.User.newBuilder()
+                .setId("121")
+                .setLogin("nikita")
+                .build();
 
         Assert.assertTrue(lockService.lock(user1, home));
 
@@ -155,7 +168,11 @@ public class LockServiceTest {
         final HashMap<Integer, User> users = new HashMap<>();
 
         for(final AtomicInteger aint = new AtomicInteger(1); aint.get() <= threads; aint.incrementAndGet()) {
-            users.put(aint.get(), new User(aint.toString(), "nikita" + aint.toString()));
+            users.put(aint.get(), RequestProto.Request.User.newBuilder()
+                    .setId(aint.toString())
+                    .setLogin("nikita"+aint.toString())
+                    .build()
+            );
             Runnable thread = new Runnable() {
                 public void run() {
                     User user = users.get(aint.get());
@@ -192,8 +209,14 @@ public class LockServiceTest {
         nodeService.getNodeManager().setParent(weblogic, servers);
 
 
-        User user1 = new User("121", "nikita");
-        User user2 = new User("122", "admin");
+        User user1 = RequestProto.Request.User.newBuilder()
+                .setId("121")
+                .setLogin("nikita")
+                .build();
+        User user2 = RequestProto.Request.User.newBuilder()
+                .setId("122")
+                .setLogin("admin")
+                .build();
 
         Assert.assertTrue(lockService.lock(user1, home));
         Assert.assertTrue(lockService.isLocked(home));
@@ -216,7 +239,7 @@ public class LockServiceTest {
                         "|  |__servers\n" +
                         "|  |  |__weblogic\n",
                 nodePrinter.print(nodeService.getRoot()));
-    }*/
+    }
 
 
 }

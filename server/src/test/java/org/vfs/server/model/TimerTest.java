@@ -3,8 +3,6 @@ package org.vfs.server.model;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.concurrent.TimeUnit;
-
 /**
  * @author Lipatov Nikita
  */

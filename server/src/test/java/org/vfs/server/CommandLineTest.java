@@ -1,20 +1,29 @@
 package org.vfs.server;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.vfs.core.network.protocol.proto.RequestFactory;
 import org.vfs.server.commands.Command;
+import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
+import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.services.UserService;
 import org.vfs.server.utils.NodePrinter;
 
+import java.net.Socket;
 import java.util.Map;
+
+import static org.mockito.Mockito.*;
 
 /**
  * All common tests, except LockTests.
@@ -43,7 +52,7 @@ public class CommandLineTest {
 
     }
 
-    /*@Before
+    @Before
     public void setUp() throws InterruptedException {
         nodeService.initDirs();
 
@@ -330,6 +339,6 @@ public class CommandLineTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-    }*/
+    }
 
 }
