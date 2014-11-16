@@ -1,41 +1,39 @@
 package org.vfs.server.model;
 
-import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.Protocol;
 
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @author Lipatov Nikita
  */
 public class NodeLock {
 
-    private volatile RequestProto.Request.User user;
-    private final Semaphore semaphore; // or AtomicBoolean
+    private volatile Protocol.User user;
+    private final Lock lock;
 
     public NodeLock() {
-        this.semaphore = new Semaphore(1);
+        lock = new ReentrantLock();
     }
 
     public boolean isLocked() {
-        int permitCount = semaphore.availablePermits();
-        return (permitCount > 0) ? true : false;
+        return (user == null) ? false : true;
     }
 
-    public void acquire(RequestProto.Request.User user) {
-        try {
+    public void lock(Protocol.User user) {
+        boolean result = lock.tryLock();
+        if(result) {
             this.user = user;
-            semaphore.acquire();
-        } catch (InterruptedException ie) {
-            System.err.println(ie);
         }
     }
 
-    public void release() {
+    public void unlock() {
         user = null;
-        semaphore.release();
+        lock.unlock();
     }
 
-    public RequestProto.Request.User getUser() {
+    public Protocol.User getUser() {
         return user;
     }
 

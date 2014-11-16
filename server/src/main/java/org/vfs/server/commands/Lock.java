@@ -3,7 +3,7 @@ package org.vfs.server.commands;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
-import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.Protocol;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.LockService;
@@ -30,7 +30,7 @@ public class Lock extends AbstractCommand implements Command {
     @Override
     public void apply(UserSession userSession, CommandValues values) {
         clientWriter = userSession.getClientWriter();
-        RequestProto.Request.User user = userSession.getUser();
+        Protocol.User user = userSession.getUser();
         Node directory = userSession.getNode();
         String key = values.getNextKey();
         String lockDirectory = values.getNextParam();

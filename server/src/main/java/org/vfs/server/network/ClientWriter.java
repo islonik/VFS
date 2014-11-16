@@ -2,7 +2,7 @@ package org.vfs.server.network;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vfs.core.network.protocol.proto.ResponseProto;
+import org.vfs.core.network.protocol.Protocol;
 
 import java.io.*;
 import java.net.Socket;
@@ -23,7 +23,7 @@ public class ClientWriter {
         this.outputStream = this.socket.getOutputStream();
     }
 
-    public void send(ResponseProto.Response response) {
+    public void send(Protocol.Response response) {
         try {
             if(!socket.isClosed()) {
                 response.writeDelimitedTo(outputStream);

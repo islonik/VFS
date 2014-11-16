@@ -1,6 +1,6 @@
 package org.vfs.server.network;
 
-import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.Protocol;
 
 import java.io.*;
 
@@ -15,7 +15,7 @@ public class MessageReader {
         this.inputStream = inputStream;
     }
 
-    public RequestProto.Request read() throws IOException {
-        return RequestProto.Request.parseDelimitedFrom(inputStream);
+    public Protocol.Request read() throws IOException {
+        return Protocol.Request.parseDelimitedFrom(inputStream);
     }
 }

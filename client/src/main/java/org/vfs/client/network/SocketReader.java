@@ -1,7 +1,7 @@
 package org.vfs.client.network;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.vfs.core.network.protocol.proto.ResponseProto;
+import org.vfs.core.network.protocol.Protocol;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -14,10 +14,10 @@ import java.util.concurrent.BlockingQueue;
  * @author Lipatov Nikita
  */
 public class SocketReader {
-    private final BlockingQueue<ResponseProto.Response> toUserQueue;
+    private final BlockingQueue<Protocol.Response> toUserQueue;
     private final NetworkManager networkManager;
 
-    public SocketReader(BlockingQueue<ResponseProto.Response> queue, NetworkManager networkManager) throws IOException {
+    public SocketReader(BlockingQueue<Protocol.Response> queue, NetworkManager networkManager) throws IOException {
         this.toUserQueue = queue;
         this.networkManager = networkManager;
     }
@@ -26,7 +26,7 @@ public class SocketReader {
         try {
             while (true) {
                 try {
-                    ResponseProto.Response response = ResponseProto.Response.parseDelimitedFrom(networkManager.getSocket().getInputStream());
+                    Protocol.Response response = Protocol.Response.parseDelimitedFrom(networkManager.getSocket().getInputStream());
                     this.toUserQueue.put(response);
                 } catch (SocketException | InvalidProtocolBufferException se) {
                     if(!se.getMessage().toLowerCase().equals("socket closed")) {

@@ -1,7 +1,6 @@
 package org.vfs.client.network;
 
-import org.vfs.core.network.protocol.proto.RequestProto;
-import org.vfs.core.network.protocol.proto.ResponseProto;
+import org.vfs.core.network.protocol.Protocol;
 
 /**
  * @author Lipatov Nikita
@@ -16,17 +15,16 @@ public class IncomingMessageHandler {
         this.networkManager = networkManager;
     }
 
-    public void handle(ResponseProto.Response response) {
-
-        ResponseProto.Response.ResponseType code = response.getCode();
+    public void handle(Protocol.Response response) {
+        Protocol.Response.ResponseType code = response.getCode();
 
         String message = response.getMessage();
 
-        RequestProto.Request.User user = userManager.getUser();
+        Protocol.User user = userManager.getUser();
 
         switch (code) {
             case SUCCESS_CONNECT:  // success authorization
-                user = RequestProto.Request.User.newBuilder()
+                user = Protocol.User.newBuilder()
                         .setId(response.getSpecificCode())
                         .setLogin(user.getLogin())
                         .build();

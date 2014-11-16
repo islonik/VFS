@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.vfs.core.network.protocol.proto.ResponseFactory;
-import org.vfs.core.network.protocol.proto.ResponseProto;
+import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.UserService;
 
@@ -53,20 +53,18 @@ public class TimeoutJob {
             if(diff >= 1 && login == null) { // very rare case
                 System.out.println("Rare thread was killed!");
                 userService.stopSession(key);
-                userSession.getTask().cancel(true);
             }
             if(diff >= timeout && login != null) { // kill session
                 System.out.println("Thread was killed!");
 
                 userSession.getClientWriter().send(
                         ResponseFactory.newResponse(
-                                ResponseProto.Response.ResponseType.SUCCESS_QUIT,
+                                Protocol.Response.ResponseType.SUCCESS_QUIT,
                                 "Timeout disconnect"
                         )
                 );
 
                 userService.stopSession(key);
-                userSession.getTask().cancel(true); // kill thread
             }
         }
     }

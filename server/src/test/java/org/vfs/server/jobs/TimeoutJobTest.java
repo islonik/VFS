@@ -21,7 +21,6 @@ import java.net.Socket;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.*;
 
 /**
  * @author Lipatov Nikita
@@ -51,37 +50,6 @@ public class TimeoutJobTest {
 
         UserSession nikita = userService.startSession(nikitaSocketMock, nikitaTimerMock, nikitaCWMock);
         userService.attachUser(nikita.getUser().getId(), "nikita");
-        nikita.setTask(new RunnableFuture() {
-            @Override
-            public void run() {
-
-            }
-
-            @Override
-            public boolean cancel(boolean mayInterruptIfRunning) {
-                return false;
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return false;
-            }
-
-            @Override
-            public boolean isDone() {
-                return false;
-            }
-
-            @Override
-            public Object get() throws InterruptedException, ExecutionException {
-                return null;
-            }
-
-            @Override
-            public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-                return null;
-            }
-        });
 
         // UserSession #2
         Socket emptySocketMock = Mockito.mock(Socket.class);
@@ -91,32 +59,6 @@ public class TimeoutJobTest {
         ClientWriter emptyCWMock = Mockito.mock(ClientWriter.class);
 
         UserSession empty = userService.startSession(emptySocketMock, emptyTimerMock, emptyCWMock);
-        empty.setTask(new Future() {
-            @Override
-            public boolean cancel(boolean mayInterruptIfRunning) {
-                return false;
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return false;
-            }
-
-            @Override
-            public boolean isDone() {
-                return false;
-            }
-
-            @Override
-            public Object get() throws InterruptedException, ExecutionException {
-                return null;
-            }
-
-            @Override
-            public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-                return null;
-            }
-        });
 
         // UserSession #3
         Socket r2d2SocketMock = Mockito.mock(Socket.class);
@@ -127,32 +69,6 @@ public class TimeoutJobTest {
 
         UserSession r2d2 = userService.startSession(r2d2SocketMock, r2d2TimerMock, r2d2CWMock);
         userService.attachUser(r2d2.getUser().getId(), "r2d2");
-        r2d2.setTask(new Future() {
-            @Override
-            public boolean cancel(boolean mayInterruptIfRunning) {
-                return false;
-            }
-
-            @Override
-            public boolean isCancelled() {
-                return false;
-            }
-
-            @Override
-            public boolean isDone() {
-                return false;
-            }
-
-            @Override
-            public Object get() throws InterruptedException, ExecutionException {
-                return null;
-            }
-
-            @Override
-            public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-                return null;
-            }
-        });
 
         Map<String, UserSession> userSessions = new HashMap<>();
         userSessions.put(nikita.getUser().getId(), nikita);

@@ -4,9 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
-import org.vfs.core.network.protocol.proto.RequestProto;
-import org.vfs.core.network.protocol.proto.ResponseFactory;
-import org.vfs.core.network.protocol.proto.ResponseProto;
+import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.commands.Command;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.model.UserSession;
@@ -33,7 +32,7 @@ public class CommandLine {
         parser = new CommandParser();
     }
 
-    public void onUserInput(RequestProto.Request request) {
+    public void onUserInput(Protocol.Request request) {
 
         String fullCommand = request.getCommand();
         parser.parse(fullCommand);
@@ -47,7 +46,7 @@ public class CommandLine {
             } else {
                 clientWriter.send(
                         ResponseFactory.newResponse(
-                                ResponseProto.Response.ResponseType.OK,
+                                Protocol.Response.ResponseType.OK,
                                 "No such command! Please check you syntax or type 'help'!"
                         )
                 );
@@ -55,21 +54,21 @@ public class CommandLine {
         } catch(IllegalArgumentException e) {
             clientWriter.send(
                     ResponseFactory.newResponse(
-                            ResponseProto.Response.ResponseType.FAIL,
+                            Protocol.Response.ResponseType.FAIL,
                             e.getMessage()
                     )
             );
         } catch(IllegalAccessError e) {
             clientWriter.send(
                     ResponseFactory.newResponse(
-                            ResponseProto.Response.ResponseType.FAIL,
+                            Protocol.Response.ResponseType.FAIL,
                             e.getMessage()
                     )
             );
         } catch (NullPointerException npe) {
             clientWriter.send(
                     ResponseFactory.newResponse(
-                            ResponseProto.Response.ResponseType.FAIL,
+                            Protocol.Response.ResponseType.FAIL,
                             npe.getMessage()
                     )
             );

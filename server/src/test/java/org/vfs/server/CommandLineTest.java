@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.vfs.core.network.protocol.proto.RequestFactory;
+import org.vfs.core.network.protocol.RequestFactory;
 import org.vfs.server.commands.Command;
 import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
@@ -46,11 +46,6 @@ public class CommandLineTest {
 
     private UserSession nikitaSession;
     private UserSession r2d2Session;
-
-    @Test
-    public void test() {
-
-    }
 
     @Before
     public void setUp() throws InterruptedException {

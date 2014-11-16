@@ -1,6 +1,6 @@
 package org.vfs.client.network;
 
-import org.vfs.core.network.protocol.proto.ResponseProto;
+import org.vfs.core.network.protocol.Protocol;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -10,10 +10,10 @@ import java.util.concurrent.BlockingQueue;
  * @author Lipatov Nikita
  */
 public class IncomingMessageListener {
-    private BlockingQueue<ResponseProto.Response> toUserQueue;
+    private BlockingQueue<Protocol.Response> toUserQueue;
     private IncomingMessageHandler handler;
 
-    public IncomingMessageListener(BlockingQueue<ResponseProto.Response> queue, IncomingMessageHandler handler) {
+    public IncomingMessageListener(BlockingQueue<Protocol.Response> queue, IncomingMessageHandler handler) {
         this.toUserQueue = queue;
         this.handler = handler;
     }
@@ -21,7 +21,7 @@ public class IncomingMessageListener {
     public void run() {
         while (true) {
             try {
-                ResponseProto.Response response = toUserQueue.take();
+                Protocol.Response response = toUserQueue.take();
 
                 handler.handle(response);
             } catch (InterruptedException e) {

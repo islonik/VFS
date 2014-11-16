@@ -1,4 +1,4 @@
-package org.vfs.core.network.protocol.proto;
+package org.vfs.core.network.protocol;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -10,7 +10,7 @@ public class RequestFactoryTest {
 
     @Test
     public void testNewRequest() {
-        RequestProto.Request request = RequestFactory.newRequest("122", "nikita", "copy dir1 dir2");
+        Protocol.Request request = RequestFactory.newRequest("122", "nikita", "copy dir1 dir2");
         Assert.assertEquals(
                 "user {\n" +
                         "  id: \"122\"\n" +
@@ -23,7 +23,7 @@ public class RequestFactoryTest {
 
     @Test
     public void testNewRequestConnectRequest() {
-        RequestProto.Request request = RequestFactory.newRequest("0", "nikita", "connect nikita");
+        Protocol.Request request = RequestFactory.newRequest("0", "nikita", "connect nikita");
 
         Assert.assertEquals(
                 "user {\n" +

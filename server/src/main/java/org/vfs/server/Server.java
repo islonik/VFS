@@ -78,9 +78,8 @@ public class Server {
                     }
                 }
             };
-            Future ftask = executorService.submit(connection);
+            executorService.execute(connection);
 
-            userSession.setTask(ftask);
         }
     }
 }

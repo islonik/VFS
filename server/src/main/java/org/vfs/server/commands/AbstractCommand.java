@@ -1,9 +1,9 @@
 package org.vfs.server.commands;
 
-import org.vfs.core.network.protocol.proto.ResponseProto.Response.ResponseType;
+import org.vfs.core.network.protocol.Protocol.Response.ResponseType;
 import org.vfs.server.network.ClientWriter;
 
-import static org.vfs.core.network.protocol.proto.ResponseFactory.newResponse;
+import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita

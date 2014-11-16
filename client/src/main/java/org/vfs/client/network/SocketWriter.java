@@ -1,6 +1,6 @@
 package org.vfs.client.network;
 
-import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.Protocol;
 
 import java.io.*;
 import java.util.concurrent.BlockingQueue;
@@ -12,10 +12,10 @@ import java.util.concurrent.BlockingQueue;
  * @author Lipatov Nikita
  */
 public class SocketWriter {
-    private final BlockingQueue<RequestProto.Request> toServerQueue;
+    private final BlockingQueue<Protocol.Request> toServerQueue;
     private final NetworkManager networkManager;
 
-    public SocketWriter(BlockingQueue<RequestProto.Request> queue, NetworkManager networkManager) throws IOException {
+    public SocketWriter(BlockingQueue<Protocol.Request> queue, NetworkManager networkManager) throws IOException {
         this.toServerQueue = queue;
         this.networkManager = networkManager;
     }
@@ -25,7 +25,7 @@ public class SocketWriter {
 
             while (true) {
                 try {
-                    RequestProto.Request request = this.toServerQueue.take();
+                    Protocol.Request request = this.toServerQueue.take();
 
                     OutputStream os = networkManager.getSocket().getOutputStream();
                     request.writeDelimitedTo(os);

@@ -1,6 +1,6 @@
 package org.vfs.server.model;
 
-import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.Protocol;
 import org.vfs.server.network.ClientWriter;
 
 import java.net.Socket;
@@ -10,7 +10,7 @@ import java.util.concurrent.Future;
  * @author Lipatov Nikita
  */
 public class UserSession {
-    private volatile RequestProto.Request.User user;
+    private volatile Protocol.User user;
     private final Socket socket;
     private final Timer timer;
     private final ClientWriter clientWriter;
@@ -18,18 +18,18 @@ public class UserSession {
     private volatile Node node;
     private volatile Future task;
 
-    public UserSession(RequestProto.Request.User user, Socket socket, Timer timer, ClientWriter clientWriter) {
+    public UserSession(Protocol.User user, Socket socket, Timer timer, ClientWriter clientWriter) {
         this.user = user;
         this.socket = socket;
         this.timer = timer;
         this.clientWriter = clientWriter;
     }
 
-    public RequestProto.Request.User getUser() {
+    public Protocol.User getUser() {
         return user;
     }
 
-    public void setUser(RequestProto.Request.User user) {
+    public void setUser(Protocol.User user) {
         this.user = user;
     }
 
@@ -55,14 +55,5 @@ public class UserSession {
             throw new IllegalArgumentException("UserSession: Node is not DIR!");
         }
     }
-
-    public final Future getTask() {
-        return task;
-    }
-
-    public void setTask(Future task) {
-        this.task = task;
-    }
-
 
 }

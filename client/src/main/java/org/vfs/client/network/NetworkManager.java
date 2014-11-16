@@ -7,7 +7,7 @@ import java.net.Socket;
 /**
  * Wait() / notifyAll() - notes:
  * When threads try to get socket(method getSocket()) then the threads will stop until the Main thread will open socket(method openSocket()).
- *
+ * + double checked locking
  * @author Lipatov Nikita
  */
 public class NetworkManager {
@@ -20,9 +20,11 @@ public class NetworkManager {
     public void openSocket(String serverHost, String serverPort) throws IOException {
         if (socket == null) {
             synchronized (this) {
-                InetAddress ipAddress = InetAddress.getByName(serverHost);
-                socket = new Socket(ipAddress, Integer.parseInt(serverPort));
-                notifyAll();
+                if(socket == null) {
+                    InetAddress ipAddress = InetAddress.getByName(serverHost);
+                    socket = new Socket(ipAddress, Integer.parseInt(serverPort));
+                    notifyAll();
+                }
             }
         }
     }
@@ -30,11 +32,13 @@ public class NetworkManager {
     public Socket getSocket() {
         if (socket == null) {
             synchronized (this) {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    System.err.println("NetworkManager.getSocket().IOException.Message=" + e.getMessage());
-                    throw new RuntimeException(e);
+                if(socket == null) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        System.err.println("NetworkManager.getSocket().IOException.Message=" + e.getMessage());
+                        throw new RuntimeException(e);
+                    }
                 }
             }
         }
@@ -44,9 +48,13 @@ public class NetworkManager {
     public void closeSocket() {
         try {
             if (socket != null) {
-                Socket socket = this.socket;
-                this.socket = null;
-                socket.close();
+                synchronized (this) {
+                    if(socket != null) {
+                        Socket socket = this.socket;
+                        this.socket = null;
+                        socket.close();
+                    }
+                }
             }
         } catch (IOException ioe) {
             System.err.println("NetworkManager.closeSocket().IOException.Message=" + ioe.getMessage());

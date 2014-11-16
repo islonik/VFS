@@ -6,7 +6,7 @@ import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.exceptions.ValidationException;
-import org.vfs.core.network.protocol.proto.RequestProto;
+import org.vfs.core.network.protocol.Protocol;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -38,7 +38,7 @@ public class CommandLine {
 
                     // connection was established
 
-                    RequestProto.Request.User user = RequestProto.Request.User.newBuilder()
+                    Protocol.User user = Protocol.User.newBuilder()
                             .setId("0")
                             .setLogin(userLogin)
                             .build();

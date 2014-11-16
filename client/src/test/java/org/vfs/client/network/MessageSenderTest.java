@@ -6,8 +6,7 @@ import org.junit.Test;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
-import org.vfs.core.network.protocol.proto.RequestProto;
-import org.vfs.core.network.protocol.proto.RequestProto.Request.User;
+import org.vfs.core.network.protocol.Protocol;
 
 /**
  * @author Lipatov Nikita
@@ -17,16 +16,16 @@ public class MessageSenderTest {
     @Test
     public void testSend() throws Exception {
 
-        BlockingQueue<RequestProto.Request> queue = new ArrayBlockingQueue<>(2);
+        BlockingQueue<Protocol.Request> queue = new ArrayBlockingQueue<>(2);
         MessageSender messageSender = new MessageSender(queue);
 
-        User user = RequestProto.Request.User.newBuilder()
+        Protocol.User user = Protocol.User.newBuilder()
                 .setId("0")
                 .setLogin("nikita")
                 .build();
         Assert.assertTrue(messageSender.send(user, "connect nikita"));
 
-        RequestProto.Request request = queue.take();
+        Protocol.Request request = queue.take();
 
         Assert.assertEquals
                 (

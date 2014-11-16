@@ -2,8 +2,7 @@ package org.vfs.server.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.vfs.core.network.protocol.proto.RequestProto;
-import org.vfs.core.network.protocol.proto.ResponseProto;
+import org.vfs.core.network.protocol.Protocol;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
@@ -15,8 +14,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.vfs.core.network.protocol.proto.ResponseFactory.newResponse;
-
+import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
 
 /**
  * @author Lipatov Nikita
@@ -35,7 +33,7 @@ public class UserService {
     }
 
     public UserSession startSession(Socket socket, Timer timer, ClientWriter clientWriter) {
-        RequestProto.Request.User user = RequestProto.Request.User.newBuilder()
+        Protocol.User user = Protocol.User.newBuilder()
                 .setId(UUID.randomUUID().toString())
                 .setLogin("")
                 .build();
@@ -52,7 +50,7 @@ public class UserService {
         Node loginHome = nodeService.createHomeDirectory(login);
 
         userSession.setNode(loginHome);
-        RequestProto.Request.User user = userSession.getUser();
+        Protocol.User user = userSession.getUser();
         user = user.toBuilder().setLogin(login).build();
         userSession.setUser(user);
     }
@@ -102,7 +100,7 @@ public class UserService {
                 ClientWriter clientWriter = userSession.getClientWriter();
                 clientWriter.send(
                         newResponse(
-                                ResponseProto.Response.ResponseType.OK,
+                                Protocol.Response.ResponseType.OK,
                                 message
                         )
                 );

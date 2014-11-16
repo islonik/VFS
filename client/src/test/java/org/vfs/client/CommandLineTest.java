@@ -7,8 +7,7 @@ import org.vfs.client.network.NetworkManager;
 import org.vfs.client.network.UserManager;
 import org.vfs.core.command.CommandParser;
 
-import org.vfs.core.network.protocol.proto.RequestProto;
-import org.vfs.core.network.protocol.proto.RequestProto.Request.User;
+import org.vfs.core.network.protocol.Protocol;
 
 /**
  * @author Lipatov Nikita
@@ -27,7 +26,7 @@ public class CommandLineTest {
         CommandLine cmd = new CommandLine(userManager, networkManager);
         cmd.execute("connect localhost:4499 nikita");
 
-        User user = RequestProto.Request.User.newBuilder()
+        Protocol.User user = Protocol.User.newBuilder()
                 .setId("0")
                 .setLogin("nikita")
                 .build();
@@ -73,7 +72,7 @@ public class CommandLineTest {
         MessageSender messageSender = mock(MessageSender.class);
         when(networkManager.getMessageSender()).thenReturn(messageSender);
         when(userManager.isAuthorized()).thenReturn(true);
-        User user = RequestProto.Request.User.newBuilder()
+        Protocol.User user = Protocol.User.newBuilder()
                 .setId("0")
                 .setLogin("nikita")
                 .build();
@@ -109,7 +108,7 @@ public class CommandLineTest {
         MessageSender messageSender = mock(MessageSender.class);
         when(networkManager.getMessageSender()).thenReturn(messageSender);
         when(userManager.isAuthorized()).thenReturn(true);
-        User user = RequestProto.Request.User.newBuilder()
+        Protocol.User user = Protocol.User.newBuilder()
                 .setId("0")
                 .setLogin("nikita")
                 .build();
