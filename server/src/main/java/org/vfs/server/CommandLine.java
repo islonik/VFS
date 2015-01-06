@@ -19,20 +19,18 @@ public class CommandLine {
     private static final Logger log = LoggerFactory.getLogger(CommandLine.class);
 
     private final Map<String, Command> commands;
-    private final UserSession userSession;
-    private final ClientWriter clientWriter;
+    private volatile ClientWriter clientWriter;
 
     private final CommandParser parser;
 
-    public CommandLine(Map<String, Command> commands, UserSession userSession) {
+    public CommandLine(Map<String, Command> commands) {
         this.commands = commands;
-        this.userSession = userSession;
-        clientWriter = userSession.getClientWriter();
 
         parser = new CommandParser();
     }
 
-    public void onUserInput(Protocol.Request request) {
+    public void onUserInput(UserSession userSession, Protocol.Request request) {
+        clientWriter = userSession.getClientWriter();
 
         String fullCommand = request.getCommand();
         parser.parse(fullCommand);

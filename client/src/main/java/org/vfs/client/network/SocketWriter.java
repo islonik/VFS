@@ -20,7 +20,7 @@ public class SocketWriter {
         this.networkManager = networkManager;
     }
 
-    public void run() {
+    /*public void run() {
         try {
 
             while (true) {
@@ -28,6 +28,7 @@ public class SocketWriter {
                     Protocol.Request request = this.toServerQueue.take();
 
                     OutputStream os = networkManager.getSocket().getOutputStream();
+
                     request.writeDelimitedTo(os);
                 } catch (IOException ioe) {
                     System.err.println("SocketWriter.IOException.Message=" + ioe.getMessage());
@@ -38,6 +39,6 @@ public class SocketWriter {
             System.err.println("SocketWriter.InterruptedException.Message=" + ie.getMessage());
         }
 
-    }
+    }*/
 
 }

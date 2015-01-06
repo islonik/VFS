@@ -2,7 +2,11 @@ package org.vfs.client.network;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.SocketChannel;
 
 /**
  * Wait() / notifyAll() - notes:
@@ -11,28 +15,40 @@ import java.net.Socket;
  * @author Lipatov Nikita
  */
 public class NetworkManager {
-    private volatile Socket socket;
+    //private volatile Socket socket;
+    private volatile SocketChannel client;
+    private volatile Selector selector;
     private MessageSender messageSender;
 
     public NetworkManager() {
     }
 
     public void openSocket(String serverHost, String serverPort) throws IOException {
-        if (socket == null) {
+        if (client == null) {
             synchronized (this) {
-                if(socket == null) {
+                if(client == null) {
+                    client = SocketChannel.open();
+                    // nonblocking I/O
+                    client.configureBlocking(false);
+                    client.connect(new InetSocketAddress(serverHost, Integer.parseInt(serverPort)));
+                    selector = Selector.open();
+                    client.register(selector, SelectionKey.OP_CONNECT);
+
+                    /*
                     InetAddress ipAddress = InetAddress.getByName(serverHost);
                     socket = new Socket(ipAddress, Integer.parseInt(serverPort));
+                    */
+
                     notifyAll();
                 }
             }
         }
     }
 
-    public Socket getSocket() {
-        if (socket == null) {
+    public Selector getSelector() {
+        if (selector == null) {
             synchronized (this) {
-                if(socket == null) {
+                if(selector == null) {
                     try {
                         wait();
                     } catch (InterruptedException e) {
@@ -42,17 +58,35 @@ public class NetworkManager {
                 }
             }
         }
-        return socket;
+        return selector;
+    }
+
+    public SocketChannel getSocketChannel() {
+        if (client == null) {
+            synchronized (this) {
+                if(client == null) {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        System.err.println("NetworkManager.getSocket().IOException.Message=" + e.getMessage());
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+        }
+        return client;
     }
 
     public void closeSocket() {
         try {
-            if (socket != null) {
+            if (client != null) {
                 synchronized (this) {
-                    if(socket != null) {
-                        Socket socket = this.socket;
-                        this.socket = null;
-                        socket.close();
+                    if(client != null) {
+                        selector.close();
+                        client.socket().close();
+                        client.close();
+                        client = null;
+                        selector = null;
                     }
                 }
             }

@@ -47,7 +47,7 @@ public class CommandLineTest {
     private UserSession nikitaSession;
     private UserSession r2d2Session;
 
-    @Before
+    /*@Before
     public void setUp() throws InterruptedException {
         nodeService.initDirs();
 
@@ -334,6 +334,6 @@ public class CommandLineTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-    }
+    }*/
 
 }

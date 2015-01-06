@@ -1,0 +1,2 @@
+# command of creation protocol.desc file
+protoc -I=src/main/proto --descriptor_set_out=src/main/resources/protocol.desc src/main/proto/Protocol.proto

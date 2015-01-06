@@ -40,17 +40,17 @@ public class ClientListener {
 
                 timer.updateTime();
 
-                commandLine.onUserInput(request);
+                //commandLine.onUserInput(request);
             } catch (IOException e) {
                 log.error("Unable read client message!", e);
-                Socket socket = userSession.getSocket();
+                /*Socket socket = userSession.getSocket();
                 if (!socket.isClosed()) {
                     try {
                         socket.close();
                     } catch (IOException ie) {
                         log.error(ie.getMessage(), ie);
                     }
-                }
+                }*/
                 userSession.getClientWriter().send(
                         newResponse(
                                 Protocol.Response.ResponseType.SUCCESS_QUIT,

@@ -3,25 +3,19 @@ package org.vfs.server.model;
 import org.vfs.core.network.protocol.Protocol;
 import org.vfs.server.network.ClientWriter;
 
-import java.net.Socket;
-import java.util.concurrent.Future;
-
 /**
  * @author Lipatov Nikita
  */
 public class UserSession {
     private volatile Protocol.User user;
-    private final Socket socket;
     private final Timer timer;
     private final ClientWriter clientWriter;
 
     private volatile Node node;
-    private volatile Future task;
 
-    public UserSession(Protocol.User user, Socket socket, Timer timer, ClientWriter clientWriter) {
+    public UserSession(Protocol.User user, ClientWriter clientWriter) {
         this.user = user;
-        this.socket = socket;
-        this.timer = timer;
+        this.timer = new Timer();
         this.clientWriter = clientWriter;
     }
 
@@ -31,10 +25,6 @@ public class UserSession {
 
     public void setUser(Protocol.User user) {
         this.user = user;
-    }
-
-    public final Socket getSocket() {
-        return socket;
     }
 
     public final Timer getTimer() {

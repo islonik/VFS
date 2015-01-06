@@ -30,6 +30,10 @@ public class UserManager {
 
     public void setUser(Protocol.User user) {
         this.user = user;
-        latch.countDown();
+        if(this.user == null) {
+            latch = new CountDownLatch(1);
+        } else {
+            latch.countDown();
+        }
     }
 }

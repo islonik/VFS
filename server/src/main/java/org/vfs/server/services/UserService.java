@@ -4,11 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.network.protocol.Protocol;
 import org.vfs.server.model.Node;
-import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 
-import java.net.Socket;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -32,15 +30,16 @@ public class UserService {
         this.lockService = lockService;
     }
 
-    public UserSession startSession(Socket socket, Timer timer, ClientWriter clientWriter) {
+    public UserSession startSession(ClientWriter clientWriter) {
+        String sessionId = UUID.randomUUID().toString();
         Protocol.User user = Protocol.User.newBuilder()
-                .setId(UUID.randomUUID().toString())
+                .setId(sessionId)
                 .setLogin("")
                 .build();
 
-        UserSession userSession = new UserSession(user, socket, timer, clientWriter);
+        UserSession userSession = new UserSession(user, clientWriter);
 
-        registry.put(user.getId(), userSession);
+        registry.put(sessionId, userSession);
         return userSession;
     }
 
@@ -91,7 +90,9 @@ public class UserService {
         return registry;
     }
 
+    // TODO: how it should work now?
     public void notifyUsers(String idMySession, String message) {
+/*
         Set<String> keySet = registry.keySet();
         for (String key : keySet) {
             UserSession userSession = registry.get(key);
@@ -106,6 +107,7 @@ public class UserService {
                 );
             }
         }
+*/
     }
 
 

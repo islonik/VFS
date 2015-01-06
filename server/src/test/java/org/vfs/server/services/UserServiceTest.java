@@ -14,7 +14,7 @@ import java.net.Socket;
  */
 public class UserServiceTest {
 
-    @Test
+    /*@Test
     public void testGetSession() throws Exception {
         LockService lockService = new LockService();
         NodeManager nodeManager = new NodeManager();
@@ -35,9 +35,9 @@ public class UserServiceTest {
         userService.attachUser(userSession.getUser().getId(), "nikita");
 
         Assert.assertNotNull(userService.getSession(userSession.getUser().getId()));
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testStopSession() throws Exception {
         LockService lockService = new LockService();
         NodeManager nodeManager = new NodeManager();
@@ -60,5 +60,5 @@ public class UserServiceTest {
         Assert.assertEquals(0, userService.getRegistry().size());
         userService.stopSession(userSession.getUser().getId());
         Assert.assertEquals(0, userService.getRegistry().size());
-    }
+    }*/
 }

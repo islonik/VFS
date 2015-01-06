@@ -22,7 +22,7 @@ public class SocketReader {
         this.networkManager = networkManager;
     }
 
-    public void run() {
+    /*public void run() {
         try {
             while (true) {
                 try {
@@ -41,6 +41,6 @@ public class SocketReader {
         } catch (InterruptedException ie) {
             System.err.println("SocketReader.InterruptedException.Message=" + ie.getMessage());
         }
-    }
+    }*/
 
 }

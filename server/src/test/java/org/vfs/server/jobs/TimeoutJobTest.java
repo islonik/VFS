@@ -37,7 +37,7 @@ public class TimeoutJobTest {
     @Autowired
     public UserService userService;
 
-    @Before
+    /*@Before
     public void setUp() throws InterruptedException, ParseException {
         nodeService.initDirs();
 
@@ -82,5 +82,5 @@ public class TimeoutJobTest {
         timeoutJob.timeout();
 
         Assert.assertEquals(0, userService.getRegistry().size());
-    }
+    }*/
 }

@@ -1,5 +1,6 @@
 package org.vfs.client.network;
 
+import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.network.protocol.Protocol;
 
 /**
@@ -32,15 +33,11 @@ public class IncomingMessageHandler {
                 System.out.println(message);
                 break;
             case FAIL_CONNECT:     // fail authorization
-                userManager.setUser(null);
-                networkManager.closeSocket();
                 System.err.println(message);
-                break;
+                throw new QuitException("Such user already exist!");
             case SUCCESS_QUIT:     // quit response
-                userManager.setUser(null);
-                networkManager.closeSocket();
                 System.out.println(message);
-                break;
+                throw new QuitException("Closing connection by client request");
             case FAIL:
                 System.err.println(message);
                 break;

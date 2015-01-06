@@ -28,7 +28,7 @@ public class Quit extends AbstractCommand implements Command {
 
         userService.stopSession(userSession.getUser().getId());
 
-        send(Protocol.Response.ResponseType.SUCCESS_QUIT, "You disconnected from server!");
+        send(Protocol.Response.ResponseType.SUCCESS_QUIT, "You are disconnected from server!");
 
         userService.notifyUsers(
                 userSession.getUser().getId(),
