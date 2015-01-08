@@ -14,7 +14,7 @@ public class GenericMarshallingTest {
     @Test
     public void test () throws IOException {
         DescriptorProtos.FileDescriptorSet descriptorSet = DescriptorProtos.FileDescriptorSet.parseFrom(
-                new FileInputStream("core/src/main/resources/protocol.desc")
+                new FileInputStream("src/main/resources/protocol.desc")
         );
         System.out.println(descriptorSet.toString());
     }
