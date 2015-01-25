@@ -2,7 +2,7 @@ package org.vfs.server;
 
 import java.net.*;
 import java.io.*;
-import java.nio.ByteBuffer;
+import java.nio.*;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.exceptions.QuitException;
-import org.vfs.core.network.protocol.GenericMarshalling;
 import org.vfs.core.network.protocol.Protocol;
 import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.commands.Command;
@@ -211,7 +210,7 @@ public class Server implements Runnable {
 
             byte[] data = new byte[numRead];
             System.arraycopy(buffer.array(), 0, data, 0, numRead);
-            Protocol.Request request = (Protocol.Request) GenericMarshalling.objectFromByteBuffer(data);
+            Protocol.Request request = Protocol.Request.parseFrom(data);
             return request;
         } catch (Exception e) {
             log.error("Unable to read from channel", e);
@@ -227,7 +226,8 @@ public class Server implements Runnable {
     // TODO: just one answer? what about notifications? see notifyUsers method
     boolean write(SocketChannel channel, Protocol.Response response) {
         try {
-            channel.write(GenericMarshalling.objectToByteBuffer(response));
+            ByteBuffer writeBuffer = ByteBuffer.wrap(response.toByteString().toByteArray());
+            channel.write(writeBuffer);
             return true;
         } catch (IOException e) {
             log.error("Unable to write content", e);

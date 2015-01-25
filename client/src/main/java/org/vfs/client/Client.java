@@ -7,7 +7,6 @@ import org.vfs.client.network.MessageSender;
 import org.vfs.client.network.UserManager;
 import org.vfs.client.network.NetworkManager;
 import org.vfs.core.exceptions.QuitException;
-import org.vfs.core.network.protocol.GenericMarshalling;
 import org.vfs.core.network.protocol.Protocol;
 
 import java.io.BufferedReader;
@@ -76,7 +75,8 @@ public class Client {
 
                                         Protocol.Request request = toServerQueue.take();
 
-                                        channel.write(GenericMarshalling.objectToByteBuffer(request));
+                                        ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteString().toByteArray());
+                                        channel.write(writeBuffer);
 
                                         socketChannel.register(selector, SelectionKey.OP_READ);
 
@@ -95,7 +95,8 @@ public class Client {
 
                                             byte[] data = new byte[numRead];
                                             System.arraycopy(buffer.array(), 0, data, 0, numRead);
-                                            response = (Protocol.Response) GenericMarshalling.objectFromByteBuffer(data);
+                                            response = Protocol.Response.parseFrom(data);
+
                                         } catch (Exception e) {
                                             log.error("Unable to read from channel", e);
                                             try {
@@ -112,7 +113,8 @@ public class Client {
                                         socketChannel.register(selector, SelectionKey.OP_WRITE);
                                     } else if(key.isWritable()) {
                                         Protocol.Request request = toServerQueue.take();
-                                        channel.write(GenericMarshalling.objectToByteBuffer(request));
+                                        ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteString().toByteArray());
+                                        channel.write(writeBuffer);
 
                                         socketChannel.register(selector, SelectionKey.OP_READ);
                                     }
