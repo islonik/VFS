@@ -50,11 +50,11 @@ public class TimeoutJob {
             String login = userSession.getUser().getLogin();
             int diff = userSession.getTimer().difference();
             System.out.println("key = " + key + " login = " + login + " diff = " + diff);
-            if(diff >= 1 && login == null) { // very rare case
-                System.out.println("Rare thread was killed!");
+            if(diff >= 1 && (login == null || login.trim().isEmpty())) { // very rare case
+                System.out.println("Null thread was killed!");
                 userService.stopSession(key);
             }
-            if(diff >= timeout && login != null) { // kill session
+            if(diff >= timeout && login != null && !login.trim().isEmpty()) { // kill session
                 System.out.println("Thread was killed!");
 
                 userSession.getClientWriter().send(

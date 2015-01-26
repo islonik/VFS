@@ -90,14 +90,13 @@ public class UserService {
         return registry;
     }
 
-    // TODO: how it should work now?
     public void notifyUsers(String idMySession, String message) {
-/*
+
         Set<String> keySet = registry.keySet();
         for (String key : keySet) {
             UserSession userSession = registry.get(key);
             String login = userSession.getUser().getLogin();
-            if (!userSession.getUser().getId().equals(idMySession) && login != null) { // to all users except mine
+            if (!userSession.getUser().getId().equals(idMySession) && login != null && !login.trim().isEmpty()) { // to all users except mine and null sessions
                 ClientWriter clientWriter = userSession.getClientWriter();
                 clientWriter.send(
                         newResponse(
@@ -107,7 +106,6 @@ public class UserService {
                 );
             }
         }
-*/
     }
 
 

@@ -72,8 +72,11 @@ public class Client {
                                         if (channel.isConnectionPending()) {
                                             channel.finishConnect();
                                         }
+                                        messageSender.setKey(key);
 
                                         Protocol.Request request = toServerQueue.take();
+
+                                        socketChannel.register(selector, SelectionKey.OP_WRITE);
 
                                         ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteString().toByteArray());
                                         channel.write(writeBuffer);
@@ -110,13 +113,6 @@ public class Client {
                                         }
                                         incomingMessageHandler.handle(response);
 
-                                        socketChannel.register(selector, SelectionKey.OP_WRITE);
-                                    } else if(key.isWritable()) {
-                                        Protocol.Request request = toServerQueue.take();
-                                        ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteString().toByteArray());
-                                        channel.write(writeBuffer);
-
-                                        socketChannel.register(selector, SelectionKey.OP_READ);
                                     }
                                 }
                             }

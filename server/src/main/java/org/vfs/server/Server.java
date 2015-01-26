@@ -106,13 +106,6 @@ public class Server implements Runnable {
                 SelectionKey key = keys.next();
                 keys.remove();
 
-                /*System.err.println(
-                        " isAcceptable  = " + key.isAcceptable()  +
-                        " isConnectable = " + key.isConnectable() +
-                        " isReadable    = " + key.isReadable()    +
-                        " isWritable    = " + key.isWritable()
-                );*/
-
                 if(key.isConnectable()){
                     log.debug("Connectable detected");
                     ((SocketChannel) key.channel()).finishConnect();
@@ -120,8 +113,6 @@ public class Server implements Runnable {
                     acceptOp(key, selector, server);
                 } else if(key.isReadable()){
                     readOp(key);
-                } else if(key.isWritable()){
-                    writeOp(key);
                 }
             }
         }
@@ -155,7 +146,7 @@ public class Server implements Runnable {
 
             UserSession userSession = null;
             if(request.getUser().getId().equals("0")) {
-                ClientWriter clientWriter = new ClientWriter(toUsersQueue);
+                ClientWriter clientWriter = new ClientWriter(key, toUsersQueue);
 
                 userSession = userService.startSession(clientWriter);
             } else {
@@ -165,15 +156,7 @@ public class Server implements Runnable {
             userSession.getTimer().updateTime();
 
             commandLine.onUserInput(userSession, request); // QuitException could is thrown from here
-
-            Protocol.Response response = toUsersQueue.take();
-            key.attach(response);
-            key.interestOps(OP_WRITE);
-
         } catch(QuitException qe) { // quit logic
-            Protocol.Response response = toUsersQueue.take();
-            key.attach(response);
-            writeOp(key); // send quit command
             System.out.println("QuitException was detected! Address " + ((SocketChannel) key.channel()).getRemoteAddress().toString() + " was closed!");
             key.channel().close();
             key.cancel();
@@ -223,7 +206,6 @@ public class Server implements Runnable {
         return null;
     }
 
-    // TODO: just one answer? what about notifications? see notifyUsers method
     boolean write(SocketChannel channel, Protocol.Response response) {
         try {
             ByteBuffer writeBuffer = ByteBuffer.wrap(response.toByteString().toByteArray());
