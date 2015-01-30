@@ -37,7 +37,6 @@ public class CommandLine {
                     networkManager.openSocket(serverHost, serverPort);
 
                     // connection was established
-
                     Protocol.User user = Protocol.User.newBuilder()
                             .setId("0")
                             .setLogin(userLogin)

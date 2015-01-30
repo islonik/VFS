@@ -4,13 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vfs.client.network.*;
 import org.vfs.core.exceptions.QuitException;
-import org.vfs.core.network.protocol.Protocol;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -28,14 +25,12 @@ public class Client {
 
         final ExecutorService executorService = Executors.newFixedThreadPool(1);
 
-        final BlockingQueue<Protocol.Request> toServerQueue = new ArrayBlockingQueue<Protocol.Request>(1024);
-
-        final MessageSender messageSender = new MessageSender(toServerQueue);
+        final MessageSender messageSender = new MessageSender();
         networkManager.setMessageSender(messageSender);
 
         final IncomingMessageHandler incomingMessageHandler = new IncomingMessageHandler(userManager, networkManager);
 
-        final IncomingMessageListener incomingMessageListener = new IncomingMessageListener(networkManager, userManager, incomingMessageHandler, toServerQueue);
+        final IncomingMessageListener incomingMessageListener = new IncomingMessageListener(networkManager, userManager, incomingMessageHandler);
 
         // loop
         executorService.execute(incomingMessageListener);

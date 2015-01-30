@@ -16,13 +16,7 @@ import java.util.concurrent.BlockingQueue;
  */
 public class MessageSender {
 
-    private volatile boolean isConnected = false;
     private volatile SelectionKey key;
-    private BlockingQueue<Protocol.Request> toServerQueue;
-
-    public MessageSender(BlockingQueue<Protocol.Request> queue) {
-        this.toServerQueue = queue;
-    }
 
     public void setKey(SelectionKey key) {
         this.key = key;
@@ -31,17 +25,23 @@ public class MessageSender {
         }
     }
 
-    public void setConnected(boolean isConnected) {
-        this.isConnected = isConnected;
-    }
-
     public boolean send(Protocol.User user, String command) {
         if (user != null) {
             Protocol.Request request = RequestFactory.newRequest(user.getId(), user.getLogin(), command);
-            // TODO: fix this?
             try {
-                if (!isConnected) {
-                    this.toServerQueue.add(request);
+                if (key == null) {
+                    synchronized (this) {
+                        if(key == null) {
+                            wait();
+                        }
+                    }
+
+                    key.interestOps(SelectionKey.OP_WRITE);
+                    SocketChannel channel = (SocketChannel)key.channel();
+                    ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteString().toByteArray());
+                    channel.write(writeBuffer);
+
+                    key.interestOps(SelectionKey.OP_READ);
                 } else {
                     SocketChannel channel = (SocketChannel) key.channel();
                     key.interestOps(SelectionKey.OP_WRITE);
@@ -51,7 +51,7 @@ public class MessageSender {
 
                     key.interestOps(SelectionKey.OP_READ);
                 }
-            } catch (IOException ie) {
+            } catch (IOException | InterruptedException ie) {
                 System.out.println("MessageSender = " + ie);
             }
             return true;

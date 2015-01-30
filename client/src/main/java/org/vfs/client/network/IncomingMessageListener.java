@@ -22,24 +22,20 @@ public class IncomingMessageListener implements Runnable {
     private final NetworkManager networkManager;
     private final UserManager userManager;
     private final IncomingMessageHandler incomingMessageHandler;
-    private final BlockingQueue<Protocol.Request> toServerQueue;
 
     public IncomingMessageListener(
             NetworkManager networkManager,
             UserManager userManager,
-            IncomingMessageHandler incomingMessageHandler,
-            BlockingQueue<Protocol.Request> toServerQueue) {
+            IncomingMessageHandler incomingMessageHandler) {
         this.networkManager = networkManager;
         this.userManager = userManager;
         this.incomingMessageHandler = incomingMessageHandler;
-        this.toServerQueue = toServerQueue;
     }
 
     @Override
     public void run() {
         while(true) {
             Selector selector = networkManager.getSelector();
-            SocketChannel socketChannel = networkManager.getSocketChannel();
             MessageSender messageSender = networkManager.getMessageSender();
 
             try {
@@ -56,28 +52,21 @@ public class IncomingMessageListener implements Runnable {
 
                         // Attempt a connection
                         if (key.isConnectable()) { // connect command
-
                             // Close pendent connections
                             if (channel.isConnectionPending()) {
                                 channel.finishConnect();
                             }
-                            messageSender.setKey(key);
-                            // TODO: fix it?
-                            Protocol.Request request = toServerQueue.take();
-                            socketChannel.register(selector, SelectionKey.OP_WRITE);
-                            ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteString().toByteArray());
-                            channel.write(writeBuffer);
-                            socketChannel.register(selector, SelectionKey.OP_READ);
-
+                            messageSender.setKey(key); // message will send after it
                         } else if(key.isReadable()) {
                             Protocol.Response response = readResponse(channel);
                             incomingMessageHandler.handle(response);
                         }
                     }
                 }
-            } catch (IOException | InterruptedException | QuitException err) {
+            } catch (IOException /*| InterruptedException*/ | QuitException err) {
                 userManager.setUser(null);
                 networkManager.closeSocket();
+                messageSender.setKey(null);
 
                 if(!(err instanceof QuitException)) {
                     System.err.println(err.getMessage());

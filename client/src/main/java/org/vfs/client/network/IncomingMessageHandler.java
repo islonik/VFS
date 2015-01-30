@@ -30,15 +30,12 @@ public class IncomingMessageHandler {
                         .setLogin(user.getLogin())
                         .build();
                 userManager.setUser(user);
-                networkManager.getMessageSender().setConnected(true);
                 System.out.println(message);
                 break;
             case FAIL_CONNECT:     // fail authorization
-                networkManager.getMessageSender().setConnected(false);
                 System.err.println(message);
                 throw new QuitException("Such user already exist!");
             case SUCCESS_QUIT:     // quit response
-                networkManager.getMessageSender().setConnected(false);
                 System.out.println(message);
                 throw new QuitException("Closing connection by client request");
             case FAIL:
