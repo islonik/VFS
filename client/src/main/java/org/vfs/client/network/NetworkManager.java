@@ -1,9 +1,7 @@
 package org.vfs.client.network;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
@@ -33,11 +31,6 @@ public class NetworkManager {
                     client.connect(new InetSocketAddress(serverHost, Integer.parseInt(serverPort)));
                     selector = Selector.open();
                     client.register(selector, SelectionKey.OP_CONNECT);
-
-                    /*
-                    InetAddress ipAddress = InetAddress.getByName(serverHost);
-                    socket = new Socket(ipAddress, Integer.parseInt(serverPort));
-                    */
 
                     notifyAll();
                 }
