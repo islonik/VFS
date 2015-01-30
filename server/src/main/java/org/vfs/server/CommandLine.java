@@ -49,25 +49,11 @@ public class CommandLine {
                         )
                 );
             }
-        } catch(IllegalArgumentException e) {
+        } catch(IllegalArgumentException | IllegalAccessError | NullPointerException e) {
             clientWriter.send(
                     ResponseFactory.newResponse(
                             Protocol.Response.ResponseType.FAIL,
                             e.getMessage()
-                    )
-            );
-        } catch(IllegalAccessError e) {
-            clientWriter.send(
-                    ResponseFactory.newResponse(
-                            Protocol.Response.ResponseType.FAIL,
-                            e.getMessage()
-                    )
-            );
-        } catch (NullPointerException npe) {
-            clientWriter.send(
-                    ResponseFactory.newResponse(
-                            Protocol.Response.ResponseType.FAIL,
-                            npe.getMessage()
                     )
             );
         }

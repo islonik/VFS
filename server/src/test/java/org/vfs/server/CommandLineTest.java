@@ -47,25 +47,21 @@ public class CommandLineTest {
     private UserSession nikitaSession;
     private UserSession r2d2Session;
 
-    /*@Before
+    @Before
     public void setUp() throws InterruptedException {
         nodeService.initDirs();
 
         // UserSession #1
-        Socket socket1 = mock(Socket.class);
-        Timer timer1 = mock(Timer.class);
         ClientWriter clientWriter1 = mock(ClientWriter.class);
-        UserSession userSession1 = userService.startSession(socket1, timer1, clientWriter1);
+        UserSession userSession1 = userService.startSession(clientWriter1);
         String id1 = userSession1.getUser().getId();
         String login1 = "nikita";
         userService.attachUser(id1, login1);
         nikitaSession = userSession1;
 
         // UserSession #2
-        Socket socket2 = mock(Socket.class);
-        Timer timer2 = mock(Timer.class);
         ClientWriter clientWriter2 = mock(ClientWriter.class);
-        UserSession userSession2 = userService.startSession(socket2, timer2, clientWriter2);
+        UserSession userSession2 = userService.startSession(clientWriter2);
         String id2 = userSession2.getUser().getId();
         String login2 = "r2d2";
         userService.attachUser(id2, login2);
@@ -76,10 +72,10 @@ public class CommandLineTest {
     public void testChangeDirectory() throws Exception {
         String id = nikitaSession.getUser().getId();
         String login = nikitaSession.getUser().getLogin();
-        CommandLine cmd = new CommandLine(commands, nikitaSession);
+        CommandLine cmd = new CommandLine(commands);
 
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "cd ../.."));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "cd ../.."));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "cd ../.."));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "cd ../.."));
 
         Assert.assertEquals(
                 "/\n" +
@@ -94,12 +90,12 @@ public class CommandLineTest {
     public void testCopy() throws Exception {
         String id = nikitaSession.getUser().getId();
         String login = nikitaSession.getUser().getLogin();
-        CommandLine cmd = new CommandLine(commands, nikitaSession);
+        CommandLine cmd = new CommandLine(commands);
 
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "cd ../.."));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "mkdir applications/servers/weblogic"));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "mkdir logs"));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "copy applications logs"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "cd ../.."));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir applications/servers/weblogic"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir logs"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "copy applications logs"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -121,12 +117,12 @@ public class CommandLineTest {
     public void testMove() throws Exception {
         String id = nikitaSession.getUser().getId();
         String login = nikitaSession.getUser().getLogin();
-        CommandLine cmd = new CommandLine(commands, nikitaSession);
+        CommandLine cmd = new CommandLine(commands);
 
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "cd ../.."));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "mkdir applications/servers/weblogic"));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "mkdir logs"));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "move applications logs"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "cd ../.."));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir applications/servers/weblogic"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir logs"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "move applications logs"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -145,12 +141,12 @@ public class CommandLineTest {
     public void testRm() throws Exception {
         String id = nikitaSession.getUser().getId();
         String login = nikitaSession.getUser().getLogin();
-        CommandLine cmd = new CommandLine(commands, nikitaSession);
+        CommandLine cmd = new CommandLine(commands);
 
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "cd ../.."));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "mkdir applications/servers"));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "mkdir logs"));
-        cmd.onUserInput(RequestFactory.newRequest(id, login, "rm applications"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "cd ../.."));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir applications/servers"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir logs"));
+        cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "rm applications"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -168,14 +164,14 @@ public class CommandLineTest {
         String login1 = nikitaSession.getUser().getLogin();
         String id2 = r2d2Session.getUser().getId();
         String login2 = r2d2Session.getUser().getLogin();
-        CommandLine cmd1 = new CommandLine(commands, nikitaSession);
-        CommandLine cmd2 = new CommandLine(commands, r2d2Session);
+        CommandLine cmd1 = new CommandLine(commands);
+        CommandLine cmd2 = new CommandLine(commands);
 
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "cd ../.."));
-        cmd2.onUserInput(RequestFactory.newRequest(id2, login2, "cd ../.."));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "cd ../.."));
+        cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "cd ../.."));
 
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "mkfile applications/servers/weblogic/logs/weblogic.log"));
-        cmd2.onUserInput(RequestFactory.newRequest(id2, login2, "mkfile applications/databases/oracle/bin/oracle.exe"));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "mkfile applications/servers/weblogic/logs/weblogic.log"));
+        cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "mkfile applications/databases/oracle/bin/oracle.exe"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -194,7 +190,7 @@ public class CommandLineTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "lock applications/databases"));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "lock applications/databases"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -213,7 +209,7 @@ public class CommandLineTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-        cmd2.onUserInput(RequestFactory.newRequest(id2, login2, "lock applications"));
+        cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "lock applications"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -239,14 +235,14 @@ public class CommandLineTest {
         String login1 = nikitaSession.getUser().getLogin();
         String id2 = r2d2Session.getUser().getId();
         String login2 = r2d2Session.getUser().getLogin();
-        CommandLine cmd1 = new CommandLine(commands, nikitaSession);
-        CommandLine cmd2 = new CommandLine(commands, r2d2Session);
+        CommandLine cmd1 = new CommandLine(commands);
+        CommandLine cmd2 = new CommandLine(commands);
 
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "cd ../.."));
-        cmd2.onUserInput(RequestFactory.newRequest(id2, login2, "cd ../.."));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "cd ../.."));
+        cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "cd ../.."));
 
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "mkfile applications/servers/weblogic/logs/weblogic.log"));
-        cmd2.onUserInput(RequestFactory.newRequest(id2, login2, "mkfile applications/databases/oracle/bin/oracle.exe"));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "mkfile applications/servers/weblogic/logs/weblogic.log"));
+        cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "mkfile applications/databases/oracle/bin/oracle.exe"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -265,7 +261,7 @@ public class CommandLineTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "lock -r applications/databases"));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "lock -r applications/databases"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -284,7 +280,7 @@ public class CommandLineTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-        cmd2.onUserInput(RequestFactory.newRequest(id2, login2, "lock -r applications"));
+        cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "lock -r applications"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -310,16 +306,16 @@ public class CommandLineTest {
         String login1 = nikitaSession.getUser().getLogin();
         String id2 = r2d2Session.getUser().getId();
         String login2 = r2d2Session.getUser().getLogin();
-        CommandLine cmd1 = new CommandLine(commands, nikitaSession);
-        CommandLine cmd2 = new CommandLine(commands, r2d2Session);
+        CommandLine cmd1 = new CommandLine(commands);
+        CommandLine cmd2 = new CommandLine(commands);
 
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "cd ../.."));
-        cmd2.onUserInput(RequestFactory.newRequest(id2, login2, "cd ../.."));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "cd ../.."));
+        cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "cd ../.."));
 
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "mkfile applications/servers/weblogic/logs/weblogic.log"));
-        cmd1.onUserInput(RequestFactory.newRequest(id1, login1, "lock -r applications/servers/weblogic"));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "mkfile applications/servers/weblogic/logs/weblogic.log"));
+        cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "lock -r applications/servers/weblogic"));
 
-        cmd2.onUserInput(RequestFactory.newRequest(id2, login2, "rename applications/servers web-servers"));
+        cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "rename applications/servers web-servers"));
 
         Assert.assertEquals(
                 "/\n" +
@@ -334,6 +330,6 @@ public class CommandLineTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-    }*/
+    }
 
 }

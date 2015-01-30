@@ -37,50 +37,37 @@ public class TimeoutJobTest {
     @Autowired
     public UserService userService;
 
-    /*@Before
+    @Before
     public void setUp() throws InterruptedException, ParseException {
         nodeService.initDirs();
 
         // UserSession #1
-        Socket nikitaSocketMock = Mockito.mock(Socket.class);
-        Mockito.when(nikitaSocketMock.isClosed()).thenReturn(true);
-        Timer nikitaTimerMock = Mockito.mock(Timer.class);
-        Mockito.when(nikitaTimerMock.difference()).thenReturn(15);
         ClientWriter nikitaCWMock = Mockito.mock(ClientWriter.class);
+        UserSession nikita = userService.startSession(nikitaCWMock);
 
-        UserSession nikita = userService.startSession(nikitaSocketMock, nikitaTimerMock, nikitaCWMock);
         userService.attachUser(nikita.getUser().getId(), "nikita");
 
         // UserSession #2
-        Socket emptySocketMock = Mockito.mock(Socket.class);
-        Mockito.when(emptySocketMock.isClosed()).thenReturn(true);
-        Timer emptyTimerMock = Mockito.mock(Timer.class);
-        Mockito.when(emptyTimerMock.difference()).thenReturn(10);
         ClientWriter emptyCWMock = Mockito.mock(ClientWriter.class);
-
-        UserSession empty = userService.startSession(emptySocketMock, emptyTimerMock, emptyCWMock);
+        UserSession empty = userService.startSession(emptyCWMock);
 
         // UserSession #3
-        Socket r2d2SocketMock = Mockito.mock(Socket.class);
-        Mockito.when(r2d2SocketMock.isClosed()).thenReturn(true);
-        Timer r2d2TimerMock = Mockito.mock(Timer.class);
-        Mockito.when(r2d2TimerMock.difference()).thenReturn(100);
         ClientWriter r2d2CWMock = Mockito.mock(ClientWriter.class);
 
-        UserSession r2d2 = userService.startSession(r2d2SocketMock, r2d2TimerMock, r2d2CWMock);
+        UserSession r2d2 = userService.startSession(r2d2CWMock);
         userService.attachUser(r2d2.getUser().getId(), "r2d2");
-
-        Map<String, UserSession> userSessions = new HashMap<>();
-        userSessions.put(nikita.getUser().getId(), nikita);
-        userSessions.put(empty.getUser().getId(), empty);
-        userSessions.put(r2d2.getUser().getId(), r2d2);
     }
 
     @Test
-    public void testTimeout() {
-        TimeoutJob timeoutJob = new TimeoutJob(userService, "1");
+    public void testTimeout() throws InterruptedException {
+        TimeoutJob timeoutJob = new TimeoutJob(userService, "1"); // 1 min
+
+        Assert.assertEquals(3, userService.getRegistry().size());
+
+        Thread.sleep(60000); // 1 min
+
         timeoutJob.timeout();
 
         Assert.assertEquals(0, userService.getRegistry().size());
-    }*/
+    }
 }

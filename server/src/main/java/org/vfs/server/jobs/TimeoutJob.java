@@ -64,6 +64,11 @@ public class TimeoutJob {
                         )
                 );
 
+                userService.notifyUsers(
+                        userSession.getUser().getId(),
+                        "User " + userSession.getUser().getLogin() + " was disconnected from server by timeout!"
+                );
+
                 userService.stopSession(key);
             }
         }

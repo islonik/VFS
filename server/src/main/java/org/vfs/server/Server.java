@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.network.protocol.Protocol;
-import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.commands.Command;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.*;
@@ -26,7 +25,6 @@ import org.vfs.server.services.UserService;
 
 import static java.nio.channels.SelectionKey.OP_ACCEPT;
 import static java.nio.channels.SelectionKey.OP_READ;
-import static java.nio.channels.SelectionKey.OP_WRITE;
 
 /**
  * Server class.
@@ -133,7 +131,7 @@ public class Server implements Runnable {
             log.debug("Data received, going to read them");
             SocketChannel channel = (SocketChannel) key.channel();
 
-            Protocol.Request request = read(channel);
+            Protocol.Request request = readRequest(channel);
 
             if(request == null) {
                 log.error("Protocol.Request is null! Channel is going to be closed!");
@@ -163,22 +161,7 @@ public class Server implements Runnable {
         }
     }
 
-    private void writeOp(SelectionKey key) throws IOException {
-        Protocol.Response toWrite = (Protocol.Response) key.attachment();
-        if(toWrite == null) {
-            toWrite = ResponseFactory.newResponse(
-                    Protocol.Response.ResponseType.FAIL, "No answer from server!"
-            );
-        }
-        if(write((SocketChannel) key.channel(), toWrite)) {
-            key.interestOps(OP_READ);
-        } else {
-            key.channel().close();
-            key.cancel();
-        }
-    }
-
-    Protocol.Request read(SocketChannel channel) throws IOException {
+    private Protocol.Request readRequest(SocketChannel channel) throws IOException {
         ByteBuffer buffer = ByteBuffer.allocate(2 * 1024);
         int numRead = -1;
 
@@ -204,22 +187,6 @@ public class Server implements Runnable {
             }
         }
         return null;
-    }
-
-    boolean write(SocketChannel channel, Protocol.Response response) {
-        try {
-            ByteBuffer writeBuffer = ByteBuffer.wrap(response.toByteString().toByteArray());
-            channel.write(writeBuffer);
-            return true;
-        } catch (IOException e) {
-            log.error("Unable to write content", e);
-            try {
-                channel.close();
-            } catch (IOException e1) {
-                //dead channel, nothing to do
-            }
-            return false;
-        }
     }
 
 }

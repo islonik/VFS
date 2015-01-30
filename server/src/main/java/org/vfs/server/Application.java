@@ -6,10 +6,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Entry point
  *
- TODO: nio selecters?
- 1) http://www.javaworld.com/article/2078654/java-se/five-ways-to-maximize-java-nio-and-nio-2.html
- 2) Второй - протащить Socket в лиснеры и пусть они в цикле блокируются на них
- *
  * @author Lipatov Nikita
  */
 public class Application {
