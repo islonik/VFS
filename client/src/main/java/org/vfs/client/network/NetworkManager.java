@@ -13,7 +13,6 @@ import java.nio.channels.SocketChannel;
  * @author Lipatov Nikita
  */
 public class NetworkManager {
-    //private volatile Socket socket;
     private volatile SocketChannel client;
     private volatile Selector selector;
     private MessageSender messageSender;
@@ -22,9 +21,9 @@ public class NetworkManager {
     }
 
     public void openSocket(String serverHost, String serverPort) throws IOException {
-        if (client == null) {
+        while (client == null) {
             synchronized (this) {
-                if(client == null) {
+                while(client == null) {
                     client = SocketChannel.open();
                     // nonblocking I/O
                     client.configureBlocking(false);
@@ -39,9 +38,9 @@ public class NetworkManager {
     }
 
     public Selector getSelector() {
-        if (selector == null) {
+        while (selector == null) {
             synchronized (this) {
-                if(selector == null) {
+                while(selector == null) {
                     try {
                         wait();
                     } catch (InterruptedException e) {
@@ -55,9 +54,9 @@ public class NetworkManager {
     }
 
     public SocketChannel getSocketChannel() {
-        if (client == null) {
+        while (client == null) {
             synchronized (this) {
-                if(client == null) {
+                while(client == null) {
                     try {
                         wait();
                     } catch (InterruptedException e) {
@@ -72,9 +71,9 @@ public class NetworkManager {
 
     public void closeSocket() {
         try {
-            if (client != null) {
+            while (client != null) {
                 synchronized (this) {
-                    if(client != null) {
+                    while(client != null) {
                         selector.close();
                         client.socket().close();
                         client.close();

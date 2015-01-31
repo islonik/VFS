@@ -18,8 +18,8 @@ public class MessageSender {
     private volatile SelectionKey key;
 
     public void setKey(SelectionKey key) {
-        this.key = key;
         synchronized (this) {
+            this.key = key;
             notifyAll();
         }
     }
@@ -28,9 +28,9 @@ public class MessageSender {
         if (user != null) {
             Protocol.Request request = RequestFactory.newRequest(user.getId(), user.getLogin(), command);
             try {
-                if (key == null) {
+                while (key == null) {
                     synchronized (this) {
-                        if(key == null) {
+                        while(key == null) {
                             wait();
                         }
                     }
