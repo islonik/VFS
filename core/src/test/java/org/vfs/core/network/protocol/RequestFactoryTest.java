@@ -2,6 +2,7 @@ package org.vfs.core.network.protocol;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.vfs.core.VFSConstants;
 
 /**
  * @author Lipatov Nikita
@@ -23,7 +24,7 @@ public class RequestFactoryTest {
 
     @Test
     public void testNewRequestConnectRequest() {
-        Protocol.Request request = RequestFactory.newRequest("0", "nikita", "connect nikita");
+        Protocol.Request request = RequestFactory.newRequest(VFSConstants.NEW_USER, "nikita", "connect nikita");
 
         Assert.assertEquals(
                 "user {\n" +

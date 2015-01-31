@@ -2,26 +2,25 @@ package org.vfs.server;
 
 import java.net.*;
 import java.io.*;
-import java.nio.*;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.vfs.core.VFSConstants;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.RequestFactory;
 import org.vfs.server.commands.Command;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.*;
-import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
 import static java.nio.channels.SelectionKey.OP_ACCEPT;
 import static java.nio.channels.SelectionKey.OP_READ;
@@ -35,27 +34,20 @@ import static java.nio.channels.SelectionKey.OP_READ;
 public class Server implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(Server.class);
 
-    private final ExecutorService executorService;
-    private final NetworkManager networkManager;
-    private final NodeService nodeService;
-    private final UserService userService;
+    private final NetworkConfig networkConfig;
+    private final UserSessionService userSessionService;
     private final Map<String, Command> commands;
     private final CommandLine commandLine;
-    private final BlockingQueue<Protocol.Response> toUsersQueue;
 
     @Autowired
-    public Server(ExecutorService executorService, NetworkManager networkManager, NodeService nodeService, UserService userService, Map<String, Command> commands) throws IOException {
-        this.executorService = executorService;
-        this.networkManager = networkManager;
-        this.nodeService = nodeService;
-        this.userService = userService;
+    public Server(NetworkConfig networkConfig, UserSessionService userSessionService, Map<String, Command> commands) throws IOException {
+        this.networkConfig = networkConfig;
+        this.userSessionService = userSessionService;
         this.commands = commands;
 
-        this.toUsersQueue = new ArrayBlockingQueue<Protocol.Response>(1024);
         this.commandLine = new CommandLine(commands);
 
         String out = "Server has been run!";
-        this.nodeService.initDirs();
 
         System.out.println(out);
         log.info(out);
@@ -64,8 +56,8 @@ public class Server implements Runnable {
     public void run() {
         Selector selector = null;
         ServerSocketChannel server = null;
-        String address = networkManager.getAddress();
-        int port = networkManager.getPort();
+        String address = networkConfig.getAddress();
+        int port = networkConfig.getPort();
 
         try {
             log.debug("Starting server...");
@@ -131,7 +123,7 @@ public class Server implements Runnable {
             log.debug("Data received, going to read them");
             SocketChannel channel = (SocketChannel) key.channel();
 
-            Protocol.Request request = readRequest(channel);
+            Protocol.Request request = RequestFactory.newRequest(channel);
 
             if(request == null) {
                 log.error("Protocol.Request is null! Channel is going to be closed!");
@@ -140,20 +132,20 @@ public class Server implements Runnable {
                 return;
             }
 
-            System.out.println(request.toString());
+            System.out.println("DEBUG: " + request.toString());
 
-            UserSession userSession = null;
-            if(request.getUser().getId().equals("0")) {
-                ClientWriter clientWriter = new ClientWriter(key, toUsersQueue);
+            UserSession userSession;
+            if(request.getUser().getId().equals(VFSConstants.NEW_USER)) {
+                ClientWriter clientWriter = new ClientWriter(key);
 
-                userSession = userService.startSession(clientWriter);
+                userSession = userSessionService.startSession(clientWriter);
             } else {
-                userSession = userService.getSession(request.getUser().getId());
+                userSession = userSessionService.getSession(request.getUser().getId());
             }
 
             userSession.getTimer().updateTime();
 
-            commandLine.onUserInput(userSession, request); // QuitException could is thrown from here
+            commandLine.onUserInput(userSession, request); // QuitException can be thrown here
         } catch(QuitException qe) { // quit logic
             System.out.println("QuitException was detected! Address " + ((SocketChannel) key.channel()).getRemoteAddress().toString() + " was closed!");
             key.channel().close();
@@ -161,33 +153,7 @@ public class Server implements Runnable {
         }
     }
 
-    private Protocol.Request readRequest(SocketChannel channel) throws IOException {
-        ByteBuffer buffer = ByteBuffer.allocate(2 * 1024);
-        int numRead = -1;
 
-        try {
-            numRead = channel.read(buffer); // get message from client
-
-            if(numRead == -1) {
-                log.debug("Connection closed by: {}", channel.getRemoteAddress());
-                channel.close();
-                return null;
-            }
-
-            byte[] data = new byte[numRead];
-            System.arraycopy(buffer.array(), 0, data, 0, numRead);
-            Protocol.Request request = Protocol.Request.parseFrom(data);
-            return request;
-        } catch (Exception e) {
-            log.error("Unable to read from channel", e);
-            try {
-                channel.close();
-            } catch (IOException e1) {
-                //nothing to do, channel dead
-            }
-        }
-        return null;
-    }
 
 }
 

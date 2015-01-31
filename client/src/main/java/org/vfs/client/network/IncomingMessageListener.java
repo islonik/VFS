@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.RequestFactory;
+import org.vfs.core.network.protocol.ResponseFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,6 +13,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 
 /**
@@ -58,12 +61,12 @@ public class IncomingMessageListener implements Runnable {
                             }
                             messageSender.setKey(key); // message will send after it
                         } else if(key.isReadable()) {
-                            Protocol.Response response = readResponse(channel);
+                            Protocol.Response response = ResponseFactory.newResponse(channel);
                             incomingMessageHandler.handle(response);
                         }
                     }
                 }
-            } catch (IOException /*| InterruptedException*/ | QuitException err) {
+            } catch (IOException | QuitException err) {
                 userManager.setUser(null);
                 networkManager.closeSocket();
                 messageSender.setKey(null);
@@ -73,36 +76,5 @@ public class IncomingMessageListener implements Runnable {
                 }
             }
         }
-    }
-
-    private Protocol.Response readResponse(SocketChannel channel) {
-        Protocol.Response response = null;
-        ByteBuffer buffer = ByteBuffer.allocate(2 * 1024);
-        int numRead = -1;
-
-        try {
-            numRead = channel.read(buffer); // get message from client
-
-            if(numRead == -1) {
-                log.debug("Connection closed by: {}", channel.getRemoteAddress());
-                channel.close();
-            }
-
-            byte[] data = new byte[numRead];
-            System.arraycopy(buffer.array(), 0, data, 0, numRead);
-
-            response = Protocol.Response.parseFrom(data);
-        } catch (Exception e) {
-            log.error("Unable to read from channel", e);
-            try {
-                channel.close();
-            } catch (IOException e1) {
-                //nothing to do, channel dead
-            }
-        }
-        if(response == null) {
-            System.err.println("Response was not got from server!");
-        }
-        return response;
     }
 }

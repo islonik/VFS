@@ -7,7 +7,7 @@ import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.LockService;
 import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
 /**
  * @author Lipatov Nikita
@@ -17,13 +17,13 @@ public class Rename extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
     private final LockService lockService;
-    private final UserService userService;
+    private final UserSessionService userSessionService;
 
     @Autowired
-    public Rename(NodeService nodeService, LockService lockService, UserService userService) {
+    public Rename(NodeService nodeService, LockService lockService, UserSessionService userSessionService) {
         this.nodeService = nodeService;
         this.lockService = lockService;
-        this.userService = userService;
+        this.userSessionService = userSessionService;
     }
 
     @Override
@@ -46,7 +46,7 @@ public class Rename extends AbstractCommand implements Command {
 
             sendOK(String.format("Node '%s' was renamed to '%s'", oldName, newName));
 
-            userService.notifyUsers(
+            userSessionService.notifyUsers(
                     userSession.getUser().getId(),
                     String.format("Node '%s' was renamed to '%s' by user '%s'", oldName, newName, userSession.getUser().getLogin())
             );

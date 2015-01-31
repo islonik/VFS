@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 import org.vfs.client.network.MessageSender;
 import org.vfs.client.network.NetworkManager;
 import org.vfs.client.network.UserManager;
+import org.vfs.core.VFSConstants;
 import org.vfs.core.command.CommandParser;
 
 import org.vfs.core.network.protocol.Protocol;
@@ -27,7 +28,7 @@ public class CommandLineTest {
         cmd.execute("connect localhost:4499 nikita");
 
         Protocol.User user = Protocol.User.newBuilder()
-                .setId("0")
+                .setId(VFSConstants.NEW_USER)
                 .setLogin("nikita")
                 .build();
         verify(networkManager, atLeastOnce()).openSocket("localhost", "4499");
@@ -73,7 +74,7 @@ public class CommandLineTest {
         when(networkManager.getMessageSender()).thenReturn(messageSender);
         when(userManager.isAuthorized()).thenReturn(true);
         Protocol.User user = Protocol.User.newBuilder()
-                .setId("0")
+                .setId(VFSConstants.NEW_USER)
                 .setLogin("nikita")
                 .build();
         when(userManager.getUser()).thenReturn(user);
@@ -109,7 +110,7 @@ public class CommandLineTest {
         when(networkManager.getMessageSender()).thenReturn(messageSender);
         when(userManager.isAuthorized()).thenReturn(true);
         Protocol.User user = Protocol.User.newBuilder()
-                .setId("0")
+                .setId(VFSConstants.NEW_USER)
                 .setLogin("nikita")
                 .build();
         when(userManager.getUser()).thenReturn(user);

@@ -2,6 +2,7 @@ package org.vfs.client;
 
 import org.vfs.client.network.UserManager;
 import org.vfs.client.network.NetworkManager;
+import org.vfs.core.VFSConstants;
 import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
@@ -38,7 +39,7 @@ public class CommandLine {
 
                     // connection was established
                     Protocol.User user = Protocol.User.newBuilder()
-                            .setId("0")
+                            .setId(VFSConstants.NEW_USER)
                             .setLogin(userLogin)
                             .build();
 

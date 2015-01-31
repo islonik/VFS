@@ -8,7 +8,7 @@ import org.vfs.server.model.NodeTypes;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.LockService;
 import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
 /**
  * @author Lipatov Nikita
@@ -18,13 +18,13 @@ public class Move extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
     private final LockService lockService;
-    private final UserService userService;
+    private final UserSessionService userSessionService;
 
     @Autowired
-    public Move(NodeService nodeService, LockService lockService, UserService userService) {
+    public Move(NodeService nodeService, LockService lockService, UserSessionService userSessionService) {
         this.nodeService = nodeService;
         this.lockService = lockService;
-        this.userService = userService;
+        this.userSessionService = userSessionService;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class Move extends AbstractCommand implements Command {
 
             sendOK(getMessageToYou(sourceNode, destinationNode));
 
-            userService.notifyUsers(
+            userSessionService.notifyUsers(
                     userSession.getUser().getId(),
                     getMessageToAll(
                             userSession.getUser().getLogin(),

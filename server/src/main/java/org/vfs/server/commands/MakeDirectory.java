@@ -7,7 +7,7 @@ import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
 /**
  * @author Lipatov Nikita
@@ -16,12 +16,12 @@ import org.vfs.server.services.UserService;
 public class MakeDirectory extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
-    private final UserService userService;
+    private final UserSessionService userSessionService;
 
     @Autowired
-    public MakeDirectory(NodeService nodeService, UserService userService) {
+    public MakeDirectory(NodeService nodeService, UserSessionService userSessionService) {
         this.nodeService = nodeService;
-        this.userService = userService;
+        this.userSessionService = userSessionService;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class MakeDirectory extends AbstractCommand implements Command {
             node = nodeService.createNode(directory, newNodeName, NodeTypes.DIR);
             if (node != null) {
                 sendOK(String.format("New directory '%s' was created!", nodeService.getFullPath(node)));
-                userService.notifyUsers(
+                userSessionService.notifyUsers(
                         userSession.getUser().getId(),
                         String.format("New directory '%s' was created by user '%s'", nodeService.getFullPath(node), userSession.getUser().getLogin())
                 );

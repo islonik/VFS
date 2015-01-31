@@ -6,7 +6,7 @@ import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.network.protocol.Protocol;
 import org.vfs.server.model.UserSession;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
 /**
  * @author Lipatov Nikita
@@ -14,11 +14,11 @@ import org.vfs.server.services.UserService;
 @Component("quit")
 public class Quit extends AbstractCommand implements Command {
 
-    private final UserService userService;
+    private final UserSessionService userSessionService;
 
     @Autowired
-    public Quit(UserService userService) {
-        this.userService = userService;
+    public Quit(UserSessionService userSessionService) {
+        this.userSessionService = userSessionService;
     }
 
     @Override
@@ -26,11 +26,11 @@ public class Quit extends AbstractCommand implements Command {
         clientWriter = userSession.getClientWriter();
         String login = userSession.getUser().getLogin();
 
-        userService.stopSession(userSession.getUser().getId());
+        userSessionService.stopSession(userSession.getUser().getId());
 
         send(Protocol.Response.ResponseType.SUCCESS_QUIT, "You are disconnected from server!");
 
-        userService.notifyUsers(
+        userSessionService.notifyUsers(
                 userSession.getUser().getId(),
                 String.format("User '%s' has been disconnected", login)
         );

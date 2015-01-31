@@ -8,7 +8,7 @@ import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.LockService;
 import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
 /**
  * @author Lipatov Nikita
@@ -18,13 +18,13 @@ public class Unlock extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
     private final LockService lockService;
-    private final UserService userService;
+    private final UserSessionService userSessionService;
 
     @Autowired
-    public Unlock(NodeService nodeService, LockService lockService, UserService userService) {
+    public Unlock(NodeService nodeService, LockService lockService, UserSessionService userSessionService) {
         this.nodeService = nodeService;
         this.lockService = lockService;
-        this.userService = userService;
+        this.userSessionService = userSessionService;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class Unlock extends AbstractCommand implements Command {
             if (lockService.unlock(user, node, recursive)) {
                 sendOK(String.format("Node '%s' was unlocked!", nodeService.getFullPath(node)));
 
-                userService.notifyUsers(
+                userSessionService.notifyUsers(
                         userSession.getUser().getId(),
                         String.format("Node '%s' was unlocked by user '%s'", nodeService.getFullPath(node), user.getLogin())
                 );

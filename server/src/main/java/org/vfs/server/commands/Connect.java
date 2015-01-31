@@ -8,7 +8,7 @@ import org.vfs.core.network.protocol.Protocol;
 import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
 /**
  * @author Lipatov Nikita
@@ -17,24 +17,24 @@ import org.vfs.server.services.UserService;
 public class Connect extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
-    private final UserService userService;
+    private final UserSessionService userSessionService;
 
     @Autowired
-    public Connect(NodeService nodeService, UserService userService) {
+    public Connect(NodeService nodeService, UserSessionService userSessionService) {
         this.nodeService = nodeService;
-        this.userService = userService;
+        this.userSessionService = userSessionService;
     }
 
     @Override
     public void apply(UserSession userSession, CommandValues values) {
         clientWriter = userSession.getClientWriter();
         String login = values.getNextParam();
-        if (userService.isLogged(login)) {
+        if (userSessionService.isLogged(login)) {
             send(Protocol.Response.ResponseType.FAIL_CONNECT, "Such user already exits. Please, change the login!");
 
             throw new QuitException("Such user already exist!");
         } else {
-            userService.attachUser(userSession.getUser().getId(), login);
+            userSessionService.attachUser(userSession.getUser().getId(), login);
             clientWriter.send( // send id from server to client
                     ResponseFactory.newResponse(
                             Protocol.Response.ResponseType.SUCCESS_CONNECT,
@@ -42,7 +42,7 @@ public class Connect extends AbstractCommand implements Command {
                             userSession.getUser().getId()
                     )
             );
-            userService.notifyUsers(
+            userSessionService.notifyUsers(
                     userSession.getUser().getId(),
                     "User '" + login + "' has connected to server!"
             );

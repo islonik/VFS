@@ -3,6 +3,7 @@ package org.vfs.server.jobs;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.vfs.core.network.protocol.Protocol;
 import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.model.UserSession;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
 /**
  * @author Lipatov Nikita
@@ -20,12 +21,12 @@ import org.vfs.server.services.UserService;
 @EnableScheduling
 public class TimeoutJob {
 
-    private final UserService userService;
+    private final UserSessionService userSessionService;
     private final int timeout;
 
     @Autowired
-    public TimeoutJob(UserService userService, @Value("${server.timeout}") String timeout) {
-        this.userService = userService;
+    public TimeoutJob(UserSessionService userSessionService, @Value("${server.timeout}") String timeout) {
+        this.userSessionService = userSessionService;
         this.timeout = Integer.parseInt(timeout);
     }
 
@@ -43,19 +44,19 @@ public class TimeoutJob {
      */
     @Scheduled(cron = "0 0/1 * * * ?")
     public void timeout() {
-        Map<String, UserSession> sessions = userService.getRegistry();
+        Map<String, UserSession> sessions = userSessionService.getRegistry();
         Set<String> keySet = sessions.keySet();
         for(String key : keySet) {
             UserSession userSession = sessions.get(key);
             String login = userSession.getUser().getLogin();
             int diff = userSession.getTimer().difference();
-            System.out.println("key = " + key + " login = " + login + " diff = " + diff);
-            if(diff >= 1 && (login == null || login.trim().isEmpty())) { // very rare case
-                System.out.println("Null thread was killed!");
-                userService.stopSession(key);
+            System.out.println("DEBUG: " + "key = " + key + " login = " + login + " diff = " + diff);
+            if(diff >= 1 && Strings.isNullOrEmpty(login)) { // empty session case
+                System.out.println("Empty session was killed!");
+                userSessionService.stopSession(key);
             }
-            if(diff >= timeout && login != null && !login.trim().isEmpty()) { // kill session
-                System.out.println("Thread was killed!");
+            if(diff >= timeout && !Strings.isNullOrEmpty(login)) { // kill session
+                System.out.println("DEBUG: " + "Connection was killed!");
 
                 userSession.getClientWriter().send(
                         ResponseFactory.newResponse(
@@ -64,12 +65,12 @@ public class TimeoutJob {
                         )
                 );
 
-                userService.notifyUsers(
+                userSessionService.notifyUsers(
                         userSession.getUser().getId(),
                         "User " + userSession.getUser().getLogin() + " was disconnected from server by timeout!"
                 );
 
-                userService.stopSession(key);
+                userSessionService.stopSession(key);
             }
         }
     }

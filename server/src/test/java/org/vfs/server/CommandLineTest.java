@@ -13,14 +13,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.core.network.protocol.RequestFactory;
 import org.vfs.server.commands.Command;
-import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 import org.vfs.server.utils.NodePrinter;
 
-import java.net.Socket;
 import java.util.Map;
 
 import static org.mockito.Mockito.*;
@@ -40,7 +38,7 @@ public class CommandLineTest {
     @Autowired
     private NodeService nodeService;
     @Autowired
-    private UserService userService;
+    private UserSessionService userSessionService;
     @Autowired
     private NodePrinter nodePrinter;
 
@@ -53,18 +51,18 @@ public class CommandLineTest {
 
         // UserSession #1
         ClientWriter clientWriter1 = mock(ClientWriter.class);
-        UserSession userSession1 = userService.startSession(clientWriter1);
+        UserSession userSession1 = userSessionService.startSession(clientWriter1);
         String id1 = userSession1.getUser().getId();
         String login1 = "nikita";
-        userService.attachUser(id1, login1);
+        userSessionService.attachUser(id1, login1);
         nikitaSession = userSession1;
 
         // UserSession #2
         ClientWriter clientWriter2 = mock(ClientWriter.class);
-        UserSession userSession2 = userService.startSession(clientWriter2);
+        UserSession userSession2 = userSessionService.startSession(clientWriter2);
         String id2 = userSession2.getUser().getId();
         String login2 = "r2d2";
-        userService.attachUser(id2, login2);
+        userSessionService.attachUser(id2, login2);
         r2d2Session = userSession2;
     }
 

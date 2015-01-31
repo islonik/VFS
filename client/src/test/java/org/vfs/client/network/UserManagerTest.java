@@ -2,6 +2,7 @@ package org.vfs.client.network;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.vfs.core.VFSConstants;
 import org.vfs.core.network.protocol.Protocol;
 
 /**
@@ -15,7 +16,7 @@ public class UserManagerTest {
         UserManager userManager = new UserManager();
 
         Protocol.User user1 = Protocol.User.newBuilder()
-                .setId("0")
+                .setId(VFSConstants.NEW_USER)
                 .setLogin("nikita")
                 .build();
 
@@ -25,7 +26,7 @@ public class UserManagerTest {
         Assert.assertEquals("nikita", user1.getLogin());
 
         Protocol.User user2 = Protocol.User.newBuilder()
-                .setId("0")
+                .setId(VFSConstants.NEW_USER)
                 .setLogin("r2d2")
                 .build();
 

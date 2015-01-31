@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.concurrent.BlockingQueue;
 
 /**
  * BlockingQueue should use non-blocking API.
@@ -35,22 +34,15 @@ public class MessageSender {
                             wait();
                         }
                     }
-
-                    key.interestOps(SelectionKey.OP_WRITE);
-                    SocketChannel channel = (SocketChannel)key.channel();
-                    ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteString().toByteArray());
-                    channel.write(writeBuffer);
-
-                    key.interestOps(SelectionKey.OP_READ);
-                } else {
-                    SocketChannel channel = (SocketChannel) key.channel();
-                    key.interestOps(SelectionKey.OP_WRITE);
-
-                    ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteString().toByteArray());
-                    channel.write(writeBuffer);
-
-                    key.interestOps(SelectionKey.OP_READ);
                 }
+                key.interestOps(SelectionKey.OP_WRITE);
+
+                SocketChannel channel = (SocketChannel)key.channel();
+                ByteBuffer writeBuffer = ByteBuffer.wrap(request.toByteArray());
+                channel.write(writeBuffer);
+
+                key.interestOps(SelectionKey.OP_READ);
+
             } catch (IOException | InterruptedException ie) {
                 System.out.println("MessageSender = " + ie);
             }

@@ -1,5 +1,6 @@
 package org.vfs.server.services;
 
+import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.network.protocol.Protocol;
@@ -18,14 +19,14 @@ import static org.vfs.core.network.protocol.ResponseFactory.newResponse;
  * @author Lipatov Nikita
  */
 @Component
-public class UserService {
+public class UserSessionService {
     private final NodeService nodeService;
     private final LockService lockService;
 
     private final Map<String, UserSession> registry = new ConcurrentHashMap<>();
 
     @Autowired
-    public UserService(NodeService nodeService, LockService lockService) {
+    public UserSessionService(NodeService nodeService, LockService lockService) {
         this.nodeService = nodeService;
         this.lockService = lockService;
     }
@@ -71,15 +72,13 @@ public class UserService {
     }
 
     /**
-     * Do not kill thread.
-     *
      * @param id
      */
     public void stopSession(String id) {
         UserSession userSession = registry.remove(id);
         if (userSession != null) { // can be null
             String login = userSession.getUser().getLogin();
-            if (login != null && !login.isEmpty()) { // can be null or empty
+            if (!Strings.isNullOrEmpty(login)) { // can be null or empty
                 nodeService.removeHomeDirectory(login);
                 lockService.unlockAll(userSession.getUser());
             }
@@ -96,7 +95,7 @@ public class UserService {
         for (String key : keySet) {
             UserSession userSession = registry.get(key);
             String login = userSession.getUser().getLogin();
-            if (!userSession.getUser().getId().equals(idMySession) && login != null && !login.trim().isEmpty()) { // to all users except mine and null sessions
+            if (!userSession.getUser().getId().equals(idMySession) && !Strings.isNullOrEmpty(login)) { // to all users except mine and null sessions
                 ClientWriter clientWriter = userSession.getClientWriter();
                 clientWriter.send(
                         newResponse(

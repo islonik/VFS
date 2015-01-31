@@ -12,15 +12,15 @@ import java.io.IOException;
  * @author Lipatov Nikita
  */
 @Component
-public class NetworkManager {
-    private static final Logger log = LoggerFactory.getLogger(NetworkManager.class);
+public class NetworkConfig {
+    private static final Logger log = LoggerFactory.getLogger(NetworkConfig.class);
 
     private final String address;
     private final int port;
     private final int pool;
 
     @Autowired
-    public NetworkManager(
+    public NetworkConfig(
             @Value("${server.name}") String address,
             @Value("${server.port}") String port,
             @Value("${server.pool}") String pool) throws IOException {

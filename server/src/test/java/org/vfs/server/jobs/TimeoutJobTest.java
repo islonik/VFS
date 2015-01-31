@@ -11,16 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.vfs.server.model.Timer;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.NodeService;
-import org.vfs.server.services.UserService;
+import org.vfs.server.services.UserSessionService;
 
-import java.net.Socket;
 import java.text.ParseException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Lipatov Nikita
@@ -35,7 +31,7 @@ public class TimeoutJobTest {
     private NodeService nodeService;
 
     @Autowired
-    public UserService userService;
+    public UserSessionService userSessionService;
 
     @Before
     public void setUp() throws InterruptedException, ParseException {
@@ -43,31 +39,31 @@ public class TimeoutJobTest {
 
         // UserSession #1
         ClientWriter nikitaCWMock = Mockito.mock(ClientWriter.class);
-        UserSession nikita = userService.startSession(nikitaCWMock);
+        UserSession nikita = userSessionService.startSession(nikitaCWMock);
 
-        userService.attachUser(nikita.getUser().getId(), "nikita");
+        userSessionService.attachUser(nikita.getUser().getId(), "nikita");
 
         // UserSession #2
         ClientWriter emptyCWMock = Mockito.mock(ClientWriter.class);
-        UserSession empty = userService.startSession(emptyCWMock);
+        UserSession empty = userSessionService.startSession(emptyCWMock);
 
         // UserSession #3
         ClientWriter r2d2CWMock = Mockito.mock(ClientWriter.class);
 
-        UserSession r2d2 = userService.startSession(r2d2CWMock);
-        userService.attachUser(r2d2.getUser().getId(), "r2d2");
+        UserSession r2d2 = userSessionService.startSession(r2d2CWMock);
+        userSessionService.attachUser(r2d2.getUser().getId(), "r2d2");
     }
 
     @Test
     public void testTimeout() throws InterruptedException {
-        TimeoutJob timeoutJob = new TimeoutJob(userService, "1"); // 1 min
+        TimeoutJob timeoutJob = new TimeoutJob(userSessionService, "1"); // 1 min
 
-        Assert.assertEquals(3, userService.getRegistry().size());
+        Assert.assertEquals(3, userSessionService.getRegistry().size());
 
         Thread.sleep(60000); // 1 min
 
         timeoutJob.timeout();
 
-        Assert.assertEquals(0, userService.getRegistry().size());
+        Assert.assertEquals(0, userSessionService.getRegistry().size());
     }
 }
