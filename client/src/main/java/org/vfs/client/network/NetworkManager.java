@@ -21,7 +21,7 @@ public class NetworkManager {
     }
 
     public void openSocket(String serverHost, String serverPort) throws IOException {
-        while (client == null) {
+        if (client == null) {
             synchronized (this) {
                 while(client == null) {
                     client = SocketChannel.open();
@@ -38,7 +38,7 @@ public class NetworkManager {
     }
 
     public Selector getSelector() {
-        while (selector == null) {
+        if (selector == null) {
             synchronized (this) {
                 while(selector == null) {
                     try {
@@ -54,7 +54,7 @@ public class NetworkManager {
     }
 
     public SocketChannel getSocketChannel() {
-        while (client == null) {
+        if (client == null) {
             synchronized (this) {
                 while(client == null) {
                     try {
@@ -71,7 +71,7 @@ public class NetworkManager {
 
     public void closeSocket() {
         try {
-            while (client != null) {
+            if (client != null) {
                 synchronized (this) {
                     while(client != null) {
                         selector.close();

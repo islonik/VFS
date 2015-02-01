@@ -28,7 +28,7 @@ public class Client {
         final MessageSender messageSender = new MessageSender();
         networkManager.setMessageSender(messageSender);
 
-        final IncomingMessageHandler incomingMessageHandler = new IncomingMessageHandler(userManager, networkManager);
+        final IncomingMessageHandler incomingMessageHandler = new IncomingMessageHandler(userManager);
 
         final IncomingMessageListener incomingMessageListener = new IncomingMessageListener(networkManager, userManager, incomingMessageHandler);
 

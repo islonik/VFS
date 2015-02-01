@@ -28,7 +28,7 @@ public class MessageSender {
         if (user != null) {
             Protocol.Request request = RequestFactory.newRequest(user.getId(), user.getLogin(), command);
             try {
-                while (key == null) {
+                if (key == null) {
                     synchronized (this) {
                         while(key == null) {
                             wait();

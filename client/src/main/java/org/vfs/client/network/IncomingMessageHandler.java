@@ -9,11 +9,9 @@ import org.vfs.core.network.protocol.Protocol;
 public class IncomingMessageHandler {
 
     private final UserManager userManager;
-    private final NetworkManager networkManager;
 
-    public IncomingMessageHandler(UserManager userManager, NetworkManager networkManager) {
+    public IncomingMessageHandler(UserManager userManager) {
         this.userManager = userManager;
-        this.networkManager = networkManager;
     }
 
     public void handle(Protocol.Response response) {

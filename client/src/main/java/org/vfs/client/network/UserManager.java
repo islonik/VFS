@@ -14,7 +14,7 @@ public class UserManager {
     }
 
     public Protocol.User getUser() {
-        while(user == null) {
+        if(user == null) {
             synchronized (this) {
                 while(user == null) {
                     try {
