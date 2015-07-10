@@ -90,7 +90,6 @@ public class UserSessionService {
     }
 
     public void notifyUsers(String idMySession, String message) {
-
         Set<String> keySet = registry.keySet();
         for (String key : keySet) {
             UserSession userSession = registry.get(key);

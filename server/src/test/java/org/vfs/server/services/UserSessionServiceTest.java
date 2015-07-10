@@ -6,6 +6,10 @@ import org.mockito.Mockito;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Lipatov Nikita
  */
@@ -50,4 +54,5 @@ public class UserSessionServiceTest {
         userSessionService.stopSession(userSession.getUser().getId());
         Assert.assertEquals(0, userSessionService.getRegistry().size());
     }
+
 }

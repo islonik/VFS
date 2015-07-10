@@ -61,7 +61,7 @@ public class TimeoutJob {
                 userSession.getClientWriter().send(
                         ResponseFactory.newResponse(
                                 Protocol.Response.ResponseType.SUCCESS_QUIT,
-                                "Timeout disconnect"
+                                "Your session was terminated by timeout. Please login again!"
                         )
                 );
 

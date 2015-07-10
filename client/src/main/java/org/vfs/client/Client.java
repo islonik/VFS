@@ -1,39 +1,24 @@
 package org.vfs.client;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.vfs.client.network.*;
 import org.vfs.core.exceptions.QuitException;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * @author Lipatov Nikita
  */
 public class Client {
-    private static final Logger log = LoggerFactory.getLogger(Client.class);
-    private final NetworkManager networkManager;
-    private final UserManager userManager;
+    final UserManager userManager;
+    final MessageSender messageSender;
+    final NetworkManager networkManager;
 
     public Client() throws IOException {
-        userManager = new UserManager();
-        networkManager = new NetworkManager();
-
-        final ExecutorService executorService = Executors.newFixedThreadPool(1);
-
-        final MessageSender messageSender = new MessageSender();
-        networkManager.setMessageSender(messageSender);
-
-        final IncomingMessageHandler incomingMessageHandler = new IncomingMessageHandler(userManager);
-
-        final IncomingMessageListener incomingMessageListener = new IncomingMessageListener(networkManager, userManager, incomingMessageHandler);
-
-        // loop
-        executorService.execute(incomingMessageListener);
+        this.userManager = new UserManager();
+        this.messageSender = new MessageSender();
+        this.networkManager = new NetworkManager(userManager, messageSender);
     }
 
     public void run() {
@@ -63,7 +48,9 @@ public class Client {
         } catch (QuitException qe) {
             System.out.println(qe.getMessage());
         } catch (Exception error) {
-            System.err.println(error.getLocalizedMessage());
+            if (!error.getLocalizedMessage().isEmpty()) {
+                System.err.println(error.getLocalizedMessage());
+            }
         } finally {
             System.exit(1);
         }

@@ -1,10 +1,8 @@
 package org.vfs.client.network;
 
+import io.netty.channel.Channel;
+
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.SocketChannel;
 
 /**
  * Wait() / notifyAll() - notes:
@@ -13,23 +11,28 @@ import java.nio.channels.SocketChannel;
  * @author Lipatov Nikita
  */
 public class NetworkManager {
-    private volatile SocketChannel client;
-    private volatile Selector selector;
+
+    private NettyClient nettyClient;
     private MessageSender messageSender;
 
-    public NetworkManager() {
+    private volatile Channel channel;
+
+    public NetworkManager(UserManager userManager, MessageSender messageSender) {
+        this.nettyClient = new NettyClient(userManager, this, messageSender);
+        this.messageSender = messageSender;
     }
 
-    public void openSocket(String serverHost, String serverPort) throws IOException {
-        if (client == null) {
+    public MessageSender getMessageSender() {
+        return messageSender;
+    }
+
+    public void openSocket(String host, String port) throws IOException {
+        if (channel == null) {
             synchronized (this) {
-                while(client == null) {
-                    client = SocketChannel.open();
-                    // nonblocking I/O
-                    client.configureBlocking(false);
-                    client.connect(new InetSocketAddress(serverHost, Integer.parseInt(serverPort)));
-                    selector = Selector.open();
-                    client.register(selector, SelectionKey.OP_CONNECT);
+                while(channel == null) {
+                    channel = nettyClient.createChannel(host, Integer.parseInt(port));
+
+                    messageSender.setChannel(channel);
 
                     notifyAll();
                 }
@@ -37,10 +40,10 @@ public class NetworkManager {
         }
     }
 
-    public Selector getSelector() {
-        if (selector == null) {
+    public Channel getChannel() {
+        if (channel == null) {
             synchronized (this) {
-                while(selector == null) {
+                while(channel == null) {
                     try {
                         wait();
                     } catch (InterruptedException e) {
@@ -50,50 +53,21 @@ public class NetworkManager {
                 }
             }
         }
-        return selector;
-    }
-
-    public SocketChannel getSocketChannel() {
-        if (client == null) {
-            synchronized (this) {
-                while(client == null) {
-                    try {
-                        wait();
-                    } catch (InterruptedException e) {
-                        System.err.println("NetworkManager.getSocket().IOException.Message=" + e.getMessage());
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        }
-        return client;
+        return channel;
     }
 
     public void closeSocket() {
         try {
-            if (client != null) {
+            if (channel != null) {
                 synchronized (this) {
-                    while(client != null) {
-                        selector.close();
-                        client.socket().close();
-                        client.close();
-                        client = null;
-                        selector = null;
+                    while(channel != null) {
+                        channel = null;
                     }
                 }
             }
-        } catch (IOException ioe) {
+        } catch (Exception ioe) {
             System.err.println("NetworkManager.closeSocket().IOException.Message=" + ioe.getMessage());
         }
     }
-
-    public MessageSender getMessageSender() {
-        return messageSender;
-    }
-
-    public void setMessageSender(MessageSender messageSender) {
-        this.messageSender = messageSender;
-    }
-
 
 }

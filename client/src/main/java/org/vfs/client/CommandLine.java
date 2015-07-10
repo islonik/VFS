@@ -49,7 +49,10 @@ public class CommandLine {
                     networkManager.getMessageSender().send(user, "connect " + user.getLogin());
 
                 } catch (ConnectException ce) {
-                    throw new ValidationException(ce.getMessage());
+                    throw new ValidationException(
+                            "Server is unavailable or you typed wrong host:port. " +
+                            "Please check your host:port or wait if server is unavailable. Detailed info : " + ce.getMessage()
+                    );
                 } catch (IOException ioe) {
                     System.err.println("CommandLine.IOException.Message=" + ioe.getMessage());
                 }
@@ -88,6 +91,9 @@ public class CommandLine {
     private final UserManager userManager;
     private final NetworkManager networkManager;
 
+    /**
+     * API method. Please don't change incoming parameters or name of method!
+     */
     public CommandLine(UserManager userManager, NetworkManager networkManager) {
         this.userManager = userManager;
         this.networkManager = networkManager;
