@@ -1,9 +1,6 @@
 package org.vfs.server.network;
 
 import io.netty.channel.*;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import org.vfs.core.VFSConstants;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.network.protocol.Protocol;
@@ -20,16 +17,11 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Protocol.Req
     private UserSessionService userSessionService;
     private CommandLine commandLine;
 
-
     public NettyServerHandler(UserSessionService userSessionService, CommandLine commandLine) {
         super();
         this.userSessionService = userSessionService;
         this.commandLine = commandLine;
     }
-
-    /*@Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-    }*/
 
     // Generate and write a response.
     @Override
