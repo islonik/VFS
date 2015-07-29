@@ -30,3 +30,17 @@ execute: git push --all && git push --tags
 *******************************************
 1) git tag -a 'name-version' -m 'message/description'
 2) git push origin 'name-version'
+
+*******************************************
+*** VFS tags evolution / description  
+*******************************************
+1) vfs-plain-v1.0
+VFS server/client based on java/multi-thread model
+2) vfs-spring-v1.0
+VFS server/client uses Spring framework
+3) vfs-nio-v1.0
+VFS server/client uses single-thread model
+4) vfs-protobuf-v1.0
+VFS server/client sends and receives messages using protobuf framework
+5) vfs-netty-v1.0
+VFS server/client opens and closes connections using netty framework
