@@ -3,7 +3,8 @@ package org.vfs.server.services;
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Response.ResponseType;
+import org.vfs.core.network.protocol.Protocol.User;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
@@ -33,7 +34,7 @@ public class UserSessionService {
 
     public UserSession startSession(ClientWriter clientWriter) {
         String sessionId = UUID.randomUUID().toString();
-        Protocol.User user = Protocol.User.newBuilder()
+        User user = User.newBuilder()
                 .setId(sessionId)
                 .setLogin("")
                 .build();
@@ -50,7 +51,7 @@ public class UserSessionService {
         Node loginHome = nodeService.createHomeDirectory(login);
 
         userSession.setNode(loginHome);
-        Protocol.User user = userSession.getUser();
+        User user = userSession.getUser();
         user = user.toBuilder().setLogin(login).build();
         userSession.setUser(user);
     }
@@ -98,7 +99,7 @@ public class UserSessionService {
                 ClientWriter clientWriter = userSession.getClientWriter();
                 clientWriter.send(
                         newResponse(
-                                Protocol.Response.ResponseType.OK,
+                                ResponseType.OK,
                                 message
                         )
                 );

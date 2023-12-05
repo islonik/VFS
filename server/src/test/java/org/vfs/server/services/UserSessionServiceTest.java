@@ -6,19 +6,15 @@ import org.mockito.Mockito;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * @author Lipatov Nikita
  */
 public class UserSessionServiceTest {
 
     @Test
-    public void testGetSession() throws Exception {
+    public void testGetSession() {
         LockService lockService = new LockService();
-        NodeManager nodeManager = new NodeManager();
+        NodeManager nodeManager = new NodeManager(lockService);
         NodeService nodeService = new NodeService("/", lockService, nodeManager);
         nodeService.initDirs();
         UserSessionService userSessionService = new UserSessionService(nodeService, lockService);
@@ -35,9 +31,9 @@ public class UserSessionServiceTest {
     }
 
     @Test
-    public void testStopSession() throws Exception {
+    public void testStopSession() {
         LockService lockService = new LockService();
-        NodeManager nodeManager = new NodeManager();
+        NodeManager nodeManager = new NodeManager(lockService);
         NodeService nodeService = new NodeService("/", lockService, nodeManager);
         nodeService.initDirs();
         UserSessionService userSessionService = new UserSessionService(nodeService, lockService);

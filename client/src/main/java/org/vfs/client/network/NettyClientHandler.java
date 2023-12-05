@@ -3,12 +3,13 @@ package org.vfs.client.network;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import org.vfs.core.exceptions.QuitException;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Response;
+import org.vfs.core.network.protocol.Protocol.User;
 
 /**
  * @author Lipatov Nikita
  */
-public class NettyClientHandler extends SimpleChannelInboundHandler<Protocol.Response> {
+public class NettyClientHandler extends SimpleChannelInboundHandler<Response> {
 
     private volatile UserManager userManager;
     private volatile NetworkManager networkManager;
@@ -21,15 +22,15 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<Protocol.Res
         this.messageSender = messageSender;
     }
 
-    protected void channelRead0(ChannelHandlerContext ctx, Protocol.Response response) throws Exception {
-        Protocol.Response.ResponseType code = response.getCode();
+    protected void channelRead0(ChannelHandlerContext ctx, Response response) throws Exception {
+        Response.ResponseType responseType = response.getCode();
 
         String message = response.getMessage();
-        Protocol.User user = userManager.getUser();
+        User user = userManager.getUser();
 
-        switch (code) {
+        switch (responseType) {
             case SUCCESS_CONNECT:  // success authorization
-                user = Protocol.User.newBuilder()
+                user = User.newBuilder()
                         .setId(response.getSpecificCode())
                         .setLogin(user.getLogin())
                         .build();

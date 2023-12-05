@@ -1,28 +1,24 @@
 package org.vfs.server.jobs;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.vfs.server.Application;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
 import org.vfs.server.services.NodeService;
 import org.vfs.server.services.UserSessionService;
 
-import java.text.ParseException;
-
 /**
  * @author Lipatov Nikita
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/application-test.xml" })
+@SpringBootTest(classes = Application.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TimeoutJobTest {
@@ -34,7 +30,7 @@ public class TimeoutJobTest {
     public UserSessionService userSessionService;
 
     @Before
-    public void setUp() throws InterruptedException, ParseException {
+    public void setUp() {
         nodeService.initDirs();
 
         // UserSession #1

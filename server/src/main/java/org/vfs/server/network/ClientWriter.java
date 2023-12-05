@@ -3,7 +3,7 @@ package org.vfs.server.network;
 import io.netty.channel.ChannelHandlerContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Response;
 
 /**
  * @author Lipatov Nikita
@@ -19,7 +19,7 @@ public class ClientWriter {
         this.handler = handler;
     }
 
-    public void send(Protocol.Response response) {
+    public void send(Response response) {
         handler.sendBack(ctx, response);
     }
 }

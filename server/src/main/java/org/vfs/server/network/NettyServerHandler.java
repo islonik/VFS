@@ -3,7 +3,8 @@ package org.vfs.server.network;
 import io.netty.channel.*;
 import org.vfs.core.VFSConstants;
 import org.vfs.core.exceptions.QuitException;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Request;
+import org.vfs.core.network.protocol.Protocol.Response;
 import org.vfs.server.CommandLine;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.UserSessionService;
@@ -11,7 +12,7 @@ import org.vfs.server.services.UserSessionService;
 /**
  * @author Lipatov Nikita
  */
-public class NettyServerHandler extends SimpleChannelInboundHandler<Protocol.Request> {
+public class NettyServerHandler extends SimpleChannelInboundHandler<Request> {
 
     private String userId;
     private UserSessionService userSessionService;
@@ -25,7 +26,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Protocol.Req
 
     // Generate and write a response.
     @Override
-    public void channelRead0(ChannelHandlerContext ctx, Protocol.Request request) throws Exception {
+    public void channelRead0(ChannelHandlerContext ctx, Request request) throws Exception {
         UserSession userSession;
         if(request.getUser().getId().equals(VFSConstants.NEW_USER)) {
             userSession = userSessionService.startSession(new ClientWriter(ctx, this));
@@ -44,7 +45,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<Protocol.Req
         }
     }
 
-    public void sendBack(ChannelHandlerContext ctx, Protocol.Response response) {
+    public void sendBack(ChannelHandlerContext ctx, Response response) {
         ctx.writeAndFlush(response);
     }
 

@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Response;
 import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.UserSessionService;
@@ -60,7 +60,7 @@ public class TimeoutJob {
 
                 userSession.getClientWriter().send(
                         ResponseFactory.newResponse(
-                                Protocol.Response.ResponseType.SUCCESS_QUIT,
+                                Response.ResponseType.SUCCESS_QUIT,
                                 "Your session was terminated by timeout. Please login again!"
                         )
                 );

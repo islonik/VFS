@@ -4,9 +4,10 @@ import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.vfs.server.Application;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 import org.vfs.server.utils.NodePrinter;
@@ -15,7 +16,7 @@ import org.vfs.server.utils.NodePrinter;
  * @author Lipatov Nikita
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/application-test.xml" })
+@SpringBootTest(classes = Application.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class NodeServiceTest {

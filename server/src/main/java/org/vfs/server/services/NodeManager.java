@@ -1,8 +1,7 @@
 package org.vfs.server.services;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.vfs.server.aspects.CreateNode;
-import org.vfs.server.aspects.RemoveNode;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 
@@ -10,7 +9,10 @@ import org.vfs.server.model.NodeTypes;
  * @author Lipatov Nikita
  */
 @Component
+@RequiredArgsConstructor
 public class NodeManager {
+
+    private final LockService lockService;
 
     public void setParent(Node node, Node parent) {
         if (duplicateExist(node, parent)) {
@@ -31,14 +33,16 @@ public class NodeManager {
         return false;
     }
 
-    @CreateNode
+    //@CreateNode
     public Node newNode(String name, NodeTypes type) {
         Node node = new Node(name, type);
+        lockService.addNode(node);
         return node;
     }
 
-    @RemoveNode
+    //@RemoveNode
     public boolean removeNode(Node source, Node child) {
+        lockService.removeNode(child);
         if (source.removeChild(child)) {
             setParent(child, null);
             return true;

@@ -1,7 +1,8 @@
 package org.vfs.client.network;
 
 import io.netty.channel.Channel;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Request;
+import org.vfs.core.network.protocol.Protocol.User;
 import org.vfs.core.network.protocol.RequestFactory;
 
 /**
@@ -23,9 +24,9 @@ public class MessageSender {
     /**
      * API method. Please don't change incoming parameters or name of method!
      */
-    public boolean send(Protocol.User user, String command) {
+    public boolean send(User user, String command) {
         if (user != null) {
-            Protocol.Request request = RequestFactory.newRequest(user.getId(), user.getLogin(), command);
+            Request request = RequestFactory.newRequest(user.getId(), user.getLogin(), command);
             try {
                 if (channel == null) {
                     synchronized (this) {

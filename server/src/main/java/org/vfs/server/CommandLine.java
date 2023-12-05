@@ -4,7 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Request;
+import org.vfs.core.network.protocol.Protocol.Response;
 import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.commands.Command;
 import org.vfs.server.network.ClientWriter;
@@ -29,7 +30,7 @@ public class CommandLine {
         parser = new CommandParser();
     }
 
-    public void onUserInput(UserSession userSession, Protocol.Request request) {
+    public void onUserInput(UserSession userSession, Request request) {
         clientWriter = userSession.getClientWriter();
 
         String fullCommand = request.getCommand();
@@ -44,7 +45,7 @@ public class CommandLine {
             } else {
                 clientWriter.send(
                         ResponseFactory.newResponse(
-                                Protocol.Response.ResponseType.OK,
+                                Response.ResponseType.OK,
                                 "No such command! Please check you syntax or type 'help'!"
                         )
                 );
@@ -52,7 +53,7 @@ public class CommandLine {
         } catch(IllegalArgumentException | IllegalAccessError | NullPointerException e) {
             clientWriter.send(
                     ResponseFactory.newResponse(
-                            Protocol.Response.ResponseType.FAIL,
+                            Response.ResponseType.FAIL,
                             e.getMessage()
                     )
             );

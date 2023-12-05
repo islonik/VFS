@@ -1,16 +1,15 @@
 package org.vfs.server.model;
 
-import org.vfs.core.network.protocol.Protocol;
-
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.vfs.core.network.protocol.Protocol.User;
 
 /**
  * @author Lipatov Nikita
  */
 public class NodeLock {
 
-    private volatile Protocol.User user;
+    private volatile User user;
     private final Lock lock;
 
     public NodeLock() {
@@ -21,7 +20,7 @@ public class NodeLock {
         return (user == null) ? false : true;
     }
 
-    public void lock(Protocol.User user) {
+    public void lock(User user) {
         boolean result = lock.tryLock();
         if(result) {
             this.user = user;
@@ -33,7 +32,7 @@ public class NodeLock {
         lock.unlock();
     }
 
-    public Protocol.User getUser() {
+    public User getUser() {
         return user;
     }
 

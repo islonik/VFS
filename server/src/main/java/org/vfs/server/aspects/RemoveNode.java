@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * @author Lipatov Nikita
  */
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface RemoveNode {
 }

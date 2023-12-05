@@ -43,6 +43,8 @@ public class Server implements Runnable {
 
         System.out.println(out);
         log.info(out);
+
+        run();
     }
 
     public void run() {

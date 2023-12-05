@@ -7,12 +7,12 @@ import org.vfs.core.command.CommandParser;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
 import org.vfs.core.exceptions.ValidationException;
-import org.vfs.core.network.protocol.Protocol;
 
 import java.io.IOException;
 import java.net.ConnectException;
 import java.util.HashMap;
 import java.util.Map;
+import org.vfs.core.network.protocol.Protocol.User;
 
 import static org.vfs.core.utils.Preconditions.checkArgument;
 import static org.vfs.core.utils.Preconditions.checkNotNull;
@@ -21,7 +21,7 @@ import static org.vfs.core.utils.Preconditions.checkNotNull;
  * @author Lipatov Nikita
  */
 public class CommandLine {
-    final Map<String, Runnable> commands = new HashMap<String, Runnable>() {{
+    final Map<String, Runnable> commands = new HashMap<>() {{
         put("connect", new Runnable() {
             @Override
             public void run() {
@@ -38,7 +38,7 @@ public class CommandLine {
                     networkManager.openSocket(serverHost, serverPort);
 
                     // connection was established
-                    Protocol.User user = Protocol.User.newBuilder()
+                    User user = User.newBuilder()
                             .setId(VFSConstants.NEW_USER)
                             .setLogin(userLogin)
                             .build();

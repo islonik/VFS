@@ -7,10 +7,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.User;
+import org.vfs.server.Application;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
 import org.vfs.server.utils.NodePrinter;
@@ -24,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Lipatov Nikita
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = { "/application-test.xml" })
+@SpringBootTest(classes = Application.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class LockServiceTest {
@@ -61,7 +62,7 @@ public class LockServiceTest {
         Node weblogic = nodeService.getNodeManager().newNode("weblogic", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(weblogic, servers);
 
-        Protocol.User user1 = Protocol.User.newBuilder()
+        User user1 = User.newBuilder()
                 .setId("121")
                 .setLogin("r1d1")
                 .build();
@@ -126,7 +127,7 @@ public class LockServiceTest {
         Node weblogic = nodeService.getNodeManager().newNode("weblogic", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(weblogic, servers);
 
-        Protocol.User user1 = Protocol.User.newBuilder()
+        User user1 = User.newBuilder()
                 .setId("121")
                 .setLogin("nikita")
                 .build();
@@ -163,17 +164,17 @@ public class LockServiceTest {
         int threads = 100;
 
         ExecutorService executor = Executors.newFixedThreadPool(threads);
-        final HashMap<Integer, Protocol.User> users = new HashMap<>();
+        final HashMap<Integer, User> users = new HashMap<>();
 
         for(final AtomicInteger aint = new AtomicInteger(1); aint.get() <= threads; aint.incrementAndGet()) {
-            users.put(aint.get(), Protocol.User.newBuilder()
+            users.put(aint.get(), User.newBuilder()
                     .setId(aint.toString())
                     .setLogin("nikita"+aint.toString())
                     .build()
             );
             Runnable thread = new Runnable() {
                 public void run() {
-                    Protocol.User user = users.get(aint.get());
+                    User user = users.get(aint.get());
                     if(!lockService.isLocked(weblogic)) {
                         lockService.lock(user, weblogic);
                     }
@@ -207,11 +208,11 @@ public class LockServiceTest {
         nodeService.getNodeManager().setParent(weblogic, servers);
 
 
-        Protocol.User user1 = Protocol.User.newBuilder()
+        User user1 = User.newBuilder()
                 .setId("121")
                 .setLogin("nikita")
                 .build();
-        Protocol.User user2 = Protocol.User.newBuilder()
+        User user2 = User.newBuilder()
                 .setId("122")
                 .setLogin("admin")
                 .build();

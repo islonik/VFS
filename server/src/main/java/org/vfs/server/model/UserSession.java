@@ -1,29 +1,29 @@
 package org.vfs.server.model;
 
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.User;
 import org.vfs.server.network.ClientWriter;
 
 /**
  * @author Lipatov Nikita
  */
 public class UserSession {
-    private volatile Protocol.User user;
+    private volatile User user;
     private final Timer timer;
     private final ClientWriter clientWriter;
 
     private volatile Node node;
 
-    public UserSession(Protocol.User user, ClientWriter clientWriter) {
+    public UserSession(User user, ClientWriter clientWriter) {
         this.user = user;
         this.timer = new Timer();
         this.clientWriter = clientWriter;
     }
 
-    public Protocol.User getUser() {
+    public User getUser() {
         return user;
     }
 
-    public void setUser(Protocol.User user) {
+    public void setUser(User user) {
         this.user = user;
     }
 

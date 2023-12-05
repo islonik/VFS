@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Response;
 import org.vfs.core.network.protocol.ResponseFactory;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.NodeService;
@@ -30,14 +30,14 @@ public class Connect extends AbstractCommand implements Command {
         clientWriter = userSession.getClientWriter();
         String login = values.getNextParam();
         if (userSessionService.isLogged(login)) {
-            send(Protocol.Response.ResponseType.FAIL_CONNECT, "Such user already exits. Please, change the login!");
+            send(Response.ResponseType.FAIL_CONNECT, "Such user already exits. Please, change the login!");
 
             throw new QuitException("Such user already exist!");
         } else {
             userSessionService.attachUser(userSession.getUser().getId(), login);
             clientWriter.send( // send id from server to client
                     ResponseFactory.newResponse(
-                            Protocol.Response.ResponseType.SUCCESS_CONNECT,
+                            Response.ResponseType.SUCCESS_CONNECT,
                             nodeService.getFullPath(userSession.getNode()),
                             userSession.getUser().getId()
                     )

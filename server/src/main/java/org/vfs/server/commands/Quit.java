@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.Response;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.services.UserSessionService;
 
@@ -28,7 +28,7 @@ public class Quit extends AbstractCommand implements Command {
 
         userSessionService.stopSession(userSession.getUser().getId());
 
-        send(Protocol.Response.ResponseType.SUCCESS_QUIT, "You are disconnected from server!");
+        send(Response.ResponseType.SUCCESS_QUIT, "You are disconnected from server!");
 
         userSessionService.notifyUsers(
                 userSession.getUser().getId(),

@@ -2,7 +2,7 @@ package org.vfs.server.services;
 
 import org.springframework.stereotype.Component;
 
-import org.vfs.core.network.protocol.Protocol;
+import org.vfs.core.network.protocol.Protocol.User;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeLock;
 
@@ -87,7 +87,7 @@ public class LockService {
         return lockedNodes;
     }
 
-    public boolean lock(Protocol.User user, Node node) {
+    public boolean lock(User user, Node node) {
         if (lockMap.containsKey(node)) {
             lockMap.get(node).lock(user);
             return true;
@@ -95,11 +95,11 @@ public class LockService {
         return false;
     }
 
-    public boolean lock(Protocol.User user, Node node, boolean recursive) {
+    public boolean lock(User user, Node node, boolean recursive) {
         return (recursive) ? recursiveLock(user, node) : lock(user, node);
     }
 
-    private boolean recursiveLock(Protocol.User user, Node node) {
+    private boolean recursiveLock(User user, Node node) {
         if (lockMap.containsKey(node)) {
             Collection<Node> children = node.getChildren();
             for (Node child : children) {
@@ -111,7 +111,7 @@ public class LockService {
         return false;
     }
 
-    public boolean unlock(Protocol.User user, Node node) {
+    public boolean unlock(User user, Node node) {
         if (lockMap.containsKey(node) && isLocked(node)) {
             NodeLock nodeLock = lockMap.get(node);
             if (nodeLock.getUser().equals(user)) {
@@ -122,7 +122,7 @@ public class LockService {
         return false;
     }
 
-    public void unlockAll(Protocol.User user) {
+    public void unlockAll(User user) {
         Set<Node> nodes = lockMap.keySet();
         for(Node node : nodes) {
             NodeLock nodeLock = lockMap.get(node);
@@ -132,11 +132,11 @@ public class LockService {
         }
     }
 
-    public boolean unlock(Protocol.User user, Node node, boolean recursive) {
+    public boolean unlock(User user, Node node, boolean recursive) {
         return (recursive) ? recursiveUnlock(user, node) : unlock(user, node);
     }
 
-    private boolean recursiveUnlock(Protocol.User user, Node node) {
+    private boolean recursiveUnlock(User user, Node node) {
         if (lockMap.containsKey(node) && isLocked(node)) {
             Collection<Node> children = node.getChildren();
             for (Node child : children) {
@@ -151,7 +151,7 @@ public class LockService {
         return false;
     }
 
-    public Protocol.User getUser(Node node) {
+    public User getUser(Node node) {
         if (lockMap.containsKey(node)) {
             return lockMap.get(node).getUser();
         }
