@@ -17,10 +17,11 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class Application {
 
     public static void main(String[] args){
+        log.info("VFS is starting...");
         new SpringApplicationBuilder(Application.class)
                 .web(WebApplicationType.NONE)
-                .run(args);
-        log.info("VFS started.");
+                .run(args)
+                .registerShutdownHook();
     }
 
 

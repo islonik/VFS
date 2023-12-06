@@ -9,6 +9,7 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.core.network.protocol.Protocol.User;
 import org.vfs.server.Application;
@@ -26,6 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
+@ActiveProfiles(value = "test")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class LockServiceTest {
@@ -72,19 +74,26 @@ public class LockServiceTest {
         Assert.assertFalse(lockService.isLocked(home));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__home\n" +
-                        "|  |__servers [Locked by r1d1 ]\n" +
-                        "|  |  |__weblogic\n",
-                nodePrinter.print(nodeService.getRoot()));
+                """
+                /
+                |__home
+                |  |__servers [Locked by r1d1 ]
+                |  |  |__weblogic
+                """,
+                nodePrinter.print(nodeService.getRoot())
+        );
 
         lockService.unlock(user1, servers);
+
         Assert.assertEquals(
-                "/\n" +
-                        "|__home\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n",
-                nodePrinter.print(nodeService.getRoot()));
+                """
+                /
+                |__home
+                |  |__servers
+                |  |  |__weblogic
+                """,
+                nodePrinter.print(nodeService.getRoot())
+        );
 
     }
 
@@ -135,22 +144,28 @@ public class LockServiceTest {
         Assert.assertTrue(lockService.lock(user1, home));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__home [Locked by nikita ]\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n",
-                nodePrinter.print(nodeService.getRoot()));
+                """
+                /
+                |__home [Locked by nikita ]
+                |  |__servers
+                |  |  |__weblogic
+                """,
+                nodePrinter.print(nodeService.getRoot())
+        );
 
         Assert.assertTrue(lockService.isLocked(home));
         Assert.assertEquals(user1, lockService.getUser(home));
 
         lockService.unlock(user1, home);
         Assert.assertEquals(
-                "/\n" +
-                        "|__home\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n",
-                nodePrinter.print(nodeService.getRoot()));
+                """
+                /
+                |__home
+                |  |__servers
+                |  |  |__weblogic
+                """,
+                nodePrinter.print(nodeService.getRoot())
+        );
     }
 
     @Test
@@ -191,16 +206,18 @@ public class LockServiceTest {
         Assert.assertTrue(lockService.getUser(weblogic).getLogin().startsWith("nikita"));
         Assert.assertTrue(
                 nodePrinter.print(nodeService.getRoot()).startsWith(
-                        "/\n" +
-                                "|__home\n" +
-                                "|  |__servers\n" +
-                                "|  |  |__weblogic [Locked by nikita"
+                        """
+                        /
+                        |__home
+                        |  |__servers
+                        |  |  |__weblogic [Locked by nikita2 ]
+                        """
                 )
         );
     }
 
     @Test
-    public void testUnlock() throws Exception {
+    public void testUnlock() {
         final Node home = nodeService.getHome();
         Node servers = nodeService.getNodeManager().newNode("servers", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(servers, home);
@@ -221,11 +238,14 @@ public class LockServiceTest {
         Assert.assertTrue(lockService.isLocked(home));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__home [Locked by nikita ]\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n",
-                nodePrinter.print(nodeService.getRoot()));
+                """
+                /
+                |__home [Locked by nikita ]
+                |  |__servers
+                |  |  |__weblogic
+                """,
+                nodePrinter.print(nodeService.getRoot())
+        );
 
         Assert.assertEquals(user1, lockService.getUser(home));
 
@@ -233,11 +253,14 @@ public class LockServiceTest {
         Assert.assertTrue(lockService.unlock(user1, home));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__home\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n",
-                nodePrinter.print(nodeService.getRoot()));
+                """
+                /
+                |__home
+                |  |__servers
+                |  |  |__weblogic
+                """,
+                nodePrinter.print(nodeService.getRoot())
+        );
     }
 
 

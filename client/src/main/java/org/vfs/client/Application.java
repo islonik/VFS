@@ -1,7 +1,5 @@
 package org.vfs.client;
 
-import java.io.IOException;
-
 /**
  * Entry point
  *
@@ -12,7 +10,7 @@ public class Application {
     /**
      * @param args no arguments
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         Client client = new Client();
         client.run();
     }

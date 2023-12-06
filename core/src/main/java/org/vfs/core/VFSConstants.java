@@ -5,5 +5,6 @@ package org.vfs.core;
  */
 public interface VFSConstants {
 
-    public static final String NEW_USER = "0";
+    String NEW_USER = "0";
+
 }

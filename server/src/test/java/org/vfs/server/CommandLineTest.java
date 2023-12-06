@@ -10,6 +10,7 @@ import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.vfs.core.network.protocol.RequestFactory;
 import org.vfs.server.commands.Command;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.*;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class)
+@ActiveProfiles(value = "test")
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CommandLineTest {
@@ -46,7 +48,7 @@ public class CommandLineTest {
     private UserSession r2d2Session;
 
     @Before
-    public void setUp() throws InterruptedException {
+    public void setUp() {
         nodeService.initDirs();
 
         // UserSession #1
@@ -67,7 +69,7 @@ public class CommandLineTest {
     }
 
     @Test
-    public void testChangeDirectory() throws Exception {
+    public void testChangeDirectory() {
         String id = nikitaSession.getUser().getId();
         String login = nikitaSession.getUser().getLogin();
         CommandLine cmd = new CommandLine(commands);
@@ -76,16 +78,18 @@ public class CommandLineTest {
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "cd ../.."));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n",
+                """
+                /
+                |__home
+                |  |__nikita
+                |  |__r2d2
+                """,
                 nodePrinter.print(nodeService.getRoot())
         );
     }
 
     @Test
-    public void testCopy() throws Exception {
+    public void testCopy() {
         String id = nikitaSession.getUser().getId();
         String login = nikitaSession.getUser().getLogin();
         CommandLine cmd = new CommandLine(commands);
@@ -96,23 +100,25 @@ public class CommandLineTest {
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "copy applications logs"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__applications\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n" +
-                        "|__logs\n" +
-                        "|  |__applications\n" +
-                        "|  |  |__servers\n" +
-                        "|  |  |  |__weblogic\n",
+                """
+                        /
+                        |__applications
+                        |  |__servers
+                        |  |  |__weblogic
+                        |__home
+                        |  |__nikita
+                        |  |__r2d2
+                        |__logs
+                        |  |__applications
+                        |  |  |__servers
+                        |  |  |  |__weblogic
+                        """,
                 nodePrinter.print(nodeService.getRoot())
         );
     }
 
     @Test
-    public void testMove() throws Exception {
+    public void testMove() {
         String id = nikitaSession.getUser().getId();
         String login = nikitaSession.getUser().getLogin();
         CommandLine cmd = new CommandLine(commands);
@@ -123,20 +129,22 @@ public class CommandLineTest {
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "move applications logs"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n" +
-                        "|__logs\n" +
-                        "|  |__applications\n" +
-                        "|  |  |__servers\n" +
-                        "|  |  |  |__weblogic\n",
+                """
+                        /
+                        |__home
+                        |  |__nikita
+                        |  |__r2d2
+                        |__logs
+                        |  |__applications
+                        |  |  |__servers
+                        |  |  |  |__weblogic
+                        """,
                 nodePrinter.print(nodeService.getRoot())
         );
     }
 
     @Test
-    public void testRm() throws Exception {
+    public void testRm() {
         String id = nikitaSession.getUser().getId();
         String login = nikitaSession.getUser().getLogin();
         CommandLine cmd = new CommandLine(commands);
@@ -147,17 +155,19 @@ public class CommandLineTest {
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "rm applications"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n" +
-                        "|__logs\n",
+                """
+                        /
+                        |__home
+                        |  |__nikita
+                        |  |__r2d2
+                        |__logs
+                        """,
                 nodePrinter.print(nodeService.getRoot())
         );
     }
 
     @Test
-    public void testLockScenario() throws Exception {
+    public void testLockScenario() {
         String id1 = nikitaSession.getUser().getId();
         String login1 = nikitaSession.getUser().getLogin();
         String id2 = r2d2Session.getUser().getId();
@@ -172,63 +182,69 @@ public class CommandLineTest {
         cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "mkfile applications/databases/oracle/bin/oracle.exe"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__applications\n" +
-                        "|  |__databases\n" +
-                        "|  |  |__oracle\n" +
-                        "|  |  |  |__bin\n" +
-                        "|  |  |  |  |__oracle.exe\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n" +
-                        "|  |  |  |__logs\n" +
-                        "|  |  |  |  |__weblogic.log\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n",
+                """
+                        /
+                        |__applications
+                        |  |__databases
+                        |  |  |__oracle
+                        |  |  |  |__bin
+                        |  |  |  |  |__oracle.exe
+                        |  |__servers
+                        |  |  |__weblogic
+                        |  |  |  |__logs
+                        |  |  |  |  |__weblogic.log
+                        |__home
+                        |  |__nikita
+                        |  |__r2d2
+                        """,
                 nodePrinter.print(nodeService.getRoot())
         );
 
         cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "lock applications/databases"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__applications\n" +
-                        "|  |__databases [Locked by nikita ]\n" +
-                        "|  |  |__oracle\n" +
-                        "|  |  |  |__bin\n" +
-                        "|  |  |  |  |__oracle.exe\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n" +
-                        "|  |  |  |__logs\n" +
-                        "|  |  |  |  |__weblogic.log\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n",
+                """
+                /
+                |__applications
+                |  |__databases [Locked by nikita ]
+                |  |  |__oracle
+                |  |  |  |__bin
+                |  |  |  |  |__oracle.exe
+                |  |__servers
+                |  |  |__weblogic
+                |  |  |  |__logs
+                |  |  |  |  |__weblogic.log
+                |__home
+                |  |__nikita
+                |  |__r2d2
+                """,
                 nodePrinter.print(nodeService.getRoot())
         );
 
         cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "lock applications"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__applications [Locked by r2d2 ]\n" +
-                        "|  |__databases [Locked by nikita ]\n" +
-                        "|  |  |__oracle\n" +
-                        "|  |  |  |__bin\n" +
-                        "|  |  |  |  |__oracle.exe\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n" +
-                        "|  |  |  |__logs\n" +
-                        "|  |  |  |  |__weblogic.log\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n",
+                """
+                /
+                |__applications [Locked by r2d2 ]
+                |  |__databases [Locked by nikita ]
+                |  |  |__oracle
+                |  |  |  |__bin
+                |  |  |  |  |__oracle.exe
+                |  |__servers
+                |  |  |__weblogic
+                |  |  |  |__logs
+                |  |  |  |  |__weblogic.log
+                |__home
+                |  |__nikita
+                |  |__r2d2
+                """,
                 nodePrinter.print(nodeService.getRoot())
         );
     }
 
     @Test
-    public void testRecursiveLockScenario() throws Exception {
+    public void testRecursiveLockScenario() {
         String id1 = nikitaSession.getUser().getId();
         String login1 = nikitaSession.getUser().getLogin();
         String id2 = r2d2Session.getUser().getId();
@@ -243,63 +259,69 @@ public class CommandLineTest {
         cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "mkfile applications/databases/oracle/bin/oracle.exe"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__applications\n" +
-                        "|  |__databases\n" +
-                        "|  |  |__oracle\n" +
-                        "|  |  |  |__bin\n" +
-                        "|  |  |  |  |__oracle.exe\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n" +
-                        "|  |  |  |__logs\n" +
-                        "|  |  |  |  |__weblogic.log\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n",
+                """
+                        /
+                        |__applications
+                        |  |__databases
+                        |  |  |__oracle
+                        |  |  |  |__bin
+                        |  |  |  |  |__oracle.exe
+                        |  |__servers
+                        |  |  |__weblogic
+                        |  |  |  |__logs
+                        |  |  |  |  |__weblogic.log
+                        |__home
+                        |  |__nikita
+                        |  |__r2d2
+                        """,
                 nodePrinter.print(nodeService.getRoot())
         );
 
         cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "lock -r applications/databases"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__applications\n" +
-                        "|  |__databases [Locked by nikita ]\n" +
-                        "|  |  |__oracle [Locked by nikita ]\n" +
-                        "|  |  |  |__bin [Locked by nikita ]\n" +
-                        "|  |  |  |  |__oracle.exe [Locked by nikita ]\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n" +
-                        "|  |  |  |__logs\n" +
-                        "|  |  |  |  |__weblogic.log\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n",
+                """
+                /
+                |__applications
+                |  |__databases [Locked by nikita ]
+                |  |  |__oracle [Locked by nikita ]
+                |  |  |  |__bin [Locked by nikita ]
+                |  |  |  |  |__oracle.exe [Locked by nikita ]
+                |  |__servers
+                |  |  |__weblogic
+                |  |  |  |__logs
+                |  |  |  |  |__weblogic.log
+                |__home
+                |  |__nikita
+                |  |__r2d2
+                """,
                 nodePrinter.print(nodeService.getRoot())
         );
 
         cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "lock -r applications"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__applications\n" +
-                        "|  |__databases [Locked by nikita ]\n" +
-                        "|  |  |__oracle [Locked by nikita ]\n" +
-                        "|  |  |  |__bin [Locked by nikita ]\n" +
-                        "|  |  |  |  |__oracle.exe [Locked by nikita ]\n" +
-                        "|  |__servers\n" +
-                        "|  |  |__weblogic\n" +
-                        "|  |  |  |__logs\n" +
-                        "|  |  |  |  |__weblogic.log\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n",
+                """
+                /
+                |__applications
+                |  |__databases [Locked by nikita ]
+                |  |  |__oracle [Locked by nikita ]
+                |  |  |  |__bin [Locked by nikita ]
+                |  |  |  |  |__oracle.exe [Locked by nikita ]
+                |  |__servers
+                |  |  |__weblogic
+                |  |  |  |__logs
+                |  |  |  |  |__weblogic.log
+                |__home
+                |  |__nikita
+                |  |__r2d2
+                """,
                 nodePrinter.print(nodeService.getRoot())
         );
     }
 
     @Test
-    public void testRename() throws Exception {
+    public void testRename() {
         String id1 = nikitaSession.getUser().getId();
         String login1 = nikitaSession.getUser().getLogin();
         String id2 = r2d2Session.getUser().getId();
@@ -316,15 +338,17 @@ public class CommandLineTest {
         cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "rename applications/servers web-servers"));
 
         Assert.assertEquals(
-                "/\n" +
-                        "|__applications\n" +
-                        "|  |__web-servers\n" +
-                        "|  |  |__weblogic [Locked by nikita ]\n" +
-                        "|  |  |  |__logs [Locked by nikita ]\n" +
-                        "|  |  |  |  |__weblogic.log [Locked by nikita ]\n" +
-                        "|__home\n" +
-                        "|  |__nikita\n" +
-                        "|  |__r2d2\n",
+                """
+                        /
+                        |__applications
+                        |  |__web-servers
+                        |  |  |__weblogic [Locked by nikita ]
+                        |  |  |  |__logs [Locked by nikita ]
+                        |  |  |  |  |__weblogic.log [Locked by nikita ]
+                        |__home
+                        |  |__nikita
+                        |  |__r2d2
+                        """,
                 nodePrinter.print(nodeService.getRoot())
         );
 

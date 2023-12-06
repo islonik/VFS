@@ -8,13 +8,13 @@ import org.vfs.core.exceptions.ValidationException;
 public class Preconditions {
 
     public static void checkNotNull(Object object, String message) {
-        if(object == null) {
+        if (object == null) {
             throw new ValidationException(message);
         }
     }
 
     public static void checkArgument(boolean condition, String message) {
-        if(!condition) {
+        if (!condition) {
             throw new ValidationException(message);
         }
     }

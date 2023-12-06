@@ -16,7 +16,7 @@ public class TimerTest {
 
         Assert.assertEquals(0, timer.difference());
 
-        Thread.currentThread().sleep(60000); // 1 minute
+        Thread.sleep(60000); // 1 minute
 
         Assert.assertEquals(1, timer.difference());
 

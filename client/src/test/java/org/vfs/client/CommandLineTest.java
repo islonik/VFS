@@ -37,7 +37,7 @@ public class CommandLineTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testConnectCommandAlreadyAuthorized() throws Exception {
+    public void testConnectCommandAlreadyAuthorized() {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
         MessageSender messageSender = mock(MessageSender.class);
@@ -52,7 +52,7 @@ public class CommandLineTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testQuitCommandNotAuthorized() throws Exception {
+    public void testQuitCommandNotAuthorized() {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
         MessageSender messageSender = mock(MessageSender.class);
@@ -67,7 +67,7 @@ public class CommandLineTest {
     }
 
     @Test
-    public void testQuitCommand() throws Exception {
+    public void testQuitCommand() {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
         MessageSender messageSender = mock(MessageSender.class);
@@ -88,7 +88,7 @@ public class CommandLineTest {
     }
 
     @Test(expected = RuntimeException.class)
-    public void testDefaultCommandNotAuthorized() throws Exception {
+    public void testDefaultCommandNotAuthorized() {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
         MessageSender messageSender = mock(MessageSender.class);
@@ -103,7 +103,7 @@ public class CommandLineTest {
     }
 
     @Test
-    public void testDefaultCommand() throws Exception {
+    public void testDefaultCommand() {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
         MessageSender messageSender = mock(MessageSender.class);

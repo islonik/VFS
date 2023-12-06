@@ -1,10 +1,26 @@
 *******************************************
-*** Project : Virtual File Server
+# Project : Virtual File Server
 *******************************************
 
+## Find and terminate running process on Mac
+
+1. Find the process based on the port
+```bash
+lsof -i tcp:4499
+```
+The above command should return something like that:
+```bash
+COMMAND   PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+java    58944 islonik  184u  IPv6 0x4b73f6a4635a157f      0t0  TCP localhost:4499 (LISTEN)
+```
+
+2. Kill the process
+```bash
+kill -9 PID
+```
 
 *******************************************
-*** Release & How to release
+## Release & How to release
 *******************************************
 
 Full version : http://2mohitarora.blogspot.ru/2014/02/maven-release-plugin-and-gitflow.html
@@ -26,13 +42,13 @@ execute: git branch -D release/1.0
 execute: git push --all && git push --tags
 
 *******************************************
-*** Release & How to make tag
+## Release & How to make tag
 *******************************************
 1) git tag -a 'name-version' -m 'message/description'
 2) git push origin 'name-version'
 
 *******************************************
-*** VFS tags evolution / description  
+## VFS tags evolution / description  
 *******************************************
 1) vfs-plain-v1.0
 VFS server/client based on java/multi-thread model

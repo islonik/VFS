@@ -1,6 +1,5 @@
 package org.vfs.server;
 
-import java.io.*;
 import java.util.Map;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -9,9 +8,10 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.vfs.server.commands.Command;
 import org.vfs.server.network.*;
@@ -22,32 +22,42 @@ import org.vfs.server.services.UserSessionService;
  *
  * @author Lipatov Nikita
  */
+@Slf4j
 @Component
 public class Server implements Runnable {
-    private static final Logger log = LoggerFactory.getLogger(Server.class);
 
+    private final Environment environment;
     private final NetworkConfig networkConfig;
     private final UserSessionService userSessionService;
     private final Map<String, Command> commands;
     private final CommandLine commandLine;
 
     @Autowired
-    public Server(NetworkConfig networkConfig, UserSessionService userSessionService, Map<String, Command> commands) throws IOException {
+    public Server(
+            Environment environment,
+            NetworkConfig networkConfig,
+            UserSessionService userSessionService,
+            Map<String, Command> commands) {
+        this.environment = environment;
         this.networkConfig = networkConfig;
         this.userSessionService = userSessionService;
         this.commands = commands;
 
         this.commandLine = new CommandLine(commands);
 
-        String out = "Server has been running!";
-
-        System.out.println(out);
-        log.info(out);
-
-        run();
+        // W/A: do not start up netty if it's test profile
+        if (Optional.of(environment.getActiveProfiles())
+                .filter(ps -> ps.length > 0)
+                .map(ps -> ps[0])
+                .filter(p -> p.equalsIgnoreCase("test"))
+                .isEmpty()) {
+            run();
+        }
     }
 
     public void run() {
+        log.info("Server started.");
+
         String address = networkConfig.getAddress();
         int port = networkConfig.getPort();
 

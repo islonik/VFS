@@ -15,7 +15,7 @@ public class Client {
     final MessageSender messageSender;
     final NetworkManager networkManager;
 
-    public Client() throws IOException {
+    public Client() {
         this.userManager = new UserManager();
         this.messageSender = new MessageSender();
         this.networkManager = new NetworkManager(userManager, messageSender);

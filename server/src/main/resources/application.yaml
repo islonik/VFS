@@ -1,0 +1,7 @@
+delimiter:
+  /
+server:
+  name: localhost
+  port: 4499
+  pool: 100
+  timeout: 10
