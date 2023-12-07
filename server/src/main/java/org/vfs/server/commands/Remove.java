@@ -1,6 +1,6 @@
 package org.vfs.server.commands;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.server.model.Node;
@@ -13,18 +13,12 @@ import org.vfs.server.services.UserSessionService;
  * @author Lipatov Nikita
  */
 @Component("rm")
+@RequiredArgsConstructor
 public class Remove extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
     private final LockService lockService;
     private final UserSessionService userSessionService;
-
-    @Autowired
-    public Remove(NodeService nodeService, LockService lockService, UserSessionService userSessionService) {
-        this.nodeService = nodeService;
-        this.lockService = lockService;
-        this.userSessionService = userSessionService;
-    }
 
     @Override
     public void apply(UserSession userSession, CommandValues values) {
@@ -46,7 +40,7 @@ public class Remove extends AbstractCommand implements Command {
 
                 userSessionService.notifyUsers(
                         userSession.getUser().getId(),
-                        String.format("Node '%s' was deleted by user '%s'", userSession.getUser().getLogin())
+                        String.format("Node '%s' was deleted by user '%s'", nodeName, userSession.getUser().getLogin())
                 );
             } else {
                 sendFail("Node was found, but wasn't deleted!");

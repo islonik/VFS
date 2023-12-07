@@ -9,7 +9,6 @@ import org.vfs.core.network.protocol.Protocol.Response;
  * @author Lipatov Nikita
  */
 public class ClientWriter {
-    private static final Logger log = LoggerFactory.getLogger(ClientWriter.class);
 
     private final ChannelHandlerContext ctx;
     private final NettyServerHandler handler;

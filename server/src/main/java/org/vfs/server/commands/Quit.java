@@ -1,6 +1,6 @@
 package org.vfs.server.commands;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
@@ -12,14 +12,10 @@ import org.vfs.server.services.UserSessionService;
  * @author Lipatov Nikita
  */
 @Component("quit")
+@RequiredArgsConstructor
 public class Quit extends AbstractCommand implements Command {
 
     private final UserSessionService userSessionService;
-
-    @Autowired
-    public Quit(UserSessionService userSessionService) {
-        this.userSessionService = userSessionService;
-    }
 
     @Override
     public void apply(UserSession userSession, CommandValues values) {

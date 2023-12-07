@@ -13,8 +13,6 @@ import java.io.IOException;
  */
 @Component
 public class NetworkConfig {
-    private static final Logger log = LoggerFactory.getLogger(NetworkConfig.class);
-
     private final String address;
     private final int port;
     private final int pool;
@@ -23,7 +21,7 @@ public class NetworkConfig {
     public NetworkConfig(
             @Value("${server.name}") String address,
             @Value("${server.port}") String port,
-            @Value("${server.pool}") String pool) throws IOException {
+            @Value("${server.pool}") String pool) {
         this.address = address;
         this.port = Integer.parseInt(port);
         this.pool = Integer.parseInt(pool);

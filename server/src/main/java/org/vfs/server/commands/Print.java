@@ -1,6 +1,6 @@
 package org.vfs.server.commands;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.server.model.Node;
@@ -11,14 +11,10 @@ import org.vfs.server.utils.NodePrinter;
  * @author Lipatov Nikita
  */
 @Component("print")
+@RequiredArgsConstructor
 public class Print extends AbstractCommand implements Command {
 
     private final NodePrinter nodePrinter;
-
-    @Autowired
-    public Print(NodePrinter nodePrinter) {
-        this.nodePrinter = nodePrinter;
-    }
 
     @Override
     public void apply(UserSession userSession, CommandValues values) {

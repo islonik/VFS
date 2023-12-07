@@ -1,6 +1,6 @@
 package org.vfs.server.commands;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.server.model.Node;
@@ -12,13 +12,9 @@ import org.vfs.server.services.NodeService;
  * @author Lipatov Nikita
  */
 @Component("cd")
+@RequiredArgsConstructor
 public class ChangeDirectory extends AbstractCommand implements Command {
     private final NodeService nodeService;
-
-    @Autowired
-    public ChangeDirectory(NodeService nodeService) {
-        this.nodeService = nodeService;
-    }
 
     public void apply(UserSession userSession, CommandValues values) {
         clientWriter = userSession.getClientWriter();

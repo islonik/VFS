@@ -1,6 +1,6 @@
 package org.vfs.server.commands;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.vfs.core.command.CommandValues;
 import org.vfs.core.exceptions.QuitException;
@@ -14,16 +14,11 @@ import org.vfs.server.services.UserSessionService;
  * @author Lipatov Nikita
  */
 @Component("connect")
+@RequiredArgsConstructor
 public class Connect extends AbstractCommand implements Command {
 
     private final NodeService nodeService;
     private final UserSessionService userSessionService;
-
-    @Autowired
-    public Connect(NodeService nodeService, UserSessionService userSessionService) {
-        this.nodeService = nodeService;
-        this.userSessionService = userSessionService;
-    }
 
     @Override
     public void apply(UserSession userSession, CommandValues values) {

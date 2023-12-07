@@ -15,8 +15,7 @@ import org.vfs.server.services.UserSessionService;
 /**
  * @author Lipatov Nikita
  */
-public class NettyServerInitializer extends ChannelInitializer<SocketChannel>
-{
+public class NettyServerInitializer extends ChannelInitializer<SocketChannel> {
     private UserSessionService userSessionService;
     private CommandLine commandLine;
 
@@ -26,8 +25,7 @@ public class NettyServerInitializer extends ChannelInitializer<SocketChannel>
         this.commandLine = commandLine;
     }
 
-    public void initChannel(SocketChannel ch) throws Exception
-    {
+    public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
 
         pipeline.addLast(new ProtobufVarint32FrameDecoder());
