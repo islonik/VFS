@@ -95,38 +95,22 @@
     </dependencies>
 
 	<build>
+		<finalName>VFS</finalName>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<index>true</index>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<classpathPrefix>lib/</classpathPrefix>
-						</manifest>
-						<manifestEntries>
-							<Manifest-Version>1.0</Manifest-Version>
-							<Main-Class>org.vfs.server.Application</Main-Class>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>3.6.1</version>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring.boot.version}</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
 						<goals>
-							<goal>copy-dependencies</goal>
+							<!-- Generate a build-info.properties file based on the content of the current MavenProject. -->
+							<goal>build-info</goal>
+
+							<!-- Repackage existing JAR and WAR archives so that they can be executed from the command line using java -jar.
+                            With layout=NONE can also be used simply to package a JAR with nested dependencies (and no main class, so not executable).-->
+							<goal>repackage</goal>
 						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/lib</outputDirectory>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
