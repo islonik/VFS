@@ -1,7 +1,7 @@
 package org.vfs.core.utils;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.vfs.core.exceptions.ValidationException;
 
 /**
@@ -9,25 +9,39 @@ import org.vfs.core.exceptions.ValidationException;
  */
 public class PreconditionsTest {
 
-    @Test(expected = ValidationException.class)
-    public void testCheckNotNull_null() {
-        Preconditions.checkNotNull(null, "Login is empty!");
+    @Test
+    public void testCheckNotNullWithNull() {
+        String message = "Login is empty!";
+        ValidationException thrown = Assertions.assertThrows(
+                ValidationException.class,
+                () -> Preconditions.checkNotNull(null, message),
+                message
+        );
+
+        Assertions.assertEquals(message, thrown.getMessage());
     }
 
     @Test
-    public void testCheckNotNull_notNull() {
+    public void testCheckNotNullWithNotNull() {
         String login = "nikita";
         Preconditions.checkNotNull(login, "Login is empty!");
-        Assert.assertTrue(true);
+        Assertions.assertTrue(true);
     }
 
     @Test
-    public void testCheckArgument_true() {
+    public void testCheckArgumentConditionIsTrue() {
         Preconditions.checkArgument(true, "Condition is true!");
     }
 
-    @Test(expected = ValidationException.class)
-    public void testCheckArgument_false() {
-        Preconditions.checkArgument(false, "Condition is false!");
+    @Test
+    public void testCheckArgumentConditionIsFalse() {
+        String message = "Condition is false!";
+        ValidationException thrown = Assertions.assertThrows(
+                ValidationException.class,
+                () -> Preconditions.checkArgument(false, message),
+                message
+        );
+
+        Assertions.assertEquals(message, thrown.getMessage());
     }
 }

@@ -1,7 +1,7 @@
 package org.vfs.client.network;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.vfs.core.VFSConstants;
 import org.vfs.core.network.protocol.Protocol.User;
 
@@ -22,8 +22,8 @@ public class UserManagerTest {
 
         userManager.setUser(user1);
 
-        Assert.assertTrue(userManager.isAuthorized());
-        Assert.assertEquals("nikita", user1.getLogin());
+        Assertions.assertTrue(userManager.isAuthorized());
+        Assertions.assertEquals("nikita", user1.getLogin());
 
         User user2 = User.newBuilder()
                 .setId(VFSConstants.NEW_USER)
@@ -32,10 +32,10 @@ public class UserManagerTest {
 
         userManager.setUser(user2);
 
-        Assert.assertTrue(userManager.isAuthorized());
-        Assert.assertEquals("r2d2", user2.getLogin());
+        Assertions.assertTrue(userManager.isAuthorized());
+        Assertions.assertEquals("r2d2", user2.getLogin());
 
         userManager.setUser(null);
-        Assert.assertFalse(userManager.isAuthorized());
+        Assertions.assertFalse(userManager.isAuthorized());
     }
 }

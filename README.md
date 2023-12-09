@@ -50,13 +50,20 @@ execute: git push --all && git push --tags
 *******************************************
 ## VFS tags evolution / description  
 *******************************************
-1) vfs-plain-v1.0
-VFS server/client based on java/multi-thread model
-2) vfs-spring-v1.0
-VFS server/client uses Spring framework
-3) vfs-nio-v1.0
-VFS server/client uses single-thread model
-4) vfs-protobuf-v1.0
-VFS server/client sends and receives messages using protobuf framework
-5) vfs-netty-v1.0
-VFS server/client opens and closes connections using netty framework
+1) Tag: <b>vfs-plain-v1.0</b><br/>
+Description: VFS server/client based on java/multi-thread model
+2) Tag: <b>vfs-spring-v1.0</b><br/>
+Description: VFS server/client uses Spring framework
+3) Tag: <b>vfs-nio-v1.0</b><br/>
+Description: VFS server/client uses single-thread model
+4) Tag: <b>vfs-protobuf-v1.0</b><br/>
+Description: VFS server/client sends and receives messages using protobuf framework
+5) Tag: <b>vfs-netty-v1.0</b><br/>
+Description: VFS server/client opens and closes connections using netty framework
+6) Tag: <b>vfs-boot-v1.0 (planning)</b><br/>
+Description: VFS server uses Spring Boot
+
+*******************************************
+## Junit5 test & maven
+*******************************************
+To execute successfully junit5 tests you should use at least maven version - 3.9.5 

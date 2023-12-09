@@ -1,17 +1,17 @@
 package org.vfs.server;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.vfs.core.network.protocol.RequestFactory;
 import org.vfs.server.commands.Command;
 import org.vfs.server.model.UserSession;
@@ -26,12 +26,12 @@ import static org.mockito.Mockito.*;
 
 /**
  * All common tests, except LockTests.
- * @author: Lipatov Nikita
+ * @author Lipatov Nikita
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles(value = "test")
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class CommandLineTest {
 
@@ -47,7 +47,7 @@ public class CommandLineTest {
     private UserSession nikitaSession;
     private UserSession r2d2Session;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         nodeService.initDirs();
 
@@ -77,7 +77,7 @@ public class CommandLineTest {
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "cd ../.."));
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "cd ../.."));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -99,7 +99,7 @@ public class CommandLineTest {
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir logs"));
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "copy applications logs"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                         /
                         |__applications
@@ -128,7 +128,7 @@ public class CommandLineTest {
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir logs"));
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "move applications logs"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                         /
                         |__home
@@ -154,7 +154,7 @@ public class CommandLineTest {
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "mkdir logs"));
         cmd.onUserInput(nikitaSession, RequestFactory.newRequest(id, login, "rm applications"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                         /
                         |__home
@@ -181,7 +181,7 @@ public class CommandLineTest {
         cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "mkfile applications/servers/weblogic/logs/weblogic.log"));
         cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "mkfile applications/databases/oracle/bin/oracle.exe"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                         /
                         |__applications
@@ -202,7 +202,7 @@ public class CommandLineTest {
 
         cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "lock applications/databases"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__applications
@@ -223,7 +223,7 @@ public class CommandLineTest {
 
         cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "lock applications"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__applications [Locked by r2d2 ]
@@ -258,7 +258,7 @@ public class CommandLineTest {
         cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "mkfile applications/servers/weblogic/logs/weblogic.log"));
         cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "mkfile applications/databases/oracle/bin/oracle.exe"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                         /
                         |__applications
@@ -279,7 +279,7 @@ public class CommandLineTest {
 
         cmd1.onUserInput(nikitaSession, RequestFactory.newRequest(id1, login1, "lock -r applications/databases"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__applications
@@ -300,7 +300,7 @@ public class CommandLineTest {
 
         cmd2.onUserInput(r2d2Session, RequestFactory.newRequest(id2, login2, "lock -r applications"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__applications
@@ -337,7 +337,7 @@ public class CommandLineTest {
 
         cmd2.onUserInput(r2d2Session,   RequestFactory.newRequest(id2, login2, "rename applications/servers web-servers"));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                         /
                         |__applications

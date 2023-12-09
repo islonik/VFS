@@ -1,7 +1,9 @@
 package org.vfs.client;
 
-import org.junit.Test;
 import static org.mockito.Mockito.*;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.vfs.client.network.MessageSender;
 import org.vfs.client.network.NetworkManager;
 import org.vfs.client.network.UserManager;
@@ -36,7 +38,7 @@ public class CommandLineTest {
         verify(messageSender, atLeastOnce()).send(user, "connect nikita");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testConnectCommandAlreadyAuthorized() {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
@@ -48,10 +50,15 @@ public class CommandLineTest {
         CommandParser parser = new CommandParser();
         parser.parse("connect localhost:4499 nikita");
         cmd.commandValues = parser.getCommandValues();
-        cmd.commands.get("connect").run();
+
+        RuntimeException thrown = Assertions.assertThrows(
+                RuntimeException.class,
+                () -> cmd.commands.get("connect").run()
+        );
+        Assertions.assertEquals("You are already authorized!", thrown.getMessage());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testQuitCommandNotAuthorized() {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
@@ -63,7 +70,12 @@ public class CommandLineTest {
         CommandParser parser = new CommandParser();
         parser.parse("quit");
         cmd.commandValues = parser.getCommandValues();
-        cmd.commands.get("quit").run();
+
+        RuntimeException thrown = Assertions.assertThrows(
+                RuntimeException.class,
+                () -> cmd.commands.get("quit").run()
+        );
+        Assertions.assertEquals("You are not authorized or connection was lost!", thrown.getMessage());
     }
 
     @Test
@@ -87,7 +99,7 @@ public class CommandLineTest {
         verify(messageSender, atLeastOnce()).send(user, "quit");
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testDefaultCommandNotAuthorized() {
         NetworkManager networkManager = mock(NetworkManager.class);
         UserManager userManager = mock(UserManager.class);
@@ -98,8 +110,12 @@ public class CommandLineTest {
         CommandLine cmd = new CommandLine(userManager, networkManager);
         CommandParser parser = new CommandParser();
         parser.parse("default");
-        cmd.commandValues = parser.getCommandValues();
-        cmd.commands.get("default").run();
+
+        RuntimeException thrown = Assertions.assertThrows(
+                RuntimeException.class,
+                () -> cmd.commands.get("default").run()
+        );
+        Assertions.assertEquals("Please connect to the server!", thrown.getMessage());
     }
 
     @Test

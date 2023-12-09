@@ -1,13 +1,12 @@
 package org.vfs.server.services;
 
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.vfs.server.Application;
 import org.vfs.server.model.Node;
 import org.vfs.server.model.NodeTypes;
@@ -16,10 +15,10 @@ import org.vfs.server.utils.NodePrinter;
 /**
  * @author Lipatov Nikita
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles(value = "test")
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class NodeServiceTest {
 
@@ -30,7 +29,7 @@ public class NodeServiceTest {
     @Autowired
     private NodePrinter nodePrinter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         nodeService.initDirs();
     }
@@ -44,19 +43,19 @@ public class NodeServiceTest {
         this.nodeManager.setParent(girl, home);
         Node homeClone = nodeService.clone(home);
 
-        Assert.assertEquals(home.getChildren().size(), homeClone.getChildren().size());
-        Assert.assertNotEquals(home.toString(), homeClone.toString());
-        Assert.assertNotEquals(home.getChildren().toArray()[0].toString(), homeClone.getChildren().toArray()[0].toString());
-        Assert.assertEquals(((Node) home.getChildren().toArray()[0]).getName(), ((Node) homeClone.getChildren().toArray()[0]).getName());
-        Assert.assertNotEquals(home.getChildren().toArray()[1].toString(), homeClone.getChildren().toArray()[1].toString());
-        Assert.assertEquals(((Node) home.getChildren().toArray()[1]).getName(), ((Node) homeClone.getChildren().toArray()[1]).getName());
+        Assertions.assertEquals(home.getChildren().size(), homeClone.getChildren().size());
+        Assertions.assertNotEquals(home.toString(), homeClone.toString());
+        Assertions.assertNotEquals(home.getChildren().toArray()[0].toString(), homeClone.getChildren().toArray()[0].toString());
+        Assertions.assertEquals(((Node) home.getChildren().toArray()[0]).getName(), ((Node) homeClone.getChildren().toArray()[0]).getName());
+        Assertions.assertNotEquals(home.getChildren().toArray()[1].toString(), homeClone.getChildren().toArray()[1].toString());
+        Assertions.assertEquals(((Node) home.getChildren().toArray()[1]).getName(), ((Node) homeClone.getChildren().toArray()[1]).getName());
     }
 
     @Test
     public void testCreateNode() {
         nodeService.createNode(nodeService.getRoot(), "test", NodeTypes.DIR);
         String tree = nodePrinter.print(nodeService.getRoot());
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -69,7 +68,7 @@ public class NodeServiceTest {
     public void testCreateNodeStartSlash() {
         nodeService.createNode(nodeService.getRoot(), "/test", NodeTypes.DIR);
         String tree = nodePrinter.print(nodeService.getRoot());
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -83,7 +82,7 @@ public class NodeServiceTest {
     public void testCreateNodeThreeDirs() {
         nodeService.createNode(nodeService.getRoot(), "/test1/test2/test3", NodeTypes.DIR);
         String tree = nodePrinter.print(nodeService.getRoot());
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -99,7 +98,7 @@ public class NodeServiceTest {
     public void testCreateNodeTwoDirsAndFile() {
         nodeService.createNode(nodeService.getRoot(), "/test1/test2/weblogic.log", NodeTypes.FILE);
         String tree = nodePrinter.print(nodeService.getRoot());
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -122,7 +121,7 @@ public class NodeServiceTest {
 
         nodeService.createNode(nodeService.getRoot(), "/root/logs/weblogic_clust1.log", NodeTypes.FILE);
         String tree = nodePrinter.print(nodeService.getRoot());
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -135,13 +134,19 @@ public class NodeServiceTest {
         );
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testSetParentUniqueNames() {
         Node root = new Node("/", NodeTypes.DIR);
         Node home1 = new Node("home", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(home1, root);
         home1.setParent(root);
         Node home2 = new Node("home", NodeTypes.DIR);
-        nodeService.getNodeManager().setParent(home2, root); // exception from here
+
+        IllegalArgumentException thrown = Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> nodeService.getNodeManager().setParent(home2, root)
+        );
+
+        Assertions.assertEquals("Name already exist for /", thrown.getMessage());
     }
 }

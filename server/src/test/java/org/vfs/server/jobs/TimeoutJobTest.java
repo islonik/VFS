@@ -1,14 +1,14 @@
 package org.vfs.server.jobs;
 
-import org.junit.*;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.vfs.server.Application;
 import org.vfs.server.model.UserSession;
 import org.vfs.server.network.ClientWriter;
@@ -18,11 +18,9 @@ import org.vfs.server.services.UserSessionService;
 /**
  * @author Lipatov Nikita
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles(value = "test")
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TimeoutJobTest {
 
     @Autowired
@@ -31,7 +29,7 @@ public class TimeoutJobTest {
     @Autowired
     public UserSessionService userSessionService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         nodeService.initDirs();
 
@@ -56,12 +54,12 @@ public class TimeoutJobTest {
     public void testTimeout() throws InterruptedException {
         TimeoutJob timeoutJob = new TimeoutJob(userSessionService, "1"); // 1 min
 
-        Assert.assertEquals(3, userSessionService.getRegistry().size());
+        Assertions.assertEquals(3, userSessionService.getRegistry().size());
 
         Thread.sleep(60000); // 1 min
 
         timeoutJob.timeout();
 
-        Assert.assertEquals(0, userSessionService.getRegistry().size());
+        Assertions.assertEquals(0, userSessionService.getRegistry().size());
     }
 }

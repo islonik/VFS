@@ -1,7 +1,7 @@
 package org.vfs.core.command;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Lipatov Nikita
@@ -9,16 +9,16 @@ import org.junit.Test;
 public class CommandValuesTest {
 
     @Test
-    public void test() {
+    public void testCommandValues() {
         CommandValues values = new CommandValues();
         values.setCommand("copy");
         values.getParams().add("test");
         values.getParams().add("test2");
 
-        Assert.assertNull(values.getNextKey());
-        Assert.assertEquals("copy", values.getCommand());
-        Assert.assertEquals("test", values.getNextParam());
-        Assert.assertEquals("test2", values.getNextParam());
-        Assert.assertNull(values.getNextParam());
+        Assertions.assertNull(values.getNextKey());
+        Assertions.assertEquals("copy", values.getCommand());
+        Assertions.assertEquals("test", values.getNextParam());
+        Assertions.assertEquals("test2", values.getNextParam());
+        Assertions.assertNull(values.getNextParam());
     }
 }

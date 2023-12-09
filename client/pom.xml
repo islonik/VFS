@@ -32,9 +32,9 @@
 			<version>${netty.version}</version>
         </dependency>
 
-        <dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

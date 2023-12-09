@@ -1,16 +1,12 @@
 package org.vfs.server.services;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.vfs.core.network.protocol.Protocol.User;
 import org.vfs.server.Application;
 import org.vfs.server.model.Node;
@@ -25,10 +21,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Lipatov Nikita
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles(value = "test")
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class LockServiceTest {
 
@@ -39,25 +35,25 @@ public class LockServiceTest {
     @Autowired
     private NodePrinter nodePrinter;
 
-    @Before
-    public void setUp() throws InterruptedException {
+    @BeforeEach
+    public void setUp() {
         nodeService.initDirs();
     }
 
     @Test
-    public void testAddNode() throws Exception {
-        Assert.assertTrue("This test is checked the impossibility of double adding into LockService", true);
+    public void testAddNode() {
+        Assertions.assertTrue(true, "This test is checked the impossibility of double adding into LockService");
 
         Node home = nodeService.getHome();
         Node servers = new Node("servers", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(servers, home);
 
-        Assert.assertTrue(lockService.addNode(servers));
-        Assert.assertFalse(lockService.addNode(servers));
+        Assertions.assertTrue(lockService.addNode(servers));
+        Assertions.assertFalse(lockService.addNode(servers));
     }
 
     @Test
-    public void testIsLock() throws Exception {
+    public void testIsLock() {
         Node home = nodeService.getHome();
         Node servers = nodeService.getNodeManager().newNode("servers", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(servers, home);
@@ -69,11 +65,11 @@ public class LockServiceTest {
                 .setLogin("r1d1")
                 .build();
 
-        Assert.assertTrue(lockService.lock(user1, servers));
-        Assert.assertTrue(lockService.isLocked(servers));
-        Assert.assertFalse(lockService.isLocked(home));
+        Assertions.assertTrue(lockService.lock(user1, servers));
+        Assertions.assertTrue(lockService.isLocked(servers));
+        Assertions.assertFalse(lockService.isLocked(home));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -85,7 +81,7 @@ public class LockServiceTest {
 
         lockService.unlock(user1, servers);
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -98,19 +94,19 @@ public class LockServiceTest {
     }
 
     @Test
-    public void testRemoveNode() throws Exception {
+    public void testRemoveNode() {
         Node node = new Node("/", NodeTypes.DIR);
         Node home = new Node("home", NodeTypes.DIR);
         home.setParent(node);
 
-        Assert.assertFalse(lockService.removeNode(home));
-        Assert.assertTrue(lockService.addNode(home));
-        Assert.assertTrue(lockService.removeNode(home));
-        Assert.assertFalse(lockService.removeNode(home));
+        Assertions.assertFalse(lockService.removeNode(home));
+        Assertions.assertTrue(lockService.addNode(home));
+        Assertions.assertTrue(lockService.removeNode(home));
+        Assertions.assertFalse(lockService.removeNode(home));
     }
 
     @Test
-    public void testRemoveNodes() throws Exception {
+    public void testRemoveNodes() {
         Node home = nodeService.getHome();
         Node applications = nodeService.getNodeManager().newNode("applications", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(applications, home);
@@ -125,11 +121,11 @@ public class LockServiceTest {
         nodeService.removeNode(home, "applications");
 
         // 6 node should exist
-        Assert.assertEquals(6, lockService.getLockMapSize());
+        Assertions.assertEquals(6, lockService.getLockMapSize());
     }
 
     @Test
-    public void testLock() throws Exception {
+    public void testLock() {
         Node home = nodeService.getHome();
         Node servers = nodeService.getNodeManager().newNode("servers", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(servers, home);
@@ -141,9 +137,9 @@ public class LockServiceTest {
                 .setLogin("nikita")
                 .build();
 
-        Assert.assertTrue(lockService.lock(user1, home));
+        Assertions.assertTrue(lockService.lock(user1, home));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home [Locked by nikita ]
@@ -153,11 +149,11 @@ public class LockServiceTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-        Assert.assertTrue(lockService.isLocked(home));
-        Assert.assertEquals(user1, lockService.getUser(home));
+        Assertions.assertTrue(lockService.isLocked(home));
+        Assertions.assertEquals(user1, lockService.getUser(home));
 
         lockService.unlock(user1, home);
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
@@ -169,7 +165,7 @@ public class LockServiceTest {
     }
 
     @Test
-    public void testLockMultithreading() throws Exception {
+    public void testLockMultithreading() {
         final Node home = nodeService.getHome();
         final Node servers = nodeService.getNodeManager().newNode("servers", NodeTypes.DIR);
         nodeService.getNodeManager().setParent(servers, home);
@@ -181,18 +177,16 @@ public class LockServiceTest {
         ExecutorService executor = Executors.newFixedThreadPool(threads);
         final HashMap<Integer, User> users = new HashMap<>();
 
-        for(final AtomicInteger aint = new AtomicInteger(1); aint.get() <= threads; aint.incrementAndGet()) {
+        for (final AtomicInteger aint = new AtomicInteger(1); aint.get() <= threads; aint.incrementAndGet()) {
             users.put(aint.get(), User.newBuilder()
                     .setId(aint.toString())
-                    .setLogin("nikita"+aint.toString())
+                    .setLogin("nikita" + aint)
                     .build()
             );
-            Runnable thread = new Runnable() {
-                public void run() {
-                    User user = users.get(aint.get());
-                    if(!lockService.isLocked(weblogic)) {
-                        lockService.lock(user, weblogic);
-                    }
+            Runnable thread = () -> {
+                User user = users.get(aint.get());
+                if (!lockService.isLocked(weblogic)) {
+                    lockService.lock(user, weblogic);
                 }
             };
             executor.execute(thread);
@@ -200,11 +194,11 @@ public class LockServiceTest {
 
         executor.shutdown();
 
-        Assert.assertTrue(lockService.isLocked(weblogic));
+        Assertions.assertTrue(lockService.isLocked(weblogic));
 
         // could be any user
-        Assert.assertTrue(lockService.getUser(weblogic).getLogin().startsWith("nikita"));
-        Assert.assertTrue(
+        Assertions.assertTrue(lockService.getUser(weblogic).getLogin().startsWith("nikita"));
+        Assertions.assertTrue(
                 nodePrinter.print(nodeService.getRoot()).startsWith(
                         """
                         /
@@ -234,10 +228,10 @@ public class LockServiceTest {
                 .setLogin("admin")
                 .build();
 
-        Assert.assertTrue(lockService.lock(user1, home));
-        Assert.assertTrue(lockService.isLocked(home));
+        Assertions.assertTrue(lockService.lock(user1, home));
+        Assertions.assertTrue(lockService.isLocked(home));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home [Locked by nikita ]
@@ -247,12 +241,12 @@ public class LockServiceTest {
                 nodePrinter.print(nodeService.getRoot())
         );
 
-        Assert.assertEquals(user1, lockService.getUser(home));
+        Assertions.assertEquals(user1, lockService.getUser(home));
 
-        Assert.assertFalse(lockService.unlock(user2, home));
-        Assert.assertTrue(lockService.unlock(user1, home));
+        Assertions.assertFalse(lockService.unlock(user2, home));
+        Assertions.assertTrue(lockService.unlock(user1, home));
 
-        Assert.assertEquals(
+        Assertions.assertEquals(
                 """
                 /
                 |__home
