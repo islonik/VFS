@@ -1,9 +1,17 @@
 *******************************************
 # Project : Virtual File Server
 *******************************************
+VFS is a shared emulator for a file system.
 
+Technology stack: Java17, Spring framework, Spring Boot, protobuf, netty
+
+VFS-client allows you to connect to the server.
+
+Demonstrates how to do implement a project without using Spring Framework.
+
+*******************************************
 ## Find and terminate running process on Mac
-
+*******************************************
 1. Find the process based on the port
 ```bash
 lsof -i tcp:4499
