@@ -24,16 +24,18 @@ public class Client {
     public void run() {
         try
         (
-            BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in));
+            BufferedReader keyboard = new BufferedReader(new InputStreamReader(System.in))
         ) {
             CommandLine commandLine = new CommandLine(userManager, networkManager);
 
             String clientHello =
-                    "The VFS client is run.\n" +
-                    "To connect for the server, please enter next command:\n" +
-                    "Type 'connect server_name:port UserName' for connecting to the VFS server\n" +
-                    "Type 'quit' command for disconnecting from the VFS server.\n" +
-                    "Type 'exit' command for closing client.\n";
+                    """
+                    VFS client is running.
+                    To connect for the VFS server, please enter next command:
+                    Type 'connect server_name:port UserName' for connecting to the VFS server
+                    Type 'quit' command for disconnecting from the VFS server.
+                    Type 'exit' command for closing client.
+                    """;
             System.out.println(clientHello);
 
             while (true) {
