@@ -3,7 +3,7 @@
 *******************************************
 VFS is a shared emulator for a file system.
 
-Technology stack: Java17, Spring framework, Spring Boot, protobuf, netty
+Technology stack: Java 21, Spring framework, Spring Boot, protobuf, netty
 
 VFS-client allows you to connect to the server.
 
