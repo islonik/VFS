@@ -75,3 +75,21 @@ Description: VFS server uses Spring Boot
 ## Junit5 test & maven
 *******************************************
 To execute successfully junit5 tests you should use at least maven version - 3.9.5 
+
+## Dependency management
+
+### Overview of dependencies
+
+```bash
+mvn dependency:tree
+```
+
+### To find unused dependencies
+```bash
+mvn dependency:analyze
+```
+
+### To check new dependencies
+```bash
+mvn versions:display-dependency-updates
+```
